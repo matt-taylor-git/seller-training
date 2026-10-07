@@ -113,13 +113,18 @@ export function createTraining({ packs = [defaultPack], storage = () => globalTh
   /** @param {string} id */
   function selectPack(id) {
     const prior = readSelection();
+    if (prior.status === 'unavailable') return { ok: false, selection: prior, message: 'Settings could not be saved. Selection unchanged.' };
     const entry = registry.get(id);
     if (!entry?.pack) return { ok: false, selection: prior, message: entry?.error || 'This content pack is unknown.' };
     if (prior.valid && prior.status === 'valid' && prior.packId === id) return { ok: true, selection: prior, message: '' };
     try { storage().setItem(SELECTION_KEY, JSON.stringify({ schema: 1, packId: id })); }
     catch { return { ok: false, selection: prior, message: 'Settings could not be saved. Selection unchanged.' }; }
+    const confirmed = readSelection();
+    if (!confirmed.valid || confirmed.status !== 'valid' || confirmed.packId !== id) {
+      return { ok: false, selection: confirmed, message: 'Settings confirmation is unavailable. Reopen Settings to check the saved selection.' };
+    }
     notify();
-    return { ok: true, selection: readSelection(), message: `${entry.pack.label} selected for both activities. Open games keep their current pack.` };
+    return { ok: true, selection: confirmed, message: `${entry.pack.label} selected for both activities. Open games keep their current pack.` };
   }
   /** @param {'roleplay'|'jeopardy'} activity */
   function openPage(activity) {
@@ -134,6 +139,14 @@ export function createTraining({ packs = [defaultPack], storage = () => globalTh
     let checkpointStatus = 'unread';
     /** @type {{state: Checkpoint|null, teams: Team[]|undefined, message: string, status: string}|undefined} */
     let restored;
+    /** @param {Store} store */
+    function repairImportMarker(store) {
+      if (pack.id !== 'default' || pack.revision !== 1) return '';
+      try {
+        if (store.getItem(IMPORT_KEY) === null) store.setItem(IMPORT_KEY, '1');
+        return '';
+      } catch { return 'Progress is saved, but the legacy import marker could not be saved. A later save or reopening will retry.'; }
+    }
     function readCheckpoint() {
       if (activity !== 'jeopardy') throw new Error('Only Jeopardy saves checkpoints.');
       if (restored) return restored;
@@ -152,19 +165,26 @@ export function createTraining({ packs = [defaultPack], storage = () => globalTh
             checkpointStatus = 'rejected'; message = REJECTED;
             const value = parse(raw);
             teams = recoverTeams(record(value) ? value.state : null);
-          }
+          } else { message = repairImportMarker(store); }
         } else {
           const priorKeys = Array.from({ length: store.length }, (_, i) => store.key(i)).filter(item => item?.startsWith(prefix));
           if (priorKeys.length) {
             checkpointStatus = 'rejected'; message = 'A saved game uses another content revision. ' + REJECTED;
+            const revisions = priorKeys.map(item => Number(item?.slice(prefix.length)))
+              .filter(revision => Number.isSafeInteger(revision) && revision > 0 && revision < pack.revision && priorKeys.includes(prefix + revision))
+              .sort((a, b) => b - a);
+            for (const revision of revisions) {
+              const prior = decodeCheckpoint(store.getItem(prefix + revision), { ...pack, revision });
+              if (prior) { teams = recoverTeams(prior); break; }
+            }
           } else if (pack.id === 'default' && pack.revision === 1 && store.getItem(IMPORT_KEY) === null) {
             const legacy = store.getItem(LEGACY_KEY);
             if (legacy !== null) {
               state = decodeState(parse(legacy), pack);
               if (state) {
                 try {
-                  store.setItem(IMPORT_KEY, '1');
                   store.setItem(key, JSON.stringify({ schema: 2, packId: pack.id, packRevision: pack.revision, state }));
+                  message = repairImportMarker(store);
                 } catch { message = SAVE_FAILED; }
               } else { checkpointStatus = 'rejected'; message = REJECTED; teams = recoverTeams(parse(legacy)); }
             }
@@ -185,10 +205,9 @@ export function createTraining({ packs = [defaultPack], storage = () => globalTh
         if (!replace && current !== null && !decodeCheckpoint(current, pack)) {
           checkpointStatus = 'rejected'; return { ok: false, message: REJECTED };
         }
-        if (pack.id === 'default' && pack.revision === 1 && store.getItem(IMPORT_KEY) === null) store.setItem(IMPORT_KEY, '1');
         store.setItem(key, JSON.stringify({ schema: 2, packId: pack.id, packRevision: pack.revision, state }));
         checkpointStatus = 'ready';
-        return { ok: true, message: '' };
+        return { ok: true, message: repairImportMarker(store) };
       } catch { return { ok: false, message: SAVE_FAILED }; }
     }
     function readPreferences() {

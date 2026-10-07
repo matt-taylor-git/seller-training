@@ -377,7 +377,7 @@ function renderTeams(){
       <div class="meta"><div class="name" contenteditable="true" spellcheck="false"></div><div class="score ${t.score < 0 ? "neg" : ""}">${fmt(t.score)}</div></div>
       <div class="adj"><button title="+100">+</button><button title="-100">&minus;</button></div>`;
     const nm = d.querySelector(".name"); nm.textContent = t.name;
-    nm.addEventListener("blur", () => { const v = nm.textContent.trim().slice(0, 28) || ("Team " + (i + 1)); S.teams[i].name = v; nm.textContent = v; save(); });
+    nm.addEventListener("blur", () => { const v = nm.textContent.slice(0, 28).trim() || ("Team " + (i + 1)); S.teams[i].name = v; nm.textContent = v; save(); });
     const [plus, minus] = d.querySelectorAll(".adj button");
     plus.onclick = () => addScore(i, 100); minus.onclick = () => addScore(i, -100);
     wrap.appendChild(d);

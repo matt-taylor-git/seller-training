@@ -121,6 +121,7 @@ test('Lane 1. Legacy board imports once and keeps the source unchanged.', async 
       expect(JSON.parse(await stored(interrupted)).state).toEqual(state());
       if (failure.key !== key && !failure.after) {
         await expect(interrupted.locator('#saveNotice')).toContainText('Progress is saved');
+        await capture(interrupted, 'migration-marker-warning.png');
         await scoreClue(interrupted);
         await expect(score(interrupted)).toHaveText('$800');
       }
@@ -355,6 +356,7 @@ test('Lane 8. Denied reads and quota failures preserve selection while play cont
   await page.locator('#save').click();
   await expect(page.locator('#status')).toHaveText('Settings could not be saved. Selection unchanged.');
   expect(JSON.parse(await stored(readable, selectionKey)).packId).toBe('alternate');
+  await capture(page, 'selection-read-denied.png');
   await readable.goto('/jeopardy.html');
   await expect(readable.locator('#selectionNotice')).toContainText('Current pack: Alternate fixture');
   await page.evaluate(() => { window.__storageMode = ''; localStorage.setItem('aiTraining.selection.v1', '{"schema":1,"packId":"default"}'); window.__storageMode = 'quota'; });
