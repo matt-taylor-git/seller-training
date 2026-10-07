@@ -58,6 +58,36 @@ test('Selection writes once, remains pinned, and fails without effective change.
   assert.equal(training.selectPack('missing').ok, false);
 });
 
+test('Selection refuses unavailable initial reads without mutating the saved preference.', () => {
+  const raw = '{"schema":1,"packId":"alternate"}';
+  const { training, store, records, writes } = setup({ [selectionKey]: raw });
+  store.getItem = () => { throw new Error('denied'); };
+  const result = training.selectPack('default');
+  assert.equal(result.ok, false);
+  assert.equal(result.message, 'Settings could not be saved. Selection unchanged.');
+  assert.equal(result.selection.status, 'unavailable');
+  assert.equal(records.get(selectionKey), raw);
+  assert.deepEqual(writes, []);
+});
+
+test('Selection requires matching readback and reports uncertain confirmation without claiming unchanged.', () => {
+  for (const mode of ['denied', 'mismatch', 'missing']) {
+    const { training, store, records } = setup();
+    const write = store.setItem;
+    store.setItem = (key, value) => {
+      write(key, value);
+      if (mode === 'denied') store.getItem = () => { throw new Error('denied'); };
+      if (mode === 'mismatch') records.set(selectionKey, '{"schema":1,"packId":"default"}');
+      if (mode === 'missing') records.delete(selectionKey);
+    };
+    const result = training.selectPack('alternate');
+    assert.equal(result.ok, false, mode);
+    assert.match(result.message, /confirmation is unavailable/);
+    assert.doesNotMatch(result.message, /Selection unchanged|selected for both/);
+    if (mode === 'denied') assert.equal(JSON.parse(records.get(selectionKey)).packId, 'alternate');
+  }
+});
+
 test('Known invalid packs are blocked, never relabeled Default.', () => {
   const bad = structuredClone(alternate); bad.roleplay.scenarios = [];
   const { store } = setup({ [selectionKey]: '{"schema":1,"packId":"alternate"}' });
@@ -110,6 +140,44 @@ test('Old revision keys block silent import and remain intact after new revision
   assert.equal(records.has(key), false);
   assert.equal(handle.replaceCheckpoint(state()).ok, true);
   assert.equal(records.get(oldKey), envelope());
+});
+
+test('Default revision 2 recovers only names from valid revision 1 without creating a destination.', () => {
+  const nextPack = { ...defaultPack, revision: 2 };
+  const old = envelope();
+  const { store, records, writes } = setup({ [key]: old });
+  const training = createTraining({ packs: [nextPack], storage: () => store });
+  const handle = training.openPage('jeopardy');
+  assert.equal(handle.readCheckpoint().status, 'rejected');
+  assert.equal(handle.readCheckpoint().state, null);
+  assert.deepEqual(handle.readCheckpoint().teams, [{ name: 'Alpha', score: 0 }, { name: 'Beta', score: 0 }]);
+  assert.equal(handle.saveCheckpoint(state()).ok, false);
+  assert.equal(records.has('aiDealJeopardy.v2.default.2'), false);
+  assert.deepEqual(writes, []);
+  const fresh = state(); fresh.teams = handle.readCheckpoint().teams; fresh.used = [];
+  assert.equal(handle.replaceCheckpoint(fresh).ok, true);
+  assert.deepEqual(training.openPage('jeopardy').readCheckpoint().state, fresh);
+  assert.equal(records.get(key), old);
+});
+
+test('Revision recovery picks the highest valid prior numeric revision regardless of insertion order.', () => {
+  const prior = state(); prior.teams[0].name = 'Revision ten';
+  const entries = {
+    'aiDealJeopardy.v2.default.2': envelope(state(), { ...defaultPack, revision: 2 }),
+    'aiDealJeopardy.v2.default.10': envelope(prior, { ...defaultPack, revision: 10 }),
+    'aiDealJeopardy.v2.default.11': envelope(state(), { ...defaultPack, revision: 11 }).replace('"schema":2', '"schema":99'),
+    'aiDealJeopardy.v2.default.12': envelope(state(), { ...alternate, revision: 12 }),
+    'aiDealJeopardy.v2.default.13': envelope({ ...state(), used: ['99-0'] }, { ...defaultPack, revision: 13 }),
+    'aiDealJeopardy.v2.default.21': envelope(state(), { ...defaultPack, revision: 21 }),
+    'aiDealJeopardy.v2.default.019': envelope(state(), { ...defaultPack, revision: 19 })
+  };
+  for (const ordered of [entries, Object.fromEntries(Object.entries(entries).reverse())]) {
+    const { store, records, writes } = setup(ordered);
+    const training = createTraining({ packs: [{ ...defaultPack, revision: 20 }], storage: () => store });
+    assert.deepEqual(training.openPage('jeopardy').readCheckpoint().teams, [{ name: 'Revision ten', score: 0 }, { name: 'Beta', score: 0 }]);
+    assert.deepEqual(Object.fromEntries(records), ordered);
+    assert.deepEqual(writes, []);
+  }
 });
 
 test('Recovery keeps only valid names with zero scores.', () => {
@@ -201,16 +269,65 @@ test('A rejected record written by another tab is protected on the next save.', 
   assert.equal(records.get(key), 'future');
 });
 
-test('Import write failures retain the source and do not claim saved progress.', () => {
-  for (const blocked of ['aiDealJeopardy.imported.v1', key]) {
-    const { store, page, records } = setup({ [legacyKey]: JSON.stringify(state()) });
+test('A failed destination write leaves legacy import retryable on a fresh page.', () => {
+  const legacy = JSON.stringify(state());
+  const { store, page, records } = setup({ [legacyKey]: legacy });
+  const write = store.setItem;
+  store.setItem = (name, value) => { if (name === key) throw new Error('quota'); write(name, value); };
+  const restored = page().readCheckpoint();
+  assert.deepEqual(restored.state, state());
+  assert.match(restored.message, /Progress could not be saved/);
+  assert.equal(records.has(key), false);
+  assert.equal(records.has('aiDealJeopardy.imported.v1'), false);
+  store.setItem = write;
+  assert.deepEqual(page().readCheckpoint().state, state());
+  assert.equal(records.get(key), envelope());
+  assert.equal(records.get(legacyKey), legacy);
+});
+
+test('Marker failure keeps the destination saved, retries on save, and repairs on fresh load without importing stale progress.', () => {
+  const marker = 'aiDealJeopardy.imported.v1';
+  const legacy = JSON.stringify(state());
+  for (const retry of ['save', 'load']) {
+    const { store, page, records } = setup({ [legacyKey]: legacy });
     const write = store.setItem;
-    store.setItem = (key, value) => { if (key === blocked) throw new Error('quota'); write(key, value); };
-    const restored = page().readCheckpoint();
-    assert.deepEqual(restored.state, state());
-    assert.match(restored.message, /could not be saved/);
-    assert.equal(records.get(legacyKey), JSON.stringify(state()));
+    store.setItem = (name, value) => { if (name === marker) throw new Error('quota'); write(name, value); };
+    const handle = page();
+    assert.match(handle.readCheckpoint().message, /Progress is saved.*marker/);
+    assert.equal(records.get(key), envelope());
+    const newer = state(); newer.teams[0].score = 900;
+    const saved = handle.saveCheckpoint(newer);
+    assert.equal(saved.ok, true);
+    assert.match(saved.message, /Progress is saved.*marker/);
+    assert.equal(records.get(key), envelope(newer));
+    assert.equal(records.has(marker), false);
+    store.setItem = write;
+    if (retry === 'save') assert.deepEqual(handle.saveCheckpoint(newer), { ok: true, message: '' });
+    assert.deepEqual(page().readCheckpoint().state, newer);
+    assert.equal(records.get(marker), '1');
+    records.delete(key);
+    assert.equal(page().readCheckpoint().state, null);
     assert.equal(records.has(key), false);
+    assert.equal(records.get(legacyKey), legacy);
+  }
+});
+
+test('Interruptions after either import write recover on a fresh page without changing legacy bytes.', () => {
+  const marker = 'aiDealJeopardy.imported.v1';
+  for (const interrupted of [key, marker]) {
+    const legacy = JSON.stringify(state());
+    const { store, page, records, writes } = setup({ [legacyKey]: legacy });
+    const write = store.setItem;
+    store.setItem = (name, value) => { write(name, value); if (name === interrupted) throw new Error('interrupted'); };
+    page().readCheckpoint();
+    assert.equal(writes[0], key);
+    assert.equal(records.get(key), envelope());
+    store.setItem = write;
+    assert.deepEqual(page().readCheckpoint().state, state());
+    assert.equal(records.get(marker), '1');
+    records.delete(key);
+    assert.equal(page().readCheckpoint().state, null);
+    assert.equal(records.get(legacyKey), legacy);
   }
 });
 

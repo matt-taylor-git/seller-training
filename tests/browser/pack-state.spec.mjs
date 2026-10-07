@@ -21,10 +21,10 @@ const control = `<!doctype html><html><body style="font:20px system-ui;padding:4
 document.querySelector('#save').onclick=()=>{const result=training.selectPack(document.querySelector('#pack').value);document.querySelector('#status').textContent=result.message;document.querySelector('#selected').textContent=result.selection.packId;};
 </script></body></html>`;
 
-async function fixtureRoutes(context) {
+async function fixtureRoutes(context, revision = defaultPack.revision) {
   await context.route('https://fonts.googleapis.com/**', route => route.abort());
   await context.route('https://fonts.gstatic.com/**', route => route.abort());
-  await context.route('**/shared/training.mjs', route => route.fulfill({ contentType: 'text/javascript', body: moduleSource.replace('export const training = createTraining();', `export const training = createTraining({packs: [defaultPack, ${JSON.stringify(alternate)}]});`) }));
+  await context.route('**/shared/training.mjs', route => route.fulfill({ contentType: 'text/javascript', body: moduleSource.replace('export const training = createTraining();', `export const training = createTraining({packs: [{...defaultPack, revision: ${revision}}, ${JSON.stringify(alternate)}]});`) }));
   await context.route('**/__pack-control.html', route => route.fulfill({ contentType: 'text/html', body: control }));
 }
 
@@ -71,7 +71,7 @@ async function scoreClue(page) {
 }
 const score = page => page.locator('#team0 .score');
 
-test('Lane 1. Legacy board imports once and keeps the source unchanged.', async ({ page }) => {
+test('Lane 1. Legacy board imports once and keeps the source unchanged.', async ({ page, context }) => {
   const legacy = JSON.stringify(state());
   await seed(page, { [legacyKey]: legacy });
   await page.goto('/jeopardy.html');
@@ -93,6 +93,51 @@ test('Lane 1. Legacy board imports once and keeps the source unchanged.', async 
   await page.reload();
   await expect(score(page)).toHaveText('$0');
   expect(await stored(page, legacyKey)).toBe(legacy);
+  for (const failure of [
+    { key, after: false },
+    { key, after: true },
+    { key: 'aiDealJeopardy.imported.v1', after: false },
+    { key: 'aiDealJeopardy.imported.v1', after: true }
+  ]) {
+    await page.evaluate(() => localStorage.clear());
+    const interrupted = await context.newPage();
+    await interrupted.addInitScript(failure => {
+      const set = Storage.prototype.setItem;
+      Storage.prototype.setItem = function(key, value) {
+        const fail = this === localStorage && key === failure.key && sessionStorage.getItem('resume') !== '1';
+        if (fail && !failure.after) throw new DOMException('Full', 'QuotaExceededError');
+        set.call(this, key, value);
+        if (fail && failure.after) throw new Error('Interrupted after write');
+      };
+    }, failure);
+    await seed(interrupted, { [legacyKey]: legacy });
+    await interrupted.goto('/jeopardy.html');
+    await expect(score(interrupted)).toHaveText('$700');
+    if (failure.key === key && !failure.after) {
+      expect(await stored(interrupted)).toBeNull();
+      expect(await stored(interrupted, 'aiDealJeopardy.imported.v1')).toBeNull();
+      await expect(interrupted.locator('#saveNotice')).toContainText('Progress could not be saved');
+    } else {
+      expect(JSON.parse(await stored(interrupted)).state).toEqual(state());
+      if (failure.key !== key && !failure.after) {
+        await expect(interrupted.locator('#saveNotice')).toContainText('Progress is saved');
+        await scoreClue(interrupted);
+        await expect(score(interrupted)).toHaveText('$800');
+      }
+    }
+    await interrupted.evaluate(() => sessionStorage.setItem('resume', '1'));
+    await interrupted.reload();
+    await expect(score(interrupted)).toHaveText(failure.key !== key && !failure.after ? '$800' : '$700');
+    expect(await stored(interrupted, 'aiDealJeopardy.imported.v1')).toBe('1');
+    expect(await stored(interrupted, legacyKey)).toBe(legacy);
+    await capture(interrupted, `migration-${failure.key === key ? 'destination' : 'marker'}-${failure.after ? 'after' : 'before'}.png`);
+    await interrupted.evaluate(key => localStorage.removeItem(key), key);
+    await interrupted.reload();
+    await expect(score(interrupted)).toHaveText('$0');
+    expect(await stored(interrupted)).toBeNull();
+    expect(await stored(interrupted, legacyKey)).toBe(legacy);
+    await interrupted.close();
+  }
 });
 
 test('Lane 2. Corrupt checkpoint stays intact through play and canceled recovery.', async ({ page }) => {
@@ -110,7 +155,7 @@ test('Lane 2. Corrupt checkpoint stays intact through play and canceled recovery
   await capture(page, 'corrupt-save.png');
 });
 
-test('Lane 3. Future schema and old revisions survive play until approved fresh replacement.', async ({ page }) => {
+test('Lane 3. Future schema and old revisions survive play until approved fresh replacement.', async ({ page, context }) => {
   for (const rejected of [envelope({ schema: 99 }), envelope({ packRevision: 0 })]) {
     await seed(page, { [key]: rejected });
     await page.goto('/jeopardy.html');
@@ -132,14 +177,30 @@ test('Lane 3. Future schema and old revisions survive play until approved fresh 
     await page.reload();
     await expect(score(page)).toHaveText('$0');
   }
-  const oldKey = 'aiDealJeopardy.v2.default.0';
-  await page.evaluate(({ key, oldKey }) => { localStorage.removeItem(key); localStorage.setItem(oldKey, 'old revision record'); }, { key, oldKey });
-  await page.reload();
+  const prior = envelope();
+  const nextKey = 'aiDealJeopardy.v2.default.2';
+  await seed(page, { [key]: prior });
+  await fixtureRoutes(context, 2);
+  await page.goto('/jeopardy.html');
   await expect(page.locator('#saveNotice')).toContainText('another content revision');
+  await expect(page.locator('#team0 .name')).toHaveText('Discovery team');
+  await expect(page.locator('.team .score')).toHaveText(['$0', '$0']);
+  await expect(page.locator('.tile.used')).toHaveCount(0);
   await scoreClue(page);
-  expect(await stored(page)).toBeNull();
-  expect(await stored(page, oldKey)).toBe('old revision record');
+  expect(await stored(page, nextKey)).toBeNull();
+  expect(await stored(page)).toBe(prior);
+  await page.reload();
+  await expect(page.locator('#team0 .name')).toHaveText('Discovery team');
+  await expect(score(page)).toHaveText('$0');
+  expect(await stored(page, nextKey)).toBeNull();
   await capture(page, 'incompatible-save.png');
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#replaceSave').click();
+  expect(JSON.parse(await stored(page, nextKey))).toMatchObject({ packRevision: 2, state: { teams: state().teams.map(team => ({ ...team, score: 0 })), used: [] } });
+  expect(await stored(page)).toBe(prior);
+  await page.reload();
+  await expect(page.locator('#team0 .name')).toHaveText('Discovery team');
+  await expect(score(page)).toHaveText('$0');
 });
 
 test('Lane 4. Switching packs keeps separate boards and restores each original.', async ({ page }) => {
@@ -287,7 +348,15 @@ test('Lane 8. Denied reads and quota failures preserve selection while play cont
   await scoreClue(page);
   await expect(score(page)).toHaveText('$100');
   await capture(page, 'storage-unavailable.png');
+  const readable = await context.newPage();
+  await seed(readable, { [selectionKey]: '{"schema":1,"packId":"alternate"}' });
   await page.goto('/__pack-control.html');
+  await page.locator('#pack').selectOption('default');
+  await page.locator('#save').click();
+  await expect(page.locator('#status')).toHaveText('Settings could not be saved. Selection unchanged.');
+  expect(JSON.parse(await stored(readable, selectionKey)).packId).toBe('alternate');
+  await readable.goto('/jeopardy.html');
+  await expect(readable.locator('#selectionNotice')).toContainText('Current pack: Alternate fixture');
   await page.evaluate(() => { window.__storageMode = ''; localStorage.setItem('aiTraining.selection.v1', '{"schema":1,"packId":"default"}'); window.__storageMode = 'quota'; });
   await page.locator('#pack').selectOption('alternate');
   await page.locator('#save').click();
@@ -295,6 +364,17 @@ test('Lane 8. Denied reads and quota failures preserve selection while play cont
   await expect(page.locator('#selected')).toHaveText('default');
   expect(JSON.parse(await stored(page, selectionKey)).packId).toBe('default');
   await capture(page, 'selection-save-failed.png');
+  await page.evaluate(() => {
+    window.__storageMode = '';
+    const set = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(key, value) { set.call(this, key, value); window.__storageMode = 'read'; };
+  });
+  await page.locator('#save').click();
+  await expect(page.locator('#status')).toContainText('confirmation is unavailable');
+  await expect(page.locator('#status')).not.toContainText('Selection unchanged');
+  expect(JSON.parse(await stored(readable, selectionKey)).packId).toBe('alternate');
+  await capture(page, 'selection-confirmation-unavailable.png');
+  await select(readable, 'default');
   const other = await context.newPage();
   await other.goto('/jeopardy.html');
   await other.evaluate(() => { Storage.prototype.setItem = () => { throw new DOMException('Full', 'QuotaExceededError'); }; });
@@ -335,13 +415,22 @@ test('Lane 9. Durable selection and board survive closing the browser profile an
     await select(page, 'alternate');
     await page.locator('a[href="/jeopardy.html"]').click();
     await scoreClue(page);
+    await page.locator('#team0 .name').fill('A'.repeat(27) + ' B');
+    await page.locator('#team0 .name').press('Tab');
+    await expect(page.locator('#team0 .name')).toHaveText('A'.repeat(27));
     const durable = await stored(page, alternateKey);
+    await page.reload();
+    await expect(page.locator('#team0 .name')).toHaveText('A'.repeat(27));
+    await expect(score(page)).toHaveText('$100');
+    await expect(page.locator('.tile[data-key="0-0"]')).toHaveClass(/used/);
+    expect(await stored(page, alternateKey)).toBe(durable);
     await page.close();
     await context.close();
     context = await launch();
     const reopened = await context.newPage();
     await reopened.goto('/jeopardy.html');
     await expect(score(reopened)).toHaveText('$100');
+    await expect(reopened.locator('#team0 .name')).toHaveText('A'.repeat(27));
     await expect(reopened.locator('#selectionNotice')).toContainText('Current pack: Alternate fixture');
     await expect(reopened.locator('.tile[data-key="0-0"]')).toHaveClass(/used/);
     expect(await stored(reopened, alternateKey)).toBe(durable);
