@@ -199,6 +199,9 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   </div>
 
   <p id="packNotice" style="color:var(--muted);font-size:12px;line-height:1.4"></p>
+  <p id="selectionNotice" role="status" style="color:var(--muted);font-size:12px;line-height:1.4"></p>
+  <p id="saveNotice" role="status" style="color:var(--gold);font-size:13px;line-height:1.4"></p>
+  <button class="ctl" id="replaceSave" style="display:none">Start fresh saved game</button>
 
   <div class="board" id="board" role="grid" aria-label="Jeopardy board"></div>
 
@@ -277,7 +280,13 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 <script type="module">
 import { SELLER_NAME as BRAND_NAME } from "./shared/identity.mjs";
 import { training } from "./shared/training.mjs";
-const { pack } = training.openPage("jeopardy");
+let pageState;
+try { pageState = training.openPage("jeopardy"); }
+catch (error) { document.getElementById("saveNotice").textContent = error.message; throw error; }
+const { pack } = pageState;
+training.observeSelection(selection => {
+  document.getElementById("selectionNotice").textContent = pageState.selectionNotice(selection);
+});
 document.getElementById("packNotice").textContent = pack.disclaimer;
 const CATEGORIES = pack.jeopardy.categories;
 const FINAL = pack.jeopardy.final;
@@ -285,7 +294,6 @@ const VALUES = [100,200,300,400,500];
 const TEAM_COLORS = ["#38bdf8","#f472b6","#a3e635","#fb923c"];
 const CLUE_TOTAL = CATEGORIES.reduce((total, category) => total + category.clues.length, 0);
 const $ = id => document.getElementById(id);
-const STORE = "aiDealJeopardy.v1";
 const fmt = n => (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString();
 document.querySelectorAll('.brandInline').forEach(e => e.textContent = BRAND_NAME);
 document.title = "AI Deal Jeopardy · " + BRAND_NAME;
@@ -300,9 +308,14 @@ function newState(prevTeams){
   return { teams, used: [], dd: pickDailyDoubles(), timerOn: S ? S.timerOn : false, muted: S ? S.muted : false, timerSecs: S ? S.timerSecs : 20 };
 }
 let S = null;
-try { const raw = JSON.parse(localStorage.getItem(STORE)); if (raw && Array.isArray(raw.teams) && raw.teams.length >= 2 && Array.isArray(raw.used) && Array.isArray(raw.dd)) S = raw; } catch (e) {}
-if (!S) S = newState();
-const save = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} };
+const restored = pageState.readCheckpoint();
+S = restored.state || newState(restored.teams);
+function showSaveStatus(message){
+  $("saveNotice").textContent = message;
+  $("replaceSave").style.display = pageState.checkpointStatus === "rejected" ? "" : "none";
+}
+showSaveStatus(restored.message);
+const save = () => showSaveStatus(pageState.saveCheckpoint(S).message);
 let history = [];
 
 /* ---------- Sound (WebAudio, no files) ---------- */
@@ -638,6 +651,13 @@ function resetGame(skipConfirm){
   S = newState(S.teams); history = []; save(); renderBoard(); renderTeams(); toast("New game. Good luck!");
 }
 $("resetBtn").onclick = () => resetGame(false);
+$("replaceSave").onclick = () => {
+  if (!confirm("Replace the rejected saved game with a fresh game? Scores, used clues, Daily Doubles, and undo will reset. This cannot be undone.")) return;
+  closeClue(); closeFinal(); stopTimer();
+  S = newState(S.teams); history = [];
+  showSaveStatus(pageState.replaceCheckpoint(S).message);
+  renderBoard(); renderTeams();
+};
 $("undoBtn").onclick = undo;
 
 /* ---------- Keyboard ---------- */

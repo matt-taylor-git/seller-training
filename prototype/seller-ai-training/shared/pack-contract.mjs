@@ -128,7 +128,7 @@ function scenario(value, path) {
   return id;
 }
 
-/** Validate complete content before it enters the registry. @param {unknown} value @returns {ContentPack} */
+/** @param {unknown} value @returns {ContentPack} */
 export function validatePack(value) {
   const pack = object(value, 'pack');
   for (const key of ['id', 'label', 'description', 'disclaimer']) text(pack[key], `pack.${key}`);

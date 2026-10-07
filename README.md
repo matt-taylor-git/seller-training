@@ -44,7 +44,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-The browser suite runs 10 named scenarios through clicks and keys. It covers all 4 customers, CFO recovery, voting, signals, scoring, both Daily Doubles, Final, saved progress, and stale typing.
+The Default browser suite runs 10 named scenarios through clicks and keys. It covers all 4 customers, CFO recovery, voting, signals, scoring, both Daily Doubles, Final, saved progress, and stale typing.
 
 The checks compare every content leaf with `tests/fixtures/default-original.json`. That immutable fixture comes from source commit `96c2e50d06524afb6050d22fed0366fac0a9141b`. Only 5 Jeopardy strings permit the seller substitution. Do not regenerate the fixture from the moved data.
 
@@ -68,7 +68,41 @@ The probe starts Python servers and interleaves cold browser contexts with fonts
 
 `packs/default.mjs` contains one complete aggregate for both activities. `shared/identity.mjs` owns the seller name. `shared/training.mjs` validates and deeply freezes registered packs. Each engine calls `training.openPage(activity)` once and retains that pack. The game engines remain inline module scripts in their own pages.
 
-CP1 keeps the existing save keys and formats. Jeopardy stores its teams, scores, used tiles, Daily Doubles, timer settings, and sound setting under `aiDealJeopardy.v1`. It does not save an open clue, Final stage, or undo history. Role-play stores only presenter preferences under `aiRoleplay.prefs.v1`. Meetings remain in memory. This change adds no selection screen or alternate pack.
+Each page pins its pack when it opens. Reset, Replay, timers, and Final keep that pack. Selection changes update a notice, never an active game. Reopening an activity adopts the saved selection. Storage events, focus, and browser history restoration refresh the notice.
+
+Selection uses `aiTraining.selection.v1` with `{schema: 1, packId}`. A missing selection uses Default. An invalid or unknown selection also uses Default, but retains an invalid status until an explicit save repairs it. A known pack that fails content checks blocks entry instead of showing another pack under its name. This change adds no Settings screen or alternate production pack.
+
+Jeopardy uses durable `localStorage` under `aiDealJeopardy.v2.<packId>.<revision>`. Each record contains `{schema: 2, packId, packRevision, state}`. The state contains teams, scores, used tiles, Daily Doubles, timer settings, and sound settings. It does not contain an open clue, Final stage, or undo history. Different packs and revisions never share a board.
+
+A valid `aiDealJeopardy.v1` record imports once into Default revision 1 when its destination is absent. The legacy record remains unchanged. The separate `aiDealJeopardy.imported.v1` receipt prevents later deletion of the new save from resurrecting legacy progress. The receipt precedes the destination write. If either write fails, the page reports unsaved progress and keeps playing in memory.
+
+Invalid records and unsupported schemas or revisions remain untouched. Recovery play starts with zero scores and fresh clues. The **Start fresh saved game** button asks before replacing a rejected destination. Cancel leaves the record unchanged. Ordinary scoring and **New game** never approve replacement. A saved game from another revision remains at its original key after recovery.
+
+If storage reads fail, the page plays in memory until reopened. If writes fail, the page shows a save error without stopping play. A failed selection save keeps the prior selection and reports failure. Browser data clearing, private browsing policies, or another origin can remove or isolate these saves. Settings and saves do not sync across devices.
+
+One trainer should host each pack's Jeopardy board in one tab. Concurrent same-pack tabs remain last-write-wins. They do not reconcile active boards or lock other tabs.
+
+Role-play stores only the validated `group`, `spot`, and `ideal` booleans under `aiRoleplay.prefs.v1`. Meetings remain in memory. Opening the page does not overwrite malformed preferences. A deliberate toggle saves the new preferences.
+
+### Shared state API
+
+`training.listPacks()` returns complete frozen packs. `training.selectPack(id)` returns an explicit success or failure result. Settings owns selection writes. `training.openPage(activity)` returns a pinned pack and its state handle. `training.observeSelection(listener)` sends the current selection and later changes, and returns an unsubscribe function.
+
+Jeopardy handles expose `readCheckpoint()`, `saveCheckpoint(state)`, and `replaceCheckpoint(state)`. Only explicit trainer approval permits `replaceCheckpoint`. Role-play handles expose `readPreferences()` and `savePreferences(prefs)`. `selectionNotice(selection)` supplies the current-versus-selected message. The shared module owns browser keys, decoding, migration, and failure policy.
+
+### Verify storage behavior
+
+Run the state checks and the 10 browser lanes:
+
+```sh
+node --test tests/training-state.test.mjs
+CP2_EVIDENCE_DIR=/tmp/cp2-evidence PORT=8182 npx playwright test tests/browser/pack-state.spec.mjs
+node scripts/measure-training.mjs --storage --baseline ../baseline --candidate . --samples 100
+```
+
+The browser lanes cover migration, rejected records, isolated packs, pinned play, history, storage failures, durable saves, and same-pack writes. `PORT` gives independent browser runs separate servers. The alternate fixture stays under `tests/fixtures`, outside the served application. Test-only route replacement registers it without a production URL override.
+
+The storage probe times real browser reads and writes with a maximal valid board. Every operation must stay within 10 ms at p95. Checkpoint JSON must stay below 16 KiB. The probe also retains the page-load limits above. Trunk has no selection feature, so its absent-key read appears separately from candidate selection resolution.
 
 ## Supplied material
 
