@@ -1,0 +1,473 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T20:12:15.944Z",
+  "title": "Design system: CDW-inspired dark mode",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Action red",
+        "canonical": "#cc0000",
+        "tonalRamp": [
+          "oklch(15% 0.2178 29.23)",
+          "oklch(26% 0.2178 29.23)",
+          "oklch(38% 0.2178 29.23)",
+          "oklch(49% 0.2178 29.23)",
+          "oklch(61% 0.2178 29.23)",
+          "oklch(72% 0.2178 29.23)",
+          "oklch(84% 0.2178 29.23)",
+          "oklch(95% 0.2178 29.23)"
+        ]
+      },
+      "action-ink": {
+        "role": "primary",
+        "displayName": "Action white",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Bright red accent",
+        "canonical": "#ff8585",
+        "tonalRamp": [
+          "oklch(15% 0.1486 21.22)",
+          "oklch(26% 0.1486 21.22)",
+          "oklch(38% 0.1486 21.22)",
+          "oklch(49% 0.1486 21.22)",
+          "oklch(61% 0.1486 21.22)",
+          "oklch(72% 0.1486 21.22)",
+          "oklch(84% 0.1486 21.22)",
+          "oklch(95% 0.1486 21.22)"
+        ]
+      },
+      "accent-ink": {
+        "role": "primary",
+        "displayName": "Selection ink",
+        "canonical": "#160b0d",
+        "tonalRamp": [
+          "oklch(15% 0.0196 7.49)",
+          "oklch(26% 0.0196 7.49)",
+          "oklch(38% 0.0196 7.49)",
+          "oklch(49% 0.0196 7.49)",
+          "oklch(61% 0.0196 7.49)",
+          "oklch(72% 0.0196 7.49)",
+          "oklch(84% 0.0196 7.49)",
+          "oklch(95% 0.0196 7.49)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Red-tinted surface",
+        "canonical": "#2e1c22",
+        "tonalRamp": [
+          "oklch(15% 0.0300 357.84)",
+          "oklch(26% 0.0300 357.84)",
+          "oklch(38% 0.0300 357.84)",
+          "oklch(49% 0.0300 357.84)",
+          "oklch(61% 0.0300 357.84)",
+          "oklch(72% 0.0300 357.84)",
+          "oklch(84% 0.0300 357.84)",
+          "oklch(95% 0.0300 357.84)"
+        ]
+      },
+      "accent-line": {
+        "role": "primary",
+        "displayName": "Red boundary",
+        "canonical": "#8e444d",
+        "tonalRamp": [
+          "oklch(15% 0.1005 13.99)",
+          "oklch(26% 0.1005 13.99)",
+          "oklch(38% 0.1005 13.99)",
+          "oklch(49% 0.1005 13.99)",
+          "oklch(61% 0.1005 13.99)",
+          "oklch(72% 0.1005 13.99)",
+          "oklch(84% 0.1005 13.99)",
+          "oklch(95% 0.1005 13.99)"
+        ]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Red-tinted text",
+        "canonical": "#f2bfc3",
+        "tonalRamp": [
+          "oklch(15% 0.0588 13.11)",
+          "oklch(26% 0.0588 13.11)",
+          "oklch(38% 0.0588 13.11)",
+          "oklch(49% 0.0588 13.11)",
+          "oklch(61% 0.0588 13.11)",
+          "oklch(72% 0.0588 13.11)",
+          "oklch(84% 0.0588 13.11)",
+          "oklch(95% 0.0588 13.11)"
+        ]
+      },
+      "data": {
+        "role": "primary",
+        "displayName": "Chart red",
+        "canonical": "#eb626b",
+        "tonalRamp": [
+          "oklch(15% 0.1697 18.96)",
+          "oklch(26% 0.1697 18.96)",
+          "oklch(38% 0.1697 18.96)",
+          "oklch(49% 0.1697 18.96)",
+          "oklch(61% 0.1697 18.96)",
+          "oklch(72% 0.1697 18.96)",
+          "oklch(84% 0.1697 18.96)",
+          "oklch(95% 0.1697 18.96)"
+        ]
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Near-black canvas",
+        "canonical": "#101216",
+        "tonalRamp": [
+          "oklch(15% 0.0088 264.33)",
+          "oklch(26% 0.0088 264.33)",
+          "oklch(38% 0.0088 264.33)",
+          "oklch(49% 0.0088 264.33)",
+          "oklch(61% 0.0088 264.33)",
+          "oklch(72% 0.0088 264.33)",
+          "oklch(84% 0.0088 264.33)",
+          "oklch(95% 0.0088 264.33)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Slate panels",
+        "canonical": "#191d23",
+        "tonalRamp": [
+          "oklch(15% 0.0131 258.37)",
+          "oklch(26% 0.0131 258.37)",
+          "oklch(38% 0.0131 258.37)",
+          "oklch(49% 0.0131 258.37)",
+          "oklch(61% 0.0131 258.37)",
+          "oklch(72% 0.0131 258.37)",
+          "oklch(84% 0.0131 258.37)",
+          "oklch(95% 0.0131 258.37)"
+        ]
+      },
+      "panel2": {
+        "role": "neutral",
+        "displayName": "Raised slate tone",
+        "canonical": "#22272f",
+        "tonalRamp": [
+          "oklch(15% 0.0166 259.78)",
+          "oklch(26% 0.0166 259.78)",
+          "oklch(38% 0.0166 259.78)",
+          "oklch(49% 0.0166 259.78)",
+          "oklch(61% 0.0166 259.78)",
+          "oklch(72% 0.0166 259.78)",
+          "oklch(84% 0.0166 259.78)",
+          "oklch(95% 0.0166 259.78)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Primary text",
+        "canonical": "#f4f5f7",
+        "tonalRamp": [
+          "oklch(15% 0.0029 264.54)",
+          "oklch(26% 0.0029 264.54)",
+          "oklch(38% 0.0029 264.54)",
+          "oklch(49% 0.0029 264.54)",
+          "oklch(61% 0.0029 264.54)",
+          "oklch(72% 0.0029 264.54)",
+          "oklch(84% 0.0029 264.54)",
+          "oklch(95% 0.0029 264.54)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted text",
+        "canonical": "#b0b7c2",
+        "tonalRamp": [
+          "oklch(15% 0.0175 259.42)",
+          "oklch(26% 0.0175 259.42)",
+          "oklch(38% 0.0175 259.42)",
+          "oklch(49% 0.0175 259.42)",
+          "oklch(61% 0.0175 259.42)",
+          "oklch(72% 0.0175 259.42)",
+          "oklch(84% 0.0175 259.42)",
+          "oklch(95% 0.0175 259.42)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Panel boundary",
+        "canonical": "#424a56",
+        "tonalRamp": [
+          "oklch(15% 0.0227 258.37)",
+          "oklch(26% 0.0227 258.37)",
+          "oklch(38% 0.0227 258.37)",
+          "oklch(49% 0.0227 258.37)",
+          "oklch(61% 0.0227 258.37)",
+          "oklch(72% 0.0227 258.37)",
+          "oklch(84% 0.0227 258.37)",
+          "oklch(95% 0.0227 258.37)"
+        ]
+      },
+      "green": {
+        "role": "semantic",
+        "displayName": "Sage",
+        "canonical": "#9cc3a5",
+        "tonalRamp": [
+          "oklch(15% 0.0594 151.83)",
+          "oklch(26% 0.0594 151.83)",
+          "oklch(38% 0.0594 151.83)",
+          "oklch(49% 0.0594 151.83)",
+          "oklch(61% 0.0594 151.83)",
+          "oklch(72% 0.0594 151.83)",
+          "oklch(84% 0.0594 151.83)",
+          "oklch(95% 0.0594 151.83)"
+        ]
+      },
+      "amber": {
+        "role": "semantic",
+        "displayName": "Amber",
+        "canonical": "#d9b77a",
+        "tonalRamp": [
+          "oklch(15% 0.0879 81.51)",
+          "oklch(26% 0.0879 81.51)",
+          "oklch(38% 0.0879 81.51)",
+          "oklch(49% 0.0879 81.51)",
+          "oklch(61% 0.0879 81.51)",
+          "oklch(72% 0.0879 81.51)",
+          "oklch(84% 0.0879 81.51)",
+          "oklch(95% 0.0879 81.51)"
+        ]
+      },
+      "red": {
+        "role": "semantic",
+        "displayName": "Soft red",
+        "canonical": "#e6a59b",
+        "tonalRamp": [
+          "oklch(15% 0.0790 28.78)",
+          "oklch(26% 0.0790 28.78)",
+          "oklch(38% 0.0790 28.78)",
+          "oklch(49% 0.0790 28.78)",
+          "oklch(61% 0.0790 28.78)",
+          "oklch(72% 0.0790 28.78)",
+          "oklch(84% 0.0790 28.78)",
+          "oklch(95% 0.0790 28.78)"
+        ]
+      },
+      "sky": {
+        "role": "semantic",
+        "displayName": "Pale blue",
+        "canonical": "#a4bfd0",
+        "tonalRamp": [
+          "oklch(15% 0.0381 235.62)",
+          "oklch(26% 0.0381 235.62)",
+          "oklch(38% 0.0381 235.62)",
+          "oklch(49% 0.0381 235.62)",
+          "oklch(61% 0.0381 235.62)",
+          "oklch(72% 0.0381 235.62)",
+          "oklch(84% 0.0381 235.62)",
+          "oklch(95% 0.0381 235.62)"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Control overlay",
+        "canonical": "rgba(255,255,255,.05)",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
+        ]
+      },
+      "control-hover": {
+        "role": "neutral",
+        "displayName": "Control hover overlay",
+        "canonical": "rgba(255,255,255,.1)",
+        "tonalRamp": [
+          "oklch(15% 0.0000 0.00)",
+          "oklch(26% 0.0000 0.00)",
+          "oklch(38% 0.0000 0.00)",
+          "oklch(49% 0.0000 0.00)",
+          "oklch(61% 0.0000 0.00)",
+          "oklch(72% 0.0000 0.00)",
+          "oklch(84% 0.0000 0.00)",
+          "oklch(95% 0.0000 0.00)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Scenario-picker question. Fluid size: clamp(30px, 3.2vw, 48px)."
+      },
+      "conversation": {
+        "displayName": "Conversation",
+        "purpose": "Customer and seller messages. Fluid size: calc(clamp(15.5px, 1.2vw, 19px) * var(--fs))."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "message-entry",
+        "value": "250ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Existing message entrance."
+      },
+      {
+        "name": "control-change",
+        "value": "200ms ease",
+        "purpose": "Control background and brightness changes."
+      },
+      {
+        "name": "score-fill",
+        "value": "600ms cubic-bezier(.2,.8,.2,1)",
+        "purpose": "Skill bar width updates."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce",
+        "purpose": "Disable animations, transitions, smooth scrolling, and floating score effects."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-desktop",
+        "value": "1100px",
+        "condition": "max-width"
+      },
+      {
+        "name": "compact-height",
+        "value": "860px",
+        "condition": "max-height"
+      },
+      {
+        "name": "large-desktop",
+        "value": "1700px",
+        "condition": "min-width"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid red action with a minimum height of 52px.",
+      "html": "<button class=\"ds-primary\">Start the meeting</button>",
+      "css": ".ds-primary{font-family:var(--ui,Inter,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:10px 24px;border:0;border-radius:6px;background:var(--action,#cc0000);color:var(--action-ink,#fff);font-size:16px;font-weight:700;cursor:pointer;transition:filter .2s}.ds-primary:hover{filter:brightness(1.08)}.ds-primary:active{transform:scale(.98)}.ds-primary:focus-visible{outline:2px solid var(--accent,#ff8585);outline-offset:4px}.ds-primary:disabled{opacity:.5;cursor:not-allowed}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none}}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Neutral bordered action that does not compete with the primary button.",
+      "html": "<button class=\"ds-ghost\">All scenarios</button>",
+      "css": ".ds-ghost{font-family:var(--ui,Inter,system-ui,sans-serif);display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;border:1px solid var(--line,#424a56);border-radius:6px;background:rgba(255,255,255,.05);color:var(--ink,#f4f5f7);font-size:15px;font-weight:600;cursor:pointer}.ds-ghost:hover{background:rgba(255,255,255,.1)}.ds-ghost:focus-visible{outline:2px solid var(--accent,#ff8585);outline-offset:4px}.ds-ghost:disabled{opacity:.5;cursor:not-allowed}"
+    },
+    {
+      "name": "Presenter controls",
+      "kind": "nav",
+      "refersTo": "presenter-toggle",
+      "description": "Static previews of inactive and active labeled presenter controls.",
+      "html": "<div class=\"ds-tools\" role=\"group\" aria-label=\"Presenter controls\"><button class=\"ds-toggle\" aria-pressed=\"false\"><span class=\"ds-switch\" aria-hidden=\"true\"></span>Group mode</button><button class=\"ds-toggle ds-on\" aria-pressed=\"true\"><span class=\"ds-switch\" aria-hidden=\"true\"></span>Signal spotter</button></div>",
+      "css": ".ds-tools{display:flex;gap:8px;flex-wrap:wrap}.ds-toggle{font-family:var(--ui,Inter,system-ui,sans-serif);display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:8px 13px;border:1px solid var(--line,#424a56);border-radius:6px;background:rgba(255,255,255,.05);color:var(--ink,#f4f5f7);font-size:13.5px;font-weight:600;cursor:pointer;transition:background .2s}.ds-toggle:hover{background:rgba(255,255,255,.11)}.ds-switch{position:relative;width:30px;height:18px;border-radius:999px;background:rgba(255,255,255,.18)}.ds-switch:after{content:\"\";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff}.ds-toggle.ds-on{border-color:var(--accent-line,#8e444d);background:var(--accent-soft,#2e1c22)}.ds-on .ds-switch{background:var(--action,#cc0000)}.ds-on .ds-switch:after{transform:translateX(12px)}.ds-toggle:focus-visible{outline:2px solid var(--accent,#ff8585);outline-offset:4px}@media(prefers-reduced-motion:reduce){.ds-toggle{transition:none}}"
+    },
+    {
+      "name": "Scenario card",
+      "kind": "card",
+      "refersTo": "scenario-card",
+      "description": "A flat clickable scenario summary with a neutral initial avatar.",
+      "html": "<button class=\"ds-scenario\"><span class=\"ds-person\"><span class=\"ds-avatar\">DM</span><span><strong>Diane Mercer</strong><span class=\"ds-role\">Chief Financial Officer<br>Brightline Components</span></span></span><span class=\"ds-title\">The Skeptical CFO</span><span class=\"ds-quote\">“Every vendor says AI will transform us. Show me the numbers.”</span><span class=\"ds-card-action\">Brief me →</span></button>",
+      "css": ".ds-scenario{font-family:var(--ui,Inter,system-ui,sans-serif);display:flex;flex-direction:column;gap:16px;width:100%;max-width:360px;padding:22px;text-align:left;border:1px solid var(--line,#424a56);border-radius:8px;background:var(--panel,#191d23);color:var(--ink,#f4f5f7);cursor:pointer;transition:border-color .2s,background .2s}.ds-scenario:hover{border-color:var(--accent,#ff8585);background:var(--panel2,#22272f)}.ds-scenario:focus-visible{outline:2px solid var(--accent,#ff8585);outline-offset:4px}.ds-person{display:flex;gap:14px;align-items:center}.ds-person strong{font-size:18px;font-weight:700}.ds-avatar{display:grid;place-items:center;flex:none;width:58px;height:58px;border-radius:50%;background:#343c48;border:1px solid #606c7d;font-size:21px;font-weight:600}.ds-role{display:block;color:var(--muted,#b0b7c2);font-size:13.5px;font-weight:600;line-height:1.35}.ds-title{font-size:15px;font-weight:600}.ds-quote{color:var(--muted,#b0b7c2);font-size:14px;line-height:1.6}.ds-card-action{margin-top:auto;padding-top:18px;border-top:1px solid var(--line,#424a56);font-size:14px;font-weight:600;color:var(--accent,#ff8585)}@media(prefers-reduced-motion:reduce){.ds-scenario{transition:none}}"
+    },
+    {
+      "name": "Metadata chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Noninteractive scenario metadata.",
+      "html": "<span class=\"ds-chip\">Manufacturing</span>",
+      "css": ".ds-chip{font-family:var(--ui,Inter,system-ui,sans-serif);display:inline-block;padding:4px 8px;border:1px solid var(--line,#424a56);border-radius:4px;background:transparent;color:var(--muted,#b0b7c2);font-size:12px;font-weight:500;line-height:1.4}"
+    },
+    {
+      "name": "Customer message",
+      "kind": "custom",
+      "refersTo": "customer-message",
+      "description": "Neutral message bubble with an explicit speaker label.",
+      "html": "<div class=\"ds-customer\"><span class=\"ds-speaker\">Diane Mercer</span>Every vendor that walks in here says AI will transform us.</div>",
+      "css": ".ds-customer{font-family:var(--ui,Inter,system-ui,sans-serif);padding:14px 18px;border:1px solid var(--line,#424a56);border-radius:6px 8px 8px 8px;background:var(--panel2,#22272f);color:var(--ink,#f4f5f7);font-size:calc(clamp(15.5px,1.2vw,19px)*var(--fs,1));line-height:1.55}.ds-speaker{display:block;margin-bottom:4px;color:var(--muted,#b0b7c2);font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}"
+    },
+    {
+      "name": "Seller message",
+      "kind": "custom",
+      "refersTo": "seller-message",
+      "description": "Red-tinted message bubble with a matching speaker label.",
+      "html": "<div class=\"ds-seller\"><span class=\"ds-seller-name\">You · Your Company</span>Can I ask what happened with that pilot, and what you’d need to see to call an AI investment a success?</div>",
+      "css": ".ds-seller{font-family:var(--ui,Inter,system-ui,sans-serif);padding:14px 18px;border:1px solid var(--accent-line,#8e444d);border-radius:8px 6px 8px 8px;background:var(--accent-soft,#2e1c22);color:var(--ink,#f4f5f7);font-size:calc(clamp(15.5px,1.2vw,19px)*var(--fs,1));line-height:1.55}.ds-seller-name{display:block;margin-bottom:4px;color:var(--accent-text,#f2bfc3);font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase}"
+    },
+    {
+      "name": "Response choice",
+      "kind": "custom",
+      "refersTo": "response-choice",
+      "description": "Lettered response with hover and keyboard-focus feedback.",
+      "html": "<button class=\"ds-choice\"><span class=\"ds-letter\">A</span><span>What are your top financial priorities this year?</span></button>",
+      "css": ".ds-choice{font-family:var(--ui,Inter,system-ui,sans-serif);display:flex;gap:12px;align-items:flex-start;padding:12px 14px;text-align:left;border:1px solid var(--line,#424a56);border-radius:6px;background:var(--panel,#191d23);color:var(--ink,#f4f5f7);font-size:calc(clamp(14px,1.05vw,17px)*var(--fs,1));font-weight:500;line-height:1.45;cursor:pointer;transition:border-color .15s,background .15s,transform .1s}.ds-choice:hover{border-color:var(--accent,#ff8585);background:var(--panel2,#22272f)}.ds-choice:focus-visible{outline:2px solid var(--accent,#ff8585);outline-offset:2px}.ds-choice:active{transform:scale(.99)}.ds-letter{display:grid;place-items:center;flex:none;width:30px;height:30px;border:1px solid var(--line,#424a56);border-radius:4px;background:rgba(255,255,255,.08);font-size:14px;font-weight:600}.ds-choice:hover .ds-letter{background:var(--action,#cc0000);color:var(--action-ink,#fff);border-color:transparent}@media(prefers-reduced-motion:reduce){.ds-choice{transition:none}}"
+    },
+    {
+      "name": "Coaching feedback",
+      "kind": "custom",
+      "refersTo": "feedback",
+      "description": "Quality label and point change on a flat panel.",
+      "html": "<div class=\"ds-feedback\"><div class=\"ds-feedback-head\"><span class=\"ds-quality\">Missed opportunity</span><span class=\"ds-points\">+20 pts</span></div><p class=\"ds-feedback-copy\">Partnerships matter later, but leading with credentials ignores her concern.</p></div>",
+      "css": ".ds-feedback{font-family:var(--ui,Inter,system-ui,sans-serif);padding:16px 18px;border:1px solid var(--line,#424a56);border-radius:8px;background:var(--panel,#191d23);color:var(--ink,#f4f5f7)}.ds-feedback-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}.ds-quality{display:inline-flex;padding:5px 10px;border:1px solid color-mix(in srgb,var(--amber,#d9b77a) 55%,transparent);border-radius:4px;background:color-mix(in srgb,var(--amber,#d9b77a) 20%,transparent);color:var(--amber,#d9b77a);font-size:13px;font-weight:600;letter-spacing:.2px}.ds-points{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}.ds-feedback-copy{margin:0;font-size:calc(clamp(14.5px,1.1vw,18px)*var(--fs,1));line-height:1.5}"
+    }
+  ],
+  "narrative": {
+    "northStar": "CDW-inspired dark mode",
+    "overview": "This design applies to `prototype/seller-ai-training/roleplay.html`. It is a CDW-inspired treatment, not an official CDW brand standard. Do not apply it to Jeopardy or the launcher without a separate request. Their existing designs remain independent.\n\nThe interface is restrained, high-contrast, and task-focused. Cool near-black backgrounds support white text and red primary actions. The layout serves desktop trainer-led sessions and screen sharing. Mobile use is out of scope.\n\nPanels remain flat. Background tones and thin borders separate content without decorative shadows. Components are restrained and direct, with red primary buttons, compact controls, and clear keyboard focus.",
+    "keyCharacteristics": [
+      "Cool dark backgrounds with readable white and muted text.",
+      "Solid red primary actions and brighter red focus indicators.",
+      "Flat panels, thin borders, and compact controls.",
+      "Separate coaching colors with explicit text labels.",
+      "The existing scenarios, scoring, and user journey stay intact."
+    ],
+    "rules": [
+      {
+        "name": "The semantic separation rule",
+        "body": "Keep action, chart, and coaching roles distinct. A red primary button is not an error state. Preserve words, signs, signal labels, and score values alongside color.",
+        "section": "colors"
+      },
+      {
+        "name": "The flat panel rule",
+        "body": "Separate content with background tones and thin borders, not decorative shadows, glows, glass effects, or gradients.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep this design scoped to the customer role-playing page.",
+      "Do preserve desktop-only use and the existing training journey.",
+      "Do use solid red for primary actions and brighter red for focus and small accent text.",
+      "Do retain explicit coaching labels and signed score changes alongside color.",
+      "Do separate flat panels with background tones and thin borders.",
+      "Do preserve visible keyboard focus and reduced-motion support.",
+      "Do check text contrast whenever a foreground or background color changes."
+    ],
+    "donts": [
+      "Don't restyle Jeopardy or the launcher without a separate request.",
+      "Don't describe this document as an official CDW brand standard.",
+      "Don't restore brown page backgrounds, decorative gradients, glows, or rainbow avatars.",
+      "Don't replace the working scenarios, scoring, controls, or journey during visual refinement.",
+      "Don't use brand red as the only indication of an error or coaching outcome.",
+      "Don't introduce a mobile layout or participant-device workflow without a new requirement."
+    ]
+  }
+}

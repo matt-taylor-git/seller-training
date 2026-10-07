@@ -6,7 +6,7 @@
 
 web
 
-The existing prototypes run in a browser. No native app requirement has been established.
+The product runs in desktop browsers for trainer-led sessions. Mobile use is out of scope. No native app requirement has been established.
 
 ## Users
 

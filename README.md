@@ -8,6 +8,10 @@ The repository currently contains supplied prototypes and a product record. The 
 
 Read [PRODUCT.md](PRODUCT.md) for confirmed product facts and open decisions.
 
+Read [DESIGN.md](DESIGN.md) for the customer role-playing page's CDW-inspired dark design. It records the current colors, typography, components, and desktop layout. Jeopardy and the launcher remain outside its scope.
+
+[The Impeccable design companion](.impeccable/design.json) contains component previews and motion guidance. Its generated color ramps are preview aids, not additional application tokens.
+
 ## Try the prototypes
 
 From the repository root, run:
