@@ -29,6 +29,23 @@ test('The production registry exposes exactly Default and FSI as complete aggreg
   assert.equal(pinned.pack, defaultPack);
 });
 
+const words = text => text.trim().split(/\s+/).length;
+for (const [category, group] of fsi.jeopardy.categories.entries()) {
+  for (const [row, clue] of group.clues.entries()) {
+    test(`FSI authored clue ${category + 1}-${row + 1} fits the presenter reading budget.`, () => {
+      assert(words(clue.a) <= 25, `Answer has ${words(clue.a)} words, maximum 25.`);
+      assert(words(clue.why) <= 40, `Coaching has ${words(clue.why)} words, maximum 40.`);
+      assert(words(clue.a) + words(clue.why) <= 65, 'Combined answer and coaching exceed 65 words.');
+    });
+  }
+}
+test('FSI authored Final fits a focused response and coaching budget.', () => {
+  const final = fsi.jeopardy.final;
+  assert(words(final.a) <= 45, `Final answer has ${words(final.a)} words, maximum 45.`);
+  assert(words(final.why) <= 40, `Final coaching has ${words(final.why)} words, maximum 40.`);
+  assert(words(final.a) + words(final.why) <= 85, 'Combined Final answer and coaching exceed 85 words.');
+});
+
 const mutations = {
   'internal URL domains': pack => pack.jeopardy.final.why += ' See https://example.sharepoint.com/sites/AI.',
   'internal prices': pack => pack.roleplay.scenarios[0].offering.steps[0] += ' The fee is $15K.',

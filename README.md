@@ -121,7 +121,7 @@ CP3_EVIDENCE_DIR=/tmp/cp3-evidence PORT=8183 npx playwright test tests/browser/f
 node scripts/measure-training.mjs --baseline ../baseline --candidate . --samples 20 --packs default,fsi
 ```
 
-The browser lanes select FSI through declared localStorage setup, then use actual clicks and keys. They cover ideal play, risky bank play, insurance recovery, all 31 quiz answers, both Daily Doubles, Final scoring, Default return, and group-mode density. Readability checks run at 1440 by 900 and 1920 by 1080 pixels. `CP3_EVIDENCE_DIR` retains screenshots, answer records, and browser error logs. Playwright saves videos and traces under `test-results`.
+The browser lanes select FSI through declared localStorage setup, then use actual clicks and keys. They cover ideal play, risky bank play, insurance recovery, all 31 quiz answers, both Daily Doubles, Final scoring, Default return, and group-mode density. Readability checks run at 1440 by 900 and 1920 by 1080 pixels. They count rendered lines, record text and element heights, and pin existing font sizes. Regular answers allow 3 lines, Final answers allow 4, and supporting notes allow 3. Authored word ceilings also prevent oversized copy before browser testing. `CP3_EVIDENCE_DIR` retains screenshots, answer records, and browser error logs. Playwright saves videos and traces under `test-results`.
 
 The performance probe measures actual candidate Default and FSI entries against equivalent baseline Default screens. It records 20 cold samples per route and version, interleaves baseline and candidate, and blocks remote fonts. The same 1000 ms, 150 ms delta, and 400 KiB limits apply. Run a separate comparison against the CP2 worktree to retain its Default baseline.
 

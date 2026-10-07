@@ -118,6 +118,27 @@ async function closeTile(page) {
   await page.keyboard.press('Escape');
   await expect(page.locator('#overlay')).not.toHaveClass(/show/);
 }
+async function textMetrics(page, selector) {
+  return page.locator(selector).evaluate(async element => {
+    for (let ancestor = element; ancestor; ancestor = ancestor.parentElement) {
+      await Promise.all(ancestor.getAnimations().map(animation => animation.finished.catch(() => {})));
+    }
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const lines = [...range.getClientRects()].filter(rect => rect.width > 0 && rect.height > 0);
+    const style = getComputedStyle(element);
+    return { selector: element.id || element.className, text: element.textContent, words: element.textContent.trim().split(/\s+/).length,
+      lines: new Set(lines.map(rect => Math.round(rect.top))).size,
+      textHeight: range.getBoundingClientRect().height, elementHeight: element.getBoundingClientRect().height,
+      fontSize: Number.parseFloat(style.fontSize), lineHeight: Number.parseFloat(style.lineHeight) };
+  });
+}
+function expectTextBudget(metrics, maxLines, fontSize) {
+  const detail = JSON.stringify(metrics);
+  expect(metrics.lines, detail).toBeLessThanOrEqual(maxLines);
+  expect(metrics.elementHeight, detail).toBeLessThanOrEqual(maxLines * metrics.lineHeight + 1);
+  expect(metrics.fontSize, 'Readability must not come from shrinking text.').toBeCloseTo(fontSize, 2);
+}
 async function readable(page, selectors) {
   for (const selector of selectors) {
     const metrics = await page.locator(selector).evaluate(element => {
@@ -141,7 +162,13 @@ async function clues(page, categories, lane) {
       for (let row = 0; row < 5; row++) {
         await openTile(page, category, row);
         await readable(page, ['#clueText', '#answerText', '#whyText', '#judge']);
-        seen.push({ viewport, category, row, answer: await page.locator('#answerText').textContent(), explanation: await page.locator('#whyText').textContent() });
+        const answer = await textMetrics(page, '#answerText');
+        const explanation = await textMetrics(page, '#whyText');
+        seen.push({ viewport, category, row, answer, explanation });
+        record(`lane-${lane}-answers.json`, { seen });
+        expectTextBudget(answer, 3, viewport.width === 1440 ? 33.12 : 40);
+        expectTextBudget(explanation, 3, viewport.width === 1440 ? 18 : 21);
+        if (category === 2 && row === 4) await capture(page, `fsi-worst-regular-${viewport.width}.png`);
         if (row === 4 && category === categories[1]) await capture(page, `fsi-clues-${categories[0] + 1}-${categories[1] + 1}${viewport.width === 1920 ? '-1920' : ''}.png`);
         await closeTile(page);
       }
@@ -242,6 +269,11 @@ test('Lane 9. Both Daily Doubles and all Final stages keep FSI content and its o
   for (const viewport of [{ width: 1440, height: 900 }, { width: 1920, height: 1080 }]) {
     await page.setViewportSize(viewport);
     await readable(page, ['#final .answer .a', '#final .answer .why', '#fNext']);
+    const answer = await textMetrics(page, '#final .answer .a');
+    const explanation = await textMetrics(page, '#final .answer .why');
+    record(`fsi-final-metrics-${viewport.width}.json`, { viewport, answer, explanation });
+    expectTextBudget(answer, 4, viewport.width === 1440 ? 25.92 : 30);
+    expectTextBudget(explanation, 3, viewport.width === 1440 ? 18 : 21);
     await capture(page, viewport.width === 1440 ? 'fsi-final.png' : 'fsi-final-1920.png');
   }
   await page.locator('.fw .ok').nth(0).click();

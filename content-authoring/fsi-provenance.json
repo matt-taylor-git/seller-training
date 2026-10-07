@@ -2,7 +2,7 @@
   "schema": 1,
   "packId": "fsi",
   "packRevision": 1,
-  "reviewStatus": "The task reports an independent source review of the draft with PASS and 2 minor notes. CP3 spells out United Kingdom and keeps insurance recovery at the second-node depth. The integrator compared claims with the complete supplied compilation. Parent review of the final committed pack remains required.",
+  "reviewStatus": "The task reports an independent source review of the draft with PASS and 2 minor notes. CP3 spells out United Kingdom and keeps insurance recovery at the second-node depth. The integrator compared claims with the complete supplied compilation. The readability revision narrows Final to intake, 2 signals, one qualified assessment, owners, and a rejected hosting promise. It removes speculative future services from Final rather than relocating them into coaching. Parent review of the final committed pack remains required.",
   "source": {
     "id": "supplied-fsi-playbook",
     "title": "AI in Financial Services: Research Summary & CDW Seller Playbook",
@@ -193,8 +193,8 @@
       "itemId": "final", "activity": "jeopardy", "locator": "jeopardy.final",
       "claims": [
         {"claim": "A claims intake backlog with untrusted identifiers supports bounded document-work discovery and AI Readiness Data Quality Assessment.", "section": "3, Insurance; 4; 6.C", "date": "2026-10-07", "caveat": "The backlog, failed pilot, sponsor, and data problem are fictional. The assessment does not guarantee remediation or claims outcomes."},
-        {"claim": "Private AI Launch Workshop can address strategy or ownership gaps. AI Risk Assessment informs risk work, and AI LLM Penetration Testing addresses attack paths before a customer-facing launch.", "section": "6.A; 6.D; 7", "date": "2026-10-07", "caveat": "These are qualified possible next steps, not a fixed bundle or regulatory approval service. The primary next engagement depends on the stated data-readiness gap."},
-        {"claim": "Hosting is workload-specific, agents need human boundaries, and value requires baseline and net-cost evidence.", "section": "2.4; 5; 7; 10", "date": "2026-10-07", "caveat": "No guaranteed security, approval, autonomy, returns, or private-hosting advantage. Survey and proof-of-concept results do not prove customer financial returns."}
+        {"claim": "The intake and data owners should qualify assessment scope with compliance, security, and finance before commitment.", "section": "5.2; 6.C; 7", "date": "2026-10-07", "caveat": "This stakeholder discussion is an authored discovery recommendation, not an additional assessment deliverable. The primary next engagement addresses the stated data-readiness gap."},
+        {"claim": "Intake assistance keeps settlement authority with people. Evaluation needs an approved sample, baseline errors, cycle time, review effort, and net cost. Private hosting guarantees neither approval nor savings.", "section": "2.4; 3, Insurance; 5; 7", "date": "2026-10-07", "caveat": "Sample approval and the evaluation plan are authored recommendations. They do not guarantee remediation, claims outcomes, approval, or financial returns."}
       ]
     }
   ]

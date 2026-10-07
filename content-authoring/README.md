@@ -6,11 +6,19 @@ The served pack contains 23 nodes, 69 choices, 12 outcomes, and 20 takeaways. It
 
 The board contains 6 categories with 5 progressively harder clues each and 1 Final. The existing engine selects 2 Daily Doubles. No game rules changed.
 
+## Presenter reading budget
+
+Regular answers contain at most 25 words. Their coaching contains at most 40 words, with at most 65 words combined. Final allows 45 answer words, 40 coaching words, and 85 combined words. Word counts use whitespace-separated words.
+
+Final asks for one bounded task, 2 signals, one qualified CDW next step with owners, and one rejected promise. Its model answer contains 37 words. Its coaching contains 31 words. Role-play and provenance retain the broader discovery detail.
+
+Browser lanes 6 through 9 count actual text lines and record text height, element height, font size, and line height. They test 1440 by 900 and 1920 by 1080 pixels. Regular answers allow 3 lines. Final allows 4 answer lines. Supporting notes allow 3 lines. Tests pin the existing font sizes and wait for reveal animations to finish. They still check clipping and scoring.
+
 ## Evidence and review limits
 
 `fsi-provenance.json` maps all 35 content items to 56 material claim entries. Scenario claims also identify their locations. Each claim names sections, dates, and limits from the supplied playbook compiled on 2026-10-07. Its SHA-256 hash identifies the exact compilation. Offering dates identify that compilation, not live catalog publication dates.
 
-The integration task reports an independent source review of the draft with PASS and 2 minor notes. This pack spells out United Kingdom and restructures insurance recovery. The integrator also read the complete compilation and compared offering claims and answers. The parent must review the final committed pack separately. No linked offering page or external source was independently fetched for this change.
+The integration task reports an independent source review of the draft with PASS and 2 minor notes. This pack spells out United Kingdom and restructures insurance recovery. The integrator also read the complete compilation and compared offering claims and answers. The readability revision rechecked all changed clue fields and Final against that compilation. Final now omits the customer-facing launch and its possible future services. Its evidence record follows the narrower scored task. The parent must review the final committed pack separately. No linked offering page or external source was independently fetched for this change.
 
 All customers, dialogue, customer metrics, and outcomes are fictional. Scoping meetings, evaluation cohorts, sample controls, and stop rules are authored recommendations. They are not additional service deliverables.
 
