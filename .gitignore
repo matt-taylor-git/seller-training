@@ -1,0 +1,21 @@
+# macOS metadata
+.DS_Store
+
+# Local agent settings and hooks
+.claude/
+.codex/
+.grok/
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# Local design settings and live-session artifacts
+.impeccable/config.local.json
+.impeccable/live/*
+!.impeccable/live/config.json
+
+# Dependencies and generated output
+node_modules/
+dist/

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+/* ==================== CONFIG ==================== */
+/* Change your company name here; it updates everywhere in the game. */
+const BRAND_NAME = "Your Company";
+/* ================================================ */
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Deal Jeopardy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040826;--blue:#1533e6;--blue2:#0a1a9e;--deep:#071266;--gold:#ffcc4d;--gold2:#ffb020;
+  --ink:#fff;--muted:#aab4e8;--line:rgba(255,255,255,.14);--green:#22c55e;--red:#ef4444;
+  --display:Anton,Impact,"Arial Narrow Bold",sans-serif;--ui:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--ui);color:var(--ink);background:var(--bg);overflow:hidden;user-select:none;-webkit-user-select:none}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(1200px 700px at 50% -20%,rgba(37,72,255,.45),transparent 60%),radial-gradient(800px 500px at 100% 110%,rgba(255,176,32,.12),transparent 60%)}
+button{font-family:inherit;cursor:pointer;border:0;color:inherit;background:none}
+.app{position:relative;height:100vh;display:flex;flex-direction:column;gap:clamp(8px,1.4vh,16px);padding:clamp(10px,1.6vh,20px) clamp(12px,1.6vw,28px)}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.title{display:flex;align-items:center;gap:14px}
+.title .mark{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:grid;place-items:center;color:#1a1300;font-family:var(--display);font-size:24px;box-shadow:0 6px 20px rgba(255,190,40,.35)}
+.title h1{font-family:var(--display);font-weight:400;letter-spacing:1.5px;font-size:clamp(22px,2.2vw,34px);line-height:1;text-shadow:0 3px 0 rgba(0,0,0,.35)}
+.title h1 span{color:var(--gold)}
+.title small{display:block;font-size:12px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;font-weight:600}
+.controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.ctl{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-weight:600;font-size:14px;transition:background .2s,transform .1s}
+.ctl:hover{background:rgba(255,255,255,.14)}.ctl:active{transform:scale(.97)}
+.ctl.on{background:rgba(255,204,77,.16);border-color:rgba(255,204,77,.55);color:var(--gold)}
+.ctl.final{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1b1300;border:0}
+.ctl.final:hover{filter:brightness(1.08)}
+.ctl select{background:transparent;color:inherit;border:0;font:inherit;outline:none;cursor:pointer}
+.ctl select option{color:#000}
+.ctl svg{width:18px;height:18px}
+
+/* Board */
+.board{flex:1;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:minmax(64px,1.05fr) repeat(5,1fr);gap:clamp(5px,.6vw,10px);padding:clamp(6px,.6vw,10px);background:#000a3d;border-radius:18px;box-shadow:0 0 0 2px rgba(255,204,77,.25),0 30px 80px rgba(0,0,0,.55)}
+.cat{display:grid;place-items:center;text-align:center;padding:6px 10px;border-radius:10px;background:linear-gradient(180deg,#0d23b8,#071583);font-weight:900;text-transform:uppercase;letter-spacing:.5px;font-size:clamp(13px,1.35vw,24px);line-height:1.1;text-shadow:0 2px 0 rgba(0,0,0,.5);border-bottom:3px solid rgba(255,204,77,.7)}
+.tile{position:relative;display:grid;place-items:center;border-radius:10px;background:linear-gradient(180deg,#2244ff 0%,#1430d6 55%,#0f25b0 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -3px 0 rgba(0,0,0,.25);font-family:var(--display);color:var(--gold);font-size:clamp(28px,3.6vw,64px);text-shadow:0 3px 0 rgba(0,0,0,.55);transition:transform .15s,filter .15s,box-shadow .2s}
+.tile:hover:not(.used){transform:scale(1.035);filter:brightness(1.15);box-shadow:0 0 0 3px var(--gold),0 10px 30px rgba(0,0,0,.45);z-index:2}
+.tile:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.tile.used{background:#0a1350;color:transparent;text-shadow:none;cursor:default;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.tile.used:after{content:"";width:22%;max-width:36px;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.06)}
+.tile .dd-hint{display:none}
+
+/* Scoreboard */
+.scores{display:flex;gap:clamp(8px,1vw,16px);align-items:stretch}
+.team{flex:1;min-width:0;position:relative;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04));border:1px solid var(--line);transition:box-shadow .3s,transform .3s}
+.team .sw{width:10px;align-self:stretch;border-radius:6px;flex:none}
+.team .meta{min-width:0;flex:1}
+.team .name{font-weight:800;font-size:clamp(14px,1.15vw,19px);outline:none;border-radius:6px;padding:1px 4px;margin-left:-4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:text;user-select:text;-webkit-user-select:text}
+.team .name:focus{background:rgba(255,255,255,.12);text-overflow:clip}
+.team .score{font-family:var(--display);font-size:clamp(26px,2.5vw,42px);line-height:1.05;letter-spacing:.5px}
+.team .score.neg{color:#ff8a8a}
+.team .adj{display:flex;flex-direction:column;gap:4px}
+.team .adj button{width:34px;height:26px;border-radius:8px;background:rgba(255,255,255,.08);font-weight:800;font-size:15px}
+.team .adj button:hover{background:rgba(255,255,255,.18)}
+.team .key{position:absolute;top:6px;right:10px;font-size:11px;color:var(--muted);font-weight:700}
+.team.flash-up{box-shadow:0 0 0 3px var(--green),0 0 40px rgba(34,197,94,.45);transform:translateY(-3px)}
+.team.flash-down{box-shadow:0 0 0 3px var(--red),0 0 40px rgba(239,68,68,.4)}
+.team.leader .score{color:var(--gold)}
+.teamctl{display:flex;flex-direction:column;gap:6px;justify-content:center}
+.teamctl button{width:40px;height:34px;border-radius:10px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:20px;font-weight:700}
+.teamctl button:hover{background:rgba(255,255,255,.15)}
+.teamctl button:disabled{opacity:.3;cursor:not-allowed}
+
+/* Overlay + flip card */
+.overlay{position:fixed;inset:0;z-index:50;display:none;background:rgba(2,5,25,.0);transition:background .35s}
+.overlay.show{display:block}
+.overlay.dim{background:rgba(2,5,25,.78);backdrop-filter:blur(3px)}
+.mover{position:absolute;left:3vw;top:3.5vh;width:94vw;height:93vh;transform-origin:0 0;transition:transform .55s cubic-bezier(.2,.8,.2,1);perspective:2200px}
+.flipper{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .7s cubic-bezier(.3,.7,.2,1)}
+.flipper.flipped{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;overflow:hidden}
+.face.front{display:grid;place-items:center;background:linear-gradient(180deg,#2244ff,#0f25b0);font-family:var(--display);color:var(--gold);font-size:12vh;text-shadow:0 4px 0 rgba(0,0,0,.5)}
+.face.back{transform:rotateY(180deg);background:radial-gradient(1000px 600px at 50% 0%,#2448ff,#0b1aa8 55%,#071172);box-shadow:0 0 0 3px rgba(255,204,77,.55),0 40px 120px rgba(0,0,0,.6);display:flex;flex-direction:column;padding:clamp(18px,3vh,36px) clamp(22px,3vw,48px)}
+.cluehead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.18);font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:clamp(13px,1.1vw,17px)}
+.chip.val{color:var(--gold);font-family:var(--display);font-weight:400;font-size:clamp(18px,1.6vw,26px);letter-spacing:1px;padding:4px 16px}
+.closex{width:44px;height:44px;border-radius:12px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.18);font-size:22px;font-weight:700}
+.closex:hover{background:rgba(255,255,255,.15)}
+.cluebody{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:clamp(14px,2.6vh,30px);padding:10px 2vw}
+.cluetext{font-weight:800;text-transform:uppercase;font-size:clamp(26px,3.3vw,58px);line-height:1.18;letter-spacing:.3px;text-shadow:0 3px 0 rgba(0,0,0,.45);max-width:1500px}
+.cluetext.long{font-size:clamp(22px,2.6vw,46px)}
+.answer{display:none;max-width:1300px;padding:clamp(14px,2vh,24px) clamp(18px,2vw,32px);border-radius:18px;background:rgba(0,0,0,.28);border:2px solid rgba(255,204,77,.6);animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.answer.show{display:block}
+.answer .lbl{font-size:13px;letter-spacing:2px;font-weight:800;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.answer .a{font-weight:800;font-size:clamp(22px,2.3vw,40px);line-height:1.2;color:#fff}
+.answer .why{margin-top:10px;font-size:clamp(15px,1.25vw,21px);color:#cdd6ff;line-height:1.45;font-weight:500}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.timer{height:12px;border-radius:999px;background:rgba(0,0,0,.35);overflow:hidden;margin-bottom:14px;display:none;position:relative}
+.timer.show{display:block}
+.timer i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#22c55e,#facc15);border-radius:999px;transform-origin:left}
+.timer.warn i{background:linear-gradient(90deg,#f97316,#ef4444)}
+.timernum{font-family:var(--display);font-size:clamp(20px,1.8vw,30px);min-width:48px;text-align:right;color:var(--gold)}
+.cluefoot{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:clamp(46px,6vh,60px);padding:0 clamp(18px,1.6vw,28px);border-radius:14px;font-weight:800;font-size:clamp(15px,1.2vw,20px);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);transition:transform .1s,filter .2s,background .2s}
+.btn:hover{background:rgba(255,255,255,.18)}.btn:active{transform:scale(.97)}
+.btn.gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#1b1300;border:0}
+.btn.gold:hover{filter:brightness(1.08)}
+.btn kbd{font-family:var(--ui);font-size:12px;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.18);border:1px solid rgba(0,0,0,.2)}
+.btn.ghost kbd{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.judge{display:none;gap:10px;flex-wrap:wrap;justify-content:center}
+.judge.show{display:flex}
+.jt{display:flex;align-items:center;gap:6px;padding:6px 6px 6px 14px;border-radius:14px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.16)}
+.jt .n{font-weight:800;font-size:clamp(14px,1.1vw,18px);margin-right:4px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jt .sw{width:10px;height:10px;border-radius:50%}
+.jt button{height:clamp(40px,5vh,50px);min-width:clamp(40px,5vh,50px);padding:0 12px;border-radius:10px;font-weight:900;font-size:18px}
+.jt .ok{background:rgba(34,197,94,.2);color:#86efac;border:1px solid rgba(34,197,94,.5)}
+.jt .ok:hover{background:rgba(34,197,94,.4)}
+.jt .no{background:rgba(239,68,68,.18);color:#fca5a5;border:1px solid rgba(239,68,68,.5)}
+.jt .no:hover{background:rgba(239,68,68,.38)}
+.jt.done{opacity:.45;pointer-events:none}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin-top:10px}
+.hint kbd{font-family:var(--ui);font-size:11px;padding:1px 6px;border-radius:5px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff}
+
+/* Daily double */
+.dd{display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,30px);text-align:center}
+.dd.show{display:flex}
+.ddtitle{font-family:var(--display);font-size:clamp(60px,10vw,170px);line-height:.9;color:var(--gold);letter-spacing:2px;text-shadow:0 6px 0 #7a4b00,0 0 60px rgba(255,204,77,.5);animation:ddin 1s cubic-bezier(.2,1.6,.4,1)}
+@keyframes ddin{0%{transform:scale(.2) rotate(-25deg);opacity:0}100%{transform:scale(1) rotate(0)}}
+.ddsub{font-size:clamp(16px,1.4vw,22px);color:#dbe2ff;font-weight:600}
+.teampick{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.tp{padding:12px 20px;border-radius:14px;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.18);font-weight:800;font-size:clamp(15px,1.2vw,20px);display:flex;align-items:center;gap:10px}
+.tp.sel{border-color:var(--gold);background:rgba(255,204,77,.15);color:var(--gold)}
+.tp .sw{width:12px;height:12px;border-radius:50%}
+.wager{display:flex;align-items:center;gap:12px;font-weight:700;font-size:clamp(16px,1.3vw,22px)}
+.wager input{width:180px;height:56px;border-radius:14px;border:2px solid rgba(255,204,77,.6);background:rgba(0,0,0,.3);color:var(--gold);font-family:var(--display);font-size:30px;text-align:center;outline:none;user-select:text}
+.wager input:focus{border-color:#fff}
+.wager .max{font-size:14px;color:var(--muted);font-weight:600}
+
+/* Final Jeopardy */
+.final{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;gap:clamp(16px,3vh,32px);padding:4vh 5vw;text-align:center;background:radial-gradient(1200px 700px at 50% 0%,#2448ff,#0b1aa8 50%,#040826)}
+.final.show{display:flex}
+.final .ft{font-family:var(--display);font-size:clamp(44px,6vw,100px);color:var(--gold);letter-spacing:2px;text-shadow:0 5px 0 #7a4b00}
+.final .fcat{font-weight:900;text-transform:uppercase;font-size:clamp(26px,3vw,52px);letter-spacing:1px}
+.final .fclue{font-weight:800;text-transform:uppercase;font-size:clamp(22px,2.6vw,46px);line-height:1.2;max-width:1500px;text-shadow:0 3px 0 rgba(0,0,0,.4)}
+.fwagers{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.fw{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 18px;border-radius:18px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.18);min-width:200px}
+.fw .n{font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px}
+.fw .s{color:var(--muted);font-size:14px;font-weight:600}
+.fw input{width:150px;height:50px;border-radius:12px;border:2px solid rgba(255,204,77,.6);background:rgba(0,0,0,.3);color:var(--gold);font-family:var(--display);font-size:26px;text-align:center;outline:none;user-select:text}
+.fw .marks{display:flex;gap:8px}
+.fw .marks button{height:44px;padding:0 14px;border-radius:10px;font-weight:800}
+.fw .marks .ok{background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.5);color:#86efac}
+.fw .marks .no{background:rgba(239,68,68,.16);border:1px solid rgba(239,68,68,.5);color:#fca5a5}
+.fw .marks .sel.ok{background:#16a34a;color:#fff}.fw .marks .sel.no{background:#dc2626;color:#fff}
+.fw .wtag{font-family:var(--display);font-size:24px;color:var(--gold)}
+.ftimer{width:min(900px,80vw)}
+
+/* Winner */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:clamp(10px,1.5vw,24px);margin-top:10px}
+.pod{display:flex;flex-direction:column;align-items:center;gap:10px}
+.pod .bar{width:clamp(120px,13vw,220px);border-radius:16px 16px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:14px;font-family:var(--display);font-size:clamp(28px,3vw,52px);color:#1b1300;animation:rise 1s cubic-bezier(.2,.9,.3,1) both}
+.pod .nm{font-weight:900;font-size:clamp(16px,1.5vw,26px)}
+.pod .sc{font-family:var(--display);font-size:clamp(22px,2vw,36px);color:var(--gold)}
+@keyframes rise{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
+canvas#confetti{position:fixed;inset:0;z-index:80;pointer-events:none}
+
+/* Help + toast */
+.modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;background:rgba(2,5,25,.7);backdrop-filter:blur(4px)}
+.modal.show{display:grid}
+.sheet{width:min(720px,92vw);background:#0b1450;border:1px solid var(--line);border-radius:22px;padding:28px 32px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.sheet h2{font-family:var(--display);font-weight:400;letter-spacing:1px;font-size:32px;color:var(--gold);margin-bottom:14px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:16px;align-items:center}
+.keys kbd{font-family:var(--ui);font-weight:700;font-size:13px;padding:4px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.25);border-bottom-width:3px;background:rgba(255,255,255,.08);white-space:nowrap}
+.sheet p{color:var(--muted);margin-top:16px;line-height:1.5;font-size:15px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(30px);opacity:0;z-index:95;padding:12px 20px;border-radius:12px;background:#111a5c;border:1px solid var(--line);font-weight:700;transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,204,77,.7)}50%{box-shadow:0 0 0 10px rgba(255,204,77,0)}}
+@media (max-height:820px){.team{padding:8px 12px}.cat{font-size:clamp(12px,1.2vw,20px)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="title">
+      <div class="mark">J!</div>
+      <div><h1>AI DEAL <span>JEOPARDY!</span></h1><small><span class="brandInline">Your Company</span> &middot; Seller Academy</small></div>
+    </div>
+    <div class="controls">
+      <button class="ctl" id="timerBtn" title="Countdown timer on clues (T)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
+        <span id="timerLbl">Timer off</span>
+        <select id="timerSecs" title="Seconds per clue" onclick="event.stopPropagation()"><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option><option value="45">45s</option><option value="60">60s</option></select>
+      </button>
+      <button class="ctl on" id="soundBtn" title="Sound on/off (M)"><svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><span id="soundLbl">Sound on</span></button>
+      <button class="ctl" id="undoBtn" title="Undo last score change (U)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>Undo</button>
+      <button class="ctl" id="resetBtn" title="New game"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>New game</button>
+      <button class="ctl" id="helpBtn" title="Keyboard shortcuts (?)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>Shortcuts</button>
+      <button class="ctl final" id="finalBtn" title="Final Jeopardy (F)">Final Jeopardy</button>
+    </div>
+  </div>
+
+  <div class="board" id="board" role="grid" aria-label="Jeopardy board"></div>
+
+  <div class="scores">
+    <div id="teams" style="display:contents"></div>
+    <div class="teamctl">
+      <button id="addTeam" title="Add team">+</button>
+      <button id="remTeam" title="Remove last team">&minus;</button>
+    </div>
+  </div>
+</div>
+
+<!-- Clue overlay -->
+<div class="overlay" id="overlay">
+  <div class="mover" id="mover">
+    <div class="flipper" id="flipper">
+      <div class="face front" id="frontFace">$100</div>
+      <div class="face back">
+        <div class="cluehead">
+          <span class="chip" id="clueCat">Category</span>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span class="timernum" id="timerNum"></span>
+            <span class="chip val" id="clueVal">$100</span>
+            <button class="closex" id="closeClue" title="Back to board (Esc)">&times;</button>
+          </div>
+        </div>
+        <div class="dd" id="ddPane">
+          <div class="ddtitle">DAILY<br>DOUBLE!</div>
+          <div class="ddsub">Which team found it? Set the wager, then reveal the clue.</div>
+          <div class="teampick" id="ddTeams"></div>
+          <div class="wager">Wager $ <input id="ddWager" type="number" min="5" step="100" value="500"><span class="max" id="ddMax"></span></div>
+          <button class="btn gold" id="ddGo">Show the clue <kbd>Enter</kbd></button>
+        </div>
+        <div class="cluebody" id="clueBody">
+          <div class="cluetext" id="clueText"></div>
+          <div class="answer" id="answer"><div class="lbl">Correct response</div><div class="a" id="answerText"></div><div class="why" id="whyText"></div></div>
+        </div>
+        <div class="timer" id="timerBar"><i id="timerFill"></i></div>
+        <div class="cluefoot" id="clueFoot">
+          <button class="btn gold" id="revealBtn">Reveal answer <kbd>Space</kbd></button>
+          <button class="btn ghost" id="startTimer">Start timer <kbd>T</kbd></button>
+          <div class="judge" id="judge"></div>
+          <button class="btn ghost" id="noOne" style="display:none">Back to board <kbd>Esc</kbd></button>
+        </div>
+        <div class="hint" id="clueHint">Press <kbd>1</kbd>&ndash;<kbd>4</kbd> to award a team &middot; <kbd>Shift</kbd>+<kbd>1</kbd>&ndash;<kbd>4</kbd> to deduct &middot; <kbd>Esc</kbd> to return</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Final Jeopardy -->
+<div class="final" id="final"></div>
+
+<!-- Help -->
+<div class="modal" id="help">
+  <div class="sheet">
+    <h2>Presenter shortcuts</h2>
+    <div class="keys">
+      <kbd>Click tile</kbd><span>Open clue (Tab + Enter works too)</span>
+      <kbd>Space</kbd><span>Reveal the answer</span>
+      <kbd>1 &ndash; 4</kbd><span>Award points to Team 1&ndash;4</span>
+      <kbd>Shift + 1 &ndash; 4</kbd><span>Deduct points from Team 1&ndash;4</span>
+      <kbd>T</kbd><span>Start or restart the countdown on a clue</span>
+      <kbd>Esc</kbd><span>Close the clue and go back to the board</span>
+      <kbd>M</kbd><span>Mute or unmute sound</span>
+      <kbd>U</kbd><span>Undo the last score change</span>
+      <kbd>F</kbd><span>Go to Final Jeopardy</span>
+      <kbd>?</kbd><span>Show or hide this panel</span>
+    </div>
+    <p>Click a team name to rename it. Use the &plusmn; buttons on each team card for manual adjustments. The game auto-saves in this browser, so a refresh won't lose the scores. Two Daily Doubles are hidden on the board.</p>
+    <div style="margin-top:20px;text-align:right"><button class="btn gold" id="helpClose">Got it</button></div>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+<div class="toast" id="toast"></div>
+<script>
+/* =============== GAME CONTENT =============== */
+const B = BRAND_NAME;
+const CATEGORIES = [
+ { name: "Listen Up", clues: [
+  { q: "A customer says: \"My team spends hours every week copying invoice data into SAP.\" What kind of signal is this?",
+    a: "A pain point & buying signal for intelligent document processing",
+    why: "Manual, repetitive, high-volume document work is one of the clearest early AI use cases. Next, ask about volume, cost and error rates." },
+  { q: "\"Our board asked the CEO what our AI strategy is.\" This tells you there is ___.",
+    a: "Executive pressure: urgency from the top, and probably an exec sponsor",
+    why: "Top-down mandates create budget and urgency. Ask who owns the answer to the board and how they'll measure success." },
+  { q: "\"Our data is spread across 14 systems and nobody trusts the reports.\" Name the cue AND the opportunity.",
+    a: "A data-readiness red flag, and an opening to sell data foundation work",
+    why: "AI is only as good as its data. Position data modernization before or alongside the AI use case instead of ignoring the risk." },
+  { q: "\"We tried a chatbot last year and it flopped.\" Name the cue and your next move.",
+    a: "Skepticism after a failed attempt. Ask what went wrong before pitching anything",
+    why: "Learn whether it failed on scope, data, adoption or production. That tells you to position pilot-to-production rigor and change management." },
+  { q: "\"There's budget set aside for Q3, but Legal must approve anything that touches customer data.\" Identify BOTH signals.",
+    a: "A buying signal (budget + timeline) and a governance gate (Legal / compliance)",
+    why: "Celebrate the budget, then bring Legal in early with a responsible-AI and data-governance story so they don't block the deal late." }
+ ]},
+ { name: "Use Case Match", clues: [
+  { q: "An insurer's claims team reads thousands of PDFs, emails and photos every week to start each claim.",
+    a: "Intelligent document processing (document AI extraction & classification)",
+    why: "Look for high volume, unstructured inputs, and manual re-keying." },
+  { q: "Contact center agents put customers on hold to search five different knowledge bases.",
+    a: "Agent-assist copilot with knowledge search (RAG)",
+    why: "It's internal-facing, lower risk, and easy to measure on handle time, first-contact resolution and ramp-up time." },
+  { q: "A plant manager says: \"We find out a motor is failing when the production line stops.\"",
+    a: "Predictive maintenance (IoT sensor data + anomaly detection)",
+    why: "Listen for words like unplanned downtime, sensors, maintenance logs, and the cost of an hour of downtime." },
+  { q: "A retailer keeps over-stocking winter coats while running out of its best sellers.",
+    a: "Demand forecasting / inventory optimization",
+    why: "Signals: forecasts built in spreadsheets, markdowns, stock-outs, and a lot of working capital tied up in inventory." },
+  { q: "A bank sees rising card-not-present losses and takes two days to flag suspicious transactions.",
+    a: "Real-time fraud detection (ML anomaly scoring on streaming transactions)",
+    why: "A proven ML use case with a clear ROI: losses avoided, fewer false positives, and faster detection." }
+ ]},
+ { name: "Position It", clues: [
+  { q: "This low-risk, fixed-scope engagement helps a customer rank AI use cases by value and feasibility.",
+    a: "An AI assessment / strategy (use-case discovery) workshop",
+    why: "It's the best door-opener for unfocused or skeptical buyers, and it produces a roadmap that leads to the next deal." },
+  { q: "When the customer's data isn't ready for AI, lead with this offering.",
+    a: "Data foundation / data modernization (platform, quality, governance)",
+    why: "Fixing the data unlocks many AI use cases, and it's often the larger and stickier engagement." },
+  { q: "A customer has six proofs of concept and zero in production. Name the problem AND the offer.",
+    a: "\"Pilot purgatory\". Position pilot-to-production plus MLOps",
+    why: "Industrialize it: clear success metrics, integration, monitoring, security reviews and a scaling plan." },
+  { q: "Give two reasons a customer would choose an SI like " + B + " over buying directly from a hyperscaler or model vendor.",
+    a: "Any two: vendor-neutral multi-partner expertise, integration with existing systems, end-to-end accountability, change management, proven accelerators, lower risk",
+    why: "Partners provide the platform. " + B + " brings it together with the customer's processes, data and people, which gets them to value faster with less risk." },
+  { q: "The customer worries about who will monitor, retrain and keep models compliant after go-live.",
+    a: "Managed AI services (MLOps / AIOps plus governance)",
+    why: "Recurring revenue for us and peace of mind for them: drift monitoring, retraining, updates and compliance reporting." }
+ ]},
+ { name: "Objection Busters", clues: [
+  { q: "\"AI is just hype.\"",
+    a: "Anchor on one measurable business problem, share a relevant outcome, and propose a small pilot scoped to value",
+    why: "Don't argue about AI in general. Make it about their KPI and a low-risk way to prove it." },
+  { q: "\"We'll just build it ourselves with our IT team.\"",
+    a: "Respect it, then position co-delivery & enablement: accelerators, lessons learned, and upskilling their team",
+    why: "Frame " + B + " as the way to get there faster and avoid known pitfalls, not as a replacement for their team." },
+  { q: "\"Our data isn't secure enough to use AI.\"",
+    a: "Agree it matters, then explain private deployment in their tenant, access controls, and a governance framework. Start with a low-sensitivity use case",
+    why: "Security concerns are buying criteria, not deal-breakers. Turn the security team into co-designers." },
+  { q: "\"It's too expensive.\"",
+    a: "Reframe to ROI and the cost of doing nothing. Quantify the pain, then phase the investment",
+    why: "Start with an assessment or a pilot that has agreed success metrics, so each phase pays for the next." },
+  { q: "\"What if the AI gives our customers wrong answers?\"",
+    a: "Acknowledge hallucination risk, then cover guardrails: grounding (RAG), human-in-the-loop, evaluation & monitoring. Start internal-facing",
+    why: "An agent copilot proves accuracy safely before anything faces the customer." }
+ ]},
+ { name: "AI Buzzword Decoder", clues: [
+  { q: "LLM",
+    a: "Large Language Model",
+    why: "AI trained on huge amounts of text to understand and generate language. It's the engine behind ChatGPT-style assistants." },
+  { q: "RAG",
+    a: "Retrieval-Augmented Generation",
+    why: "The model looks up the company's own trusted content before it answers, so responses are more accurate, current and citable." },
+  { q: "When a generative AI model confidently makes up facts.",
+    a: "Hallucination",
+    why: "Reduce it with grounding (RAG), guardrails, evaluation, and human review for high-stakes outputs." },
+  { q: "The practices and tooling to deploy, monitor, retrain and govern models in production. Think \"DevOps for ML.\"",
+    a: "MLOps",
+    why: "This is how pilots survive in the real world, and it's a core " + B + " offering." },
+  { q: "AI that can plan and take multi-step actions with tools and systems (like looking up an order and issuing a refund) to reach a goal.",
+    a: "Agentic AI (AI agents)",
+    why: "Powerful, but it needs strong guardrails, permissions, and human approval checkpoints." }
+ ]},
+ { name: "Discovery Questions", clues: [
+  { q: "Ask this open-ended question to uncover where AI could save time.",
+    a: "\"Where does your team spend the most time on repetitive, manual work today?\"",
+    why: "Open questions about pain beat \"Do you want AI?\" every time." },
+  { q: "The question that finds out if there's an executive sponsor.",
+    a: "\"Who's championing this at the leadership level, and how will they measure success?\"",
+    why: "No sponsor usually means no budget and no decision." },
+  { q: "The question that checks data readiness.",
+    a: "\"Where does the data for this process live, and how much do you trust it?\"",
+    why: "Data quality and access decide both feasibility and timeline." },
+  { q: "Turn \"We want to do something with AI\" into a real use case.",
+    a: "\"What business outcome would make this a win in 12 months, and which KPI moves?\"",
+    why: "Start from the outcome and work back to the use case, not from the technology." },
+  { q: "The question that uncovers the buying process and hidden blockers.",
+    a: "\"Who else needs to weigh in on a project like this: security, legal, procurement?\"",
+    why: "Multi-thread early. The stakeholders you don't know about are the ones who stall deals." }
+ ]}
+];
+const FINAL = {
+  category: "The Full Deal",
+  q: "A COO says: \"Our claims backlog is six weeks, the board is on my case, and our last AI pilot never left the lab.\" Name the USE CASE, the key SIGNAL, and the " + B + " OFFER you'd lead with.",
+  a: "Use case: intelligent document processing for claims. Signals: quantified pain + board pressure (exec sponsor) + a pilot-purgatory red flag. Lead with: a short assessment and a pilot-to-production plan with success metrics, governance and change management.",
+  why: "Listen, identify, position: the whole job in one answer."
+};
+const VALUES = [100,200,300,400,500];
+const TEAM_COLORS = ["#38bdf8","#f472b6","#a3e635","#fb923c"];
+</script>
+<script>
+/* =============== GAME ENGINE =============== */
+const $ = id => document.getElementById(id);
+const STORE = "aiDealJeopardy.v1";
+const fmt = n => (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString();
+document.querySelectorAll('.brandInline').forEach(e => e.textContent = BRAND_NAME);
+document.title = "AI Deal Jeopardy · " + BRAND_NAME;
+
+function pickDailyDoubles(){
+  const cats = [...Array(CATEGORIES.length).keys()].sort(() => Math.random() - .5).slice(0, 2);
+  return cats.map(c => c + "-" + (1 + Math.floor(Math.random() * 4))); // never on $100
+}
+function newState(prevTeams){
+  const teams = prevTeams ? prevTeams.map(t => ({ name: t.name, score: 0 }))
+    : [{ name: "Team 1", score: 0 }, { name: "Team 2", score: 0 }, { name: "Team 3", score: 0 }];
+  return { teams, used: [], dd: pickDailyDoubles(), timerOn: S ? S.timerOn : false, muted: S ? S.muted : false, timerSecs: S ? S.timerSecs : 20 };
+}
+let S = null;
+try { const raw = JSON.parse(localStorage.getItem(STORE)); if (raw && Array.isArray(raw.teams) && raw.teams.length >= 2 && Array.isArray(raw.used) && Array.isArray(raw.dd)) S = raw; } catch (e) {}
+if (!S) S = newState();
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} };
+let history = [];
+
+/* ---------- Sound (WebAudio, no files) ---------- */
+let AC = null;
+function ac(){
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } }
+  if (AC && AC.state === "suspended") AC.resume().catch(() => {});
+  return AC;
+}
+function tone(f, dur, o = {}){
+  if (S.muted) return; const c = ac(); if (!c) return;
+  const t = c.currentTime + (o.delay || 0), osc = c.createOscillator(), g = c.createGain();
+  osc.type = o.type || "sine"; osc.frequency.setValueAtTime(f, t);
+  if (o.slide) osc.frequency.exponentialRampToValueAtTime(o.slide, t + dur);
+  const v = o.vol || .14;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  osc.connect(g).connect(c.destination); osc.start(t); osc.stop(t + dur + .05);
+}
+const SFX = {
+  open(){ tone(523, .12, { type: "triangle" }); tone(784, .2, { type: "triangle", delay: .1 }); },
+  reveal(){ tone(660, .1, { type: "triangle" }); tone(990, .25, { type: "triangle", delay: .08 }); },
+  tick(){ tone(1400, .06, { type: "square", vol: .07 }); },
+  buzz(){ tone(130, .8, { type: "sawtooth", vol: .16 }); tone(138, .8, { type: "sawtooth", vol: .12 }); },
+  right(){ [523, 659, 784, 1047].forEach((f, i) => tone(f, .2, { type: "triangle", delay: i * .08 })); },
+  wrong(){ tone(330, .25, { type: "sawtooth", vol: .09, slide: 180 }); tone(220, .4, { type: "sawtooth", vol: .09, delay: .2, slide: 110 }); },
+  dd(){ [392, 523, 659, 784, 659, 784, 1047].forEach((f, i) => tone(f, .22, { type: "square", vol: .06, delay: i * .11 })); },
+  win(){ [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone(f, .32, { type: "triangle", vol: .14, delay: i * .14 })); },
+  think(step){ const m = [659, 880, 659, 440, 659, 880, 659, 0, 880, 784, 740, 659, 587, 554, 523, 0]; const f = m[step % m.length]; if (f) tone(f, .28, { type: "triangle", vol: .08 }); }
+};
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2200); }
+
+/* ---------- Board ---------- */
+function renderBoard(){
+  const b = $("board"); b.innerHTML = "";
+  CATEGORIES.forEach(c => { const d = document.createElement("div"); d.className = "cat"; d.textContent = c.name; b.appendChild(d); });
+  VALUES.forEach((v, r) => CATEGORIES.forEach((c, ci) => {
+    const key = ci + "-" + r, used = S.used.includes(key);
+    const t = document.createElement("button");
+    t.className = "tile" + (used ? " used" : "");
+    t.textContent = "$" + v; t.dataset.key = key;
+    t.setAttribute("aria-label", used ? c.name + " " + v + " (used)" : c.name + " for " + v);
+    if (used) t.tabIndex = -1; else t.addEventListener("click", () => openClue(ci, r, t));
+    b.appendChild(t);
+  }));
+  $("finalBtn").style.animation = S.used.length >= 30 ? "pulse 1.2s ease-in-out infinite" : "";
+}
+
+/* ---------- Teams ---------- */
+function renderTeams(){
+  const wrap = $("teams"); wrap.innerHTML = "";
+  const max = Math.max(...S.teams.map(t => t.score));
+  S.teams.forEach((t, i) => {
+    const d = document.createElement("div");
+    d.className = "team" + (max > 0 && t.score === max ? " leader" : ""); d.id = "team" + i;
+    d.innerHTML = `<span class="key">${i + 1}</span><div class="sw" style="background:${TEAM_COLORS[i]}"></div>
+      <div class="meta"><div class="name" contenteditable="true" spellcheck="false"></div><div class="score ${t.score < 0 ? "neg" : ""}">${fmt(t.score)}</div></div>
+      <div class="adj"><button title="+100">+</button><button title="-100">&minus;</button></div>`;
+    const nm = d.querySelector(".name"); nm.textContent = t.name;
+    nm.addEventListener("blur", () => { const v = nm.textContent.trim().slice(0, 28) || ("Team " + (i + 1)); S.teams[i].name = v; nm.textContent = v; save(); });
+    const [plus, minus] = d.querySelectorAll(".adj button");
+    plus.onclick = () => addScore(i, 100); minus.onclick = () => addScore(i, -100);
+    wrap.appendChild(d);
+  });
+  $("addTeam").disabled = S.teams.length >= 4; $("remTeam").disabled = S.teams.length <= 2;
+}
+function addScore(i, delta, record = true){
+  if (!S.teams[i]) return;
+  S.teams[i].score += delta; if (record) history.push({ i, delta });
+  save(); renderTeams();
+  const el = $("team" + i); if (el) { el.classList.add(delta >= 0 ? "flash-up" : "flash-down"); setTimeout(() => el && el.classList.remove("flash-up", "flash-down"), 900); }
+}
+function undo(){
+  const h = history.pop(); if (!h) { toast("Nothing to undo"); return; }
+  S.teams[h.i].score -= h.delta; save(); renderTeams(); toast("Undid " + fmt(h.delta) + " for " + S.teams[h.i].name);
+}
+$("addTeam").onclick = () => { if (S.teams.length < 4) { S.teams.push({ name: "Team " + (S.teams.length + 1), score: 0 }); save(); renderTeams(); } };
+$("remTeam").onclick = () => { if (S.teams.length > 2) { S.teams.pop(); history = history.filter(h => h.i < S.teams.length); save(); renderTeams(); } };
+/* ---------- Timer ---------- */
+let tInt = null;
+function startTimer(){
+  stopTimer();
+  const secs = +$("timerSecs").value, bar = $("timerBar"), fill = $("timerFill");
+  bar.classList.add("show"); bar.classList.remove("warn");
+  fill.style.transition = "none"; fill.style.transform = "scaleX(1)"; void fill.offsetWidth;
+  fill.style.transition = `transform ${secs}s linear`; fill.style.transform = "scaleX(0)";
+  let left = secs; $("timerNum").textContent = left;
+  tInt = setInterval(() => {
+    left--; $("timerNum").textContent = left > 0 ? left : "TIME!";
+    if (left <= 5 && left > 0) { bar.classList.add("warn"); SFX.tick(); }
+    if (left <= 0) { clearInterval(tInt); tInt = null; SFX.buzz(); }
+  }, 1000);
+}
+function stopTimer(){
+  clearInterval(tInt); tInt = null;
+  $("timerBar").classList.remove("show", "warn"); $("timerNum").textContent = "";
+}
+function setTimerUI(){
+  $("timerBtn").classList.toggle("on", S.timerOn); $("timerLbl").textContent = S.timerOn ? "Timer on" : "Timer off";
+  $("timerSecs").value = String(S.timerSecs || 20);
+}
+$("timerBtn").onclick = e => { if (e.target.tagName === "SELECT" || e.target.tagName === "OPTION") return; S.timerOn = !S.timerOn; save(); setTimerUI(); toast(S.timerOn ? "Countdown timer ON: starts automatically on each clue" : "Countdown timer OFF"); };
+$("timerSecs").onchange = () => { S.timerSecs = +$("timerSecs").value; save(); };
+function setSoundUI(){ $("soundBtn").classList.toggle("on", !S.muted); $("soundLbl").textContent = S.muted ? "Muted" : "Sound on"; $("soundIcon").innerHTML = S.muted ? '<path d="M11 5L6 9H2v6h4l5 4z"/><path d="M22 9l-6 6M16 9l6 6"/>' : '<path d="M11 5L6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>'; }
+function toggleMute(){ S.muted = !S.muted; save(); setSoundUI(); if (!S.muted) { ac(); tone(880, .1, { type: "triangle" }); } }
+$("soundBtn").onclick = toggleMute;
+
+/* ---------- Clue overlay ---------- */
+let cur = null, closing = false;
+const HINT_DEFAULT = $("clueHint").innerHTML;
+function targetRect(){ return { L: innerWidth * .03, T: innerHeight * .035, W: innerWidth * .94, H: innerHeight * .93 }; }
+function openClue(c, r, tile){
+  if (cur || closing) return;
+  const key = c + "-" + r; if (S.used.includes(key)) return;
+  ac();
+  const clue = CATEGORIES[c].clues[r], isDD = S.dd.includes(key);
+  cur = { c, r, key, tile, clue, value: VALUES[r], isDD, stage: isDD ? "dd" : "clue", revealed: false, judged: new Set(), ddTeam: 0, wager: 0, solved: false };
+  S.used.push(key); save();
+  // content
+  $("frontFace").textContent = "$" + cur.value;
+  $("clueCat").textContent = CATEGORIES[c].name;
+  $("clueVal").textContent = "$" + cur.value;
+  $("clueText").textContent = clue.q; $("clueText").classList.toggle("long", clue.q.length > 130);
+  $("answerText").textContent = clue.a; $("whyText").textContent = clue.why;
+  $("answer").classList.remove("show"); $("judge").classList.remove("show"); $("judge").innerHTML = "";
+  $("revealBtn").style.display = ""; $("startTimer").style.display = ""; $("noOne").style.display = "none"; $("noOne").innerHTML = 'Back to board <kbd>Esc</kbd>';
+  $("ddPane").classList.toggle("show", isDD);
+  $("clueBody").style.display = isDD ? "none" : ""; $("clueFoot").style.display = isDD ? "none" : ""; $("clueHint").style.display = isDD ? "none" : "";
+  $("clueHint").innerHTML = HINT_DEFAULT;
+  stopTimer();
+  if (isDD) setupDD();
+  // FLIP animation from the tile to full screen
+  const ov = $("overlay"), mv = $("mover"), fl = $("flipper");
+  ov.classList.add("show"); fl.classList.remove("flipped");
+  const rc = tile.getBoundingClientRect(), T = targetRect();
+  mv.style.transition = "none";
+  mv.style.transform = `translate(${rc.left - T.L}px,${rc.top - T.T}px) scale(${rc.width / T.W},${rc.height / T.H})`;
+  void mv.offsetWidth;
+  requestAnimationFrame(() => {
+    mv.style.transition = ""; mv.style.transform = "none"; ov.classList.add("dim");
+    setTimeout(() => { fl.classList.add("flipped"); isDD ? SFX.dd() : SFX.open(); }, 380);
+    setTimeout(() => { if (cur && cur.stage === "clue" && S.timerOn) startTimer(); if (cur && isDD) { const w = $("ddWager"); w.focus(); w.select(); } }, 1100);
+  });
+}
+function closeClue(){
+  if (!cur || closing) return;
+  closing = true; stopTimer();
+  const ov = $("overlay"), mv = $("mover"), fl = $("flipper"), tile = cur.tile;
+  fl.classList.remove("flipped");
+  setTimeout(() => {
+    const rc = tile.getBoundingClientRect(), T = targetRect();
+    mv.style.transform = `translate(${rc.left - T.L}px,${rc.top - T.T}px) scale(${rc.width / T.W},${rc.height / T.H})`;
+    ov.classList.remove("dim");
+  }, 320);
+  setTimeout(() => {
+    ov.classList.remove("show"); cur = null; closing = false; renderBoard(); stopConfetti();
+    if (S.used.length >= 30) toast("Board cleared! Press F for Final Jeopardy");
+  }, 900);
+}
+function reveal(){
+  if (!cur || cur.stage === "dd" || cur.revealed) return;
+  cur.revealed = true; stopTimer();
+  $("answer").classList.add("show"); $("revealBtn").style.display = "none"; $("startTimer").style.display = "none";
+  renderJudge(); $("judge").classList.add("show"); $("noOne").style.display = "";
+  SFX.reveal();
+}
+function stakes(){ return cur.isDD ? cur.wager : cur.value; }
+function renderJudge(){
+  const j = $("judge"); j.innerHTML = "";
+  const list = cur.isDD ? [cur.ddTeam] : S.teams.map((_, i) => i);
+  list.forEach(i => {
+    const t = S.teams[i]; if (!t) return;
+    const d = document.createElement("div");
+    d.className = "jt" + (cur.judged.has(i) || cur.solved ? " done" : "");
+    d.innerHTML = `<span class="sw" style="background:${TEAM_COLORS[i]}"></span><span class="n"></span><button class="ok" title="Correct (${i + 1})">&#10003; +${stakes()}</button><button class="no" title="Wrong (Shift+${i + 1})">&#10007; &minus;${stakes()}</button>`;
+    d.querySelector(".n").textContent = t.name;
+    d.querySelector(".ok").onclick = () => judge(i, true);
+    d.querySelector(".no").onclick = () => judge(i, false);
+    j.appendChild(d);
+  });
+}
+function judge(i, correct){
+  if (!cur || cur.stage === "dd" || cur.solved || !S.teams[i]) return;
+  if (cur.isDD && i !== cur.ddTeam) return;
+  if (cur.judged.has(i)) return;
+  if (!cur.revealed) reveal();
+  cur.judged.add(i);
+  addScore(i, correct ? stakes() : -stakes());
+  if (correct) {
+    cur.solved = true; SFX.right();
+    const r = $("answer").getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 90);
+    toast(S.teams[i].name + " +" + fmt(stakes()));
+    $("noOne").innerHTML = 'Back to board <kbd>Esc</kbd>';
+  } else { SFX.wrong(); toast(S.teams[i].name + " " + fmt(-stakes())); }
+  if (cur.isDD) cur.solved = true;
+  renderJudge();
+}
+
+/* ---------- Daily Double ---------- */
+function setupDD(){
+  const box = $("ddTeams"); box.innerHTML = "";
+  let low = 0; S.teams.forEach((t, i) => { if (t.score < S.teams[low].score) low = i; });
+  cur.ddTeam = low;
+  S.teams.forEach((t, i) => {
+    const b = document.createElement("button"); b.className = "tp" + (i === cur.ddTeam ? " sel" : "");
+    b.innerHTML = `<span class="sw" style="background:${TEAM_COLORS[i]}"></span><span></span>`; b.lastChild.textContent = t.name;
+    b.onclick = () => selectDDTeam(i); box.appendChild(b);
+  });
+  updateDDMax(); $("ddWager").value = Math.min(500, ddMax());
+}
+function ddMax(){ return Math.max(S.teams[cur.ddTeam].score, 500); }
+function updateDDMax(){ $("ddMax").textContent = "(max " + fmt(ddMax()) + ")"; $("ddWager").max = ddMax(); }
+function selectDDTeam(i){ if (!S.teams[i]) return; cur.ddTeam = i; [...$("ddTeams").children].forEach((b, k) => b.classList.toggle("sel", k === i)); updateDDMax(); }
+function goDD(){
+  if (!cur || cur.stage !== "dd") return;
+  let w = Math.round(+$("ddWager").value || 0); w = Math.max(5, Math.min(ddMax(), w));
+  cur.wager = w; cur.stage = "clue";
+  $("clueVal").textContent = "Wager " + fmt(w);
+  $("ddPane").classList.remove("show"); $("clueBody").style.display = ""; $("clueFoot").style.display = ""; $("clueHint").style.display = "";
+  $("clueHint").innerHTML = S.teams[cur.ddTeam].name.replace(/[<>&]/g, "") + " is playing for " + fmt(w) + " &middot; <kbd>" + (cur.ddTeam + 1) + "</kbd> correct &middot; <kbd>Shift</kbd>+<kbd>" + (cur.ddTeam + 1) + "</kbd> wrong";
+  SFX.open(); if (S.timerOn) startTimer();
+}
+$("ddGo").onclick = goDD;
+$("revealBtn").onclick = reveal;
+$("startTimer").onclick = startTimer;
+$("closeClue").onclick = closeClue;
+$("noOne").onclick = closeClue;
+/* ---------- Final Jeopardy ---------- */
+let F = null, thinkInt = null;
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function openFinal(){
+  if (cur) return;
+  ac();
+  F = { stage: "wager", wagers: S.teams.map(() => 0), marks: S.teams.map(() => null) };
+  $("final").classList.add("show"); renderFinal(); SFX.dd();
+}
+function closeFinal(){ stopThink(); $("final").classList.remove("show"); F = null; stopConfetti(); }
+function stopThink(){ clearInterval(thinkInt); thinkInt = null; }
+function renderFinal(){
+  const f = $("final"); let h = "";
+  if (F.stage === "wager") {
+    h = `<div class="ft">FINAL JEOPARDY!</div><div class="ddsub">Today's category</div><div class="fcat">${esc(FINAL.category)}</div>
+      <div class="ddsub">Teams: write down a secret wager. Enter it below (up to your current score).</div><div class="fwagers">` +
+      S.teams.map((t, i) => { const mx = Math.max(0, t.score); return `<div class="fw"><div class="n"><span class="sw" style="width:12px;height:12px;border-radius:50%;background:${TEAM_COLORS[i]}"></span>${esc(t.name)}</div><div class="s">Score ${fmt(t.score)} &middot; max ${fmt(mx)}</div><input type="number" min="0" max="${mx}" step="100" value="${Math.min(F.wagers[i], mx)}" data-i="${i}" ${mx === 0 ? "disabled" : ""}></div>`; }).join("") +
+      `</div><div class="cluefoot"><button class="btn ghost" id="fBack">Back to board</button><button class="btn gold" id="fNext">Reveal the clue <kbd>Enter</kbd></button></div>`;
+  } else if (F.stage === "clue") {
+    h = `<div class="chip">${esc(FINAL.category)}</div><div class="fclue">${esc(FINAL.q)}</div>
+      <div class="ftimer"><div class="timer show" id="fTimer"><i id="fFill"></i></div><div class="ddsub" id="fLeft">30 seconds to write your answer</div></div>
+      <div class="cluefoot"><button class="btn gold" id="fNext">Reveal answer <kbd>Space</kbd></button></div>`;
+  } else if (F.stage === "judge") {
+    h = `<div class="chip">${esc(FINAL.category)}</div><div class="answer show" style="max-width:1400px"><div class="lbl">Correct response</div><div class="a" style="font-size:clamp(18px,1.8vw,30px)">${esc(FINAL.a)}</div><div class="why">${esc(FINAL.why)}</div></div>
+      <div class="fwagers">` + S.teams.map((t, i) => `<div class="fw"><div class="n"><span class="sw" style="width:12px;height:12px;border-radius:50%;background:${TEAM_COLORS[i]}"></span>${esc(t.name)}</div><div class="wtag">Wager ${fmt(F.wagers[i])}</div><div class="marks"><button class="ok ${F.marks[i] === true ? "sel" : ""}" data-i="${i}" data-v="1">&#10003; Right</button><button class="no ${F.marks[i] === false ? "sel" : ""}" data-i="${i}" data-v="0">&#10007; Wrong</button></div></div>`).join("") +
+      `</div><div class="cluefoot"><button class="btn gold" id="fNext">Show final scores <kbd>Enter</kbd></button></div>`;
+  } else {
+    const order = S.teams.map((t, i) => ({ ...t, i })).sort((a, b) => b.score - a.score);
+    const top = order[0].score, winners = order.filter(t => t.score === top);
+    const podOrder = order.length >= 3 ? [order[1], order[0], order[2], ...order.slice(3)] : order;
+    const heights = { 0: 46, 1: 34, 2: 26, 3: 20 };
+    h = `<div class="ft">${winners.length > 1 ? "IT'S A TIE!" : "WE HAVE A WINNER!"}</div><div class="fcat">${winners.map(w => esc(w.name)).join(" &amp; ")}</div><div class="podium">` +
+      podOrder.map(t => { const rank = order.indexOf(t); return `<div class="pod"><div class="nm">${esc(t.name)}</div><div class="sc">${fmt(t.score)}</div><div class="bar" style="height:${heights[rank]}vh;background:${rank === 0 ? "linear-gradient(180deg,#ffe082,#ffb020)" : "linear-gradient(180deg," + TEAM_COLORS[t.i] + ",rgba(255,255,255,.25))"};animation-delay:${.2 + (3 - rank) * .15}s">${rank + 1}</div></div>`; }).join("") +
+      `</div><div class="cluefoot"><button class="btn ghost" id="fBack">Back to board</button><button class="btn gold" id="fNew">Play again</button></div>`;
+  }
+  f.innerHTML = h;
+  const nx = $("fNext"), bk = $("fBack"), nw = $("fNew");
+  if (nx) nx.onclick = finalNext; if (bk) bk.onclick = closeFinal; if (nw) nw.onclick = () => { closeFinal(); resetGame(true); };
+  f.querySelectorAll("input[data-i]").forEach(inp => inp.oninput = () => { F.wagers[+inp.dataset.i] = +inp.value || 0; });
+  f.querySelectorAll(".marks button").forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, v = b.dataset.v === "1"; F.marks[i] = v; v ? SFX.right() : SFX.wrong();
+    b.parentNode.querySelectorAll("button").forEach(x => x.classList.toggle("sel", x === b));
+  });
+  if (F.stage === "clue") runFinalTimer();
+  if (F.stage === "done") { SFX.win(); startConfetti(); }
+}
+function runFinalTimer(){
+  const fill = $("fFill"), secs = 30; let left = secs, step = 0;
+  fill.style.transition = "none"; fill.style.transform = "scaleX(1)"; void fill.offsetWidth;
+  fill.style.transition = `transform ${secs}s linear`; fill.style.transform = "scaleX(0)";
+  stopThink();
+  thinkInt = setInterval(() => {
+    SFX.think(step++);
+    if (step % 2 === 0) { left--; const l = $("fLeft"); if (l) l.textContent = left > 0 ? left + " seconds left" : "Time's up! Pencils down."; if (left <= 5) $("fTimer") && $("fTimer").classList.add("warn"); }
+    if (left <= 0) { stopThink(); SFX.buzz(); }
+  }, 500);
+}
+function finalNext(){
+  if (!F) return;
+  if (F.stage === "wager") {
+    F.wagers = F.wagers.map((w, i) => Math.max(0, Math.min(Math.max(0, S.teams[i].score), Math.round(w))));
+    F.stage = "clue"; SFX.open();
+  } else if (F.stage === "clue") { stopThink(); F.stage = "judge"; SFX.reveal(); }
+  else if (F.stage === "judge") {
+    if (F.marks.some(m => m === null) && !confirm("Some teams aren't marked yet. Unmarked teams keep their score. Continue?")) return;
+    F.marks.forEach((m, i) => { if (m === true) addScore(i, F.wagers[i]); else if (m === false) addScore(i, -F.wagers[i]); });
+    F.stage = "done";
+  }
+  renderFinal();
+}
+$("finalBtn").onclick = openFinal;
+
+/* ---------- Confetti ---------- */
+const cv = $("confetti"), cx = cv.getContext("2d"); let parts = [], confRAF = null, confUntil = 0;
+function sizeCanvas(){ cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); }
+sizeCanvas(); addEventListener("resize", sizeCanvas);
+const CCOL = ["#ffcc4d", "#ffffff", "#38bdf8", "#f472b6", "#a3e635", "#fb923c", "#2244ff"];
+function spawn(x, y, n, spread){
+  for (let k = 0; k < n; k++) {
+    const a = spread ? Math.random() * Math.PI * 2 : Math.PI / 2 + (Math.random() - .5) * .6, sp = spread ? 4 + Math.random() * 9 : 2 + Math.random() * 4;
+    parts.push({ x: spread ? x : Math.random() * innerWidth, y: spread ? y : -20 - Math.random() * innerHeight * .5, vx: Math.cos(a) * sp, vy: spread ? Math.sin(a) * sp - 4 : sp, r: Math.random() * Math.PI, vr: (Math.random() - .5) * .3, w: 6 + Math.random() * 8, h: 8 + Math.random() * 10, c: CCOL[k % CCOL.length], life: 1 });
+  }
+  if (!confRAF) confRAF = requestAnimationFrame(tick);
+}
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight);
+  if (performance.now() < confUntil && parts.length < 500) spawn(0, 0, 6, false);
+  parts.forEach(p => { p.vy += .18; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; if (p.y > innerHeight + 30) p.life = 0;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c; cx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); cx.restore(); });
+  parts = parts.filter(p => p.life > 0);
+  confRAF = parts.length || performance.now() < confUntil ? requestAnimationFrame(tick) : null;
+  if (!confRAF) cx.clearRect(0, 0, innerWidth, innerHeight);
+}
+function burst(x, y, n){ spawn(x, y, n, true); }
+function startConfetti(){ confUntil = performance.now() + 5000; spawn(0, 0, 160, false); }
+function stopConfetti(){ confUntil = 0; parts = []; }
+
+/* ---------- Help, reset ---------- */
+function toggleHelp(force){ const m = $("help"); m.classList.toggle("show", force !== undefined ? force : !m.classList.contains("show")); }
+$("helpBtn").onclick = () => toggleHelp(true); $("helpClose").onclick = () => toggleHelp(false);
+$("help").onclick = e => { if (e.target.id === "help") toggleHelp(false); };
+function resetGame(skipConfirm){
+  if (!skipConfirm && !confirm("Start a new game? Scores and the board reset; team names are kept. Daily Doubles move.")) return;
+  S = newState(S.teams); history = []; save(); renderBoard(); renderTeams(); toast("New game. Good luck!");
+}
+$("resetBtn").onclick = () => resetGame(false);
+$("undoBtn").onclick = undo;
+
+/* ---------- Keyboard ---------- */
+document.addEventListener("keydown", e => {
+  const t = e.target, editing = t.isContentEditable || t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA";
+  if (editing) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (t.isContentEditable) t.blur();
+      else if (cur && cur.stage === "dd") goDD();
+      else if (F) finalNext();
+    } else if (e.key === "Escape") { t.blur(); if (cur && !t.isContentEditable) closeClue(); else if (F && !t.isContentEditable) closeFinal(); }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  const digit = /^(Digit|Numpad)([1-4])$/.exec(e.code);
+  if ($("help").classList.contains("show")) { if (k === "escape" || k === "?" || k === "enter") { e.preventDefault(); toggleHelp(false); } return; }
+  if (k === "?" || (k === "/" && e.shiftKey)) { toggleHelp(); return; }
+  if (k === "m") { toggleMute(); return; }
+  if (F) {
+    if (k === "escape") closeFinal();
+    else if (k === "enter" || (k === " " && F.stage === "clue")) { e.preventDefault(); finalNext(); }
+    return;
+  }
+  if (cur) {
+    if (closing) return;
+    if (k === "escape") { closeClue(); return; }
+    if (cur.stage === "dd") {
+      if (digit) selectDDTeam(+digit[2] - 1);
+      if (k === "enter") { e.preventDefault(); goDD(); }
+      return;
+    }
+    if (k === " ") { e.preventDefault(); reveal(); return; }
+    if (k === "t") { if (!cur.revealed) startTimer(); return; }
+    if (digit) { e.preventDefault(); judge(+digit[2] - 1, !e.shiftKey); return; }
+    return;
+  }
+  if (k === " ") { e.preventDefault(); return; }
+  if (k === "f") openFinal();
+  else if (k === "u") undo();
+  else if (k === "t") $("timerBtn").click();
+});
+
+/* ---------- Init ---------- */
+renderBoard(); renderTeams(); setTimerUI(); setSoundUI();
+</script>
+</body>
+</html>

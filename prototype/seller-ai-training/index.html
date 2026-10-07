@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+/* ==================== CONFIG ==================== */
+/* Change your company name here; it updates everywhere on the page. */
+const BRAND_NAME = "Your Company";
+/* ================================================ */
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Seller Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b1f;--ink:#eef2ff;--muted:#9aa6d1;--gold:#ffc843;--blue:#2b5cff;--violet:#8b5cf6;--teal:#14d3b0;--card:rgba(255,255,255,.05);--line:rgba(255,255,255,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;overflow-x:hidden}
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;background:
+ radial-gradient(900px 600px at 10% -10%,rgba(43,92,255,.35),transparent 60%),
+ radial-gradient(800px 600px at 110% 20%,rgba(139,92,246,.30),transparent 60%),
+ radial-gradient(700px 500px at 50% 120%,rgba(20,211,176,.18),transparent 60%)}
+.grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse at center,#000 30%,transparent 75%)}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:clamp(24px,4vh,48px) clamp(20px,4vw,48px);min-height:100vh;display:flex;flex-direction:column}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.2px}
+.logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--violet));display:grid;place-items:center;box-shadow:0 8px 24px rgba(43,92,255,.4)}
+.pill{font-size:13px;color:var(--muted);border:1px solid var(--line);padding:6px 12px;border-radius:999px;background:var(--card)}
+.hero{margin:clamp(28px,6vh,72px) 0 clamp(24px,4.5vh,52px);max-width:880px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:2px;font-size:13px}
+.eyebrow:before{content:"";width:28px;height:2px;background:var(--gold)}
+h1{font-family:"Space Grotesk",Inter,sans-serif;font-size:clamp(40px,5.2vw,74px);line-height:1.02;margin:14px 0 18px;letter-spacing:-1.5px}
+h1 .g{background:linear-gradient(90deg,var(--gold),#ff8a3d);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(17px,1.5vw,21px);color:var(--muted);line-height:1.55;max-width:740px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2vw,28px)}
+.card{position:relative;display:flex;flex-direction:column;gap:18px;padding:clamp(24px,2.6vw,36px);border-radius:24px;border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));text-decoration:none;color:inherit;overflow:hidden;transition:transform .25s ease,border-color .25s,box-shadow .25s}
+.card:hover,.card:focus-visible{transform:translateY(-6px);border-color:rgba(255,255,255,.3);box-shadow:0 24px 60px rgba(0,0,0,.45);outline:none}
+.card .glow{position:absolute;width:340px;height:340px;right:-120px;top:-140px;border-radius:50%;opacity:.55;pointer-events:none}
+.card.j .glow{background:radial-gradient(circle,rgba(255,200,67,.55),transparent 65%)}
+.card.r .glow{background:radial-gradient(circle,rgba(20,211,176,.5),transparent 65%)}
+.top{display:flex;gap:18px;align-items:center}
+.icon{flex:none;width:64px;height:64px;border-radius:18px;display:grid;place-items:center;position:relative}
+.card.j .icon{background:linear-gradient(135deg,#1a3cff,#0a1a8c);box-shadow:inset 0 0 0 2px rgba(255,200,67,.6)}
+.card.r .icon{background:linear-gradient(135deg,#0fb894,#0b6e8c)}
+.card h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:clamp(24px,2.3vw,32px);letter-spacing:-.5px}
+.card p{color:var(--muted);font-size:clamp(15px,1.2vw,18px);line-height:1.5}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-size:13px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:#cfd6f5}
+.cta{margin-top:auto;display:inline-flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.card.j .cta{color:var(--gold)}.card.r .cta{color:var(--teal)}
+.cta svg{transition:transform .25s}.card:hover .cta svg{transform:translateX(6px)}
+.mini{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.mini span{height:24px;border-radius:5px;background:linear-gradient(180deg,#1f45e6,#1430b8);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--gold)}
+.mini span.h{background:#0d1c66;color:#fff;font-size:8.5px;letter-spacing:.6px}
+.chat{display:flex;flex-direction:column;gap:6px}
+.b{max-width:80%;font-size:13px;padding:8px 12px;border-radius:12px;line-height:1.35}
+.b.c{background:rgba(255,255,255,.09);border-top-left-radius:4px}
+.b.s{align-self:flex-end;background:linear-gradient(135deg,#0fb894,#0b8c9c);border-top-right-radius:4px}
+.b mark{background:rgba(52,211,153,.25);color:#b8ffe3;border-radius:4px;padding:0 3px;box-shadow:0 0 0 1px rgba(52,211,153,.6)}
+footer{margin-top:auto;padding-top:36px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:14px}
+kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;background:rgba(255,255,255,.06);color:#dfe5ff}
+@media (max-width:860px){.cards{grid-template-columns:1fr}}
+@media (max-height:860px) and (min-width:861px){.wrap{padding-top:22px;padding-bottom:22px}.hero{margin:22px 0 22px}h1{font-size:clamp(36px,4.2vw,58px);margin:10px 0 12px}.lede{font-size:17px}.card{gap:14px;padding:24px 28px}footer{padding-top:22px}}
+</style>
+</head>
+<body>
+<div class="bgfx"></div><div class="grid"></div>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg></div><span><span class="brandInline">Your Company</span> &middot; AI Seller Academy</span></div>
+    <span class="pill">Trainer Edition &middot; Prototype</span>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Sales enablement</div>
+    <h1>Learn to sell AI by <span class="g">playing the deal.</span></h1>
+    <p class="lede">Two games for presenters that teach sellers what to listen for, how to spot real AI use cases, and how to position <span class="brandInline">Your Company</span>'s services. Use them in the training room or over screen share.</p>
+  </section>
+
+  <section class="cards">
+    <a class="card j" href="jeopardy.html">
+      <div class="glow"></div>
+      <div class="top">
+        <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffc843" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        <h2>AI Deal Jeopardy</h2>
+      </div>
+      <p>A team quiz game on signals, use cases, positioning and objection handling, with Daily Doubles and Final Jeopardy.</p>
+      <div class="mini" aria-hidden="true">
+        <span class="h">LISTEN UP</span><span class="h">USE CASE</span><span class="h">POSITION</span><span class="h">OBJECTION</span><span class="h">DECODER</span><span class="h">DISCOVERY</span>
+        <span>$100</span><span>$100</span><span>$100</span><span>$100</span><span>$100</span><span>$100</span>
+        <span>$200</span><span>$200</span><span>$200</span><span>$200</span><span>$200</span><span>$200</span>
+      </div>
+      <div class="tags"><span class="tag">2&ndash;4 teams</span><span class="tag">30 clues + Final</span><span class="tag">20&ndash;40 min</span><span class="tag">Timer &amp; sound</span></div>
+      <span class="cta">Launch game <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+    </a>
+
+    <a class="card r" href="roleplay.html">
+      <div class="glow"></div>
+      <div class="top">
+        <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+        <h2>Customer Role-Play Simulator</h2>
+      </div>
+      <p>Branching customer conversations: choose what to say, get coaching on every reply, and flag hidden buying signals.</p>
+      <div class="chat" aria-hidden="true">
+        <div class="b c">My team keys in <mark>9,000 invoices a month</mark> by hand...</div>
+        <div class="b s">What does an exception cost you today?</div>
+      </div>
+      <div class="tags"><span class="tag">4 personas</span><span class="tag">Group voting mode</span><span class="tag">Signal spotter</span><span class="tag">Debrief scorecard</span></div>
+      <span class="cta">Start role-play <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
+    </a>
+  </section>
+
+  <footer>
+    <span>Tip: press <kbd>F11</kbd> for full screen when projecting. Both games work over screen share.</span>
+    <span>&copy; <span class="brandInline">Your Company</span> &middot; Internal training prototype</span>
+  </footer>
+</div>
+<script>
+document.querySelectorAll('.brandInline').forEach(e => e.textContent = BRAND_NAME);
+document.title = BRAND_NAME + " · AI Seller Academy";
+</script>
+</body>
+</html>

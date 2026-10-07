@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+/* ==================== CONFIG ==================== */
+/* Change your company name here; it updates everywhere in the simulator. */
+const BRAND_NAME = "Your Company";
+/* ================================================ */
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Customer Role-Play Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b1d;--panel:#0e1530;--panel2:#121b3d;--ink:#eef2ff;--muted:#97a3cf;--line:rgba(255,255,255,.1);
+  --teal:#14d3b0;--violet:#8b5cf6;--gold:#ffc843;--green:#22c55e;--amber:#f59e0b;--red:#f43f5e;--sky:#38bdf8;
+  --head:"Space Grotesk",Inter,system-ui,sans-serif;--ui:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --fs:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--ui);background:var(--bg);color:var(--ink);overflow:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(900px 600px at 0% -10%,rgba(20,211,176,.16),transparent 60%),radial-gradient(900px 600px at 100% 0%,rgba(139,92,246,.2),transparent 60%)}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+#app{position:relative;z-index:1;height:100vh;display:flex;flex-direction:column}
+.screen{position:relative;flex:1;min-height:0;display:none;flex-direction:column}
+.playonly{display:none!important}body.inplay .playonly{display:inline-flex!important}
+.screen.show{display:flex}
+.scroll{overflow-y:auto}
+
+/* Top bar */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px clamp(16px,2vw,32px);border-bottom:1px solid var(--line);background:rgba(7,11,29,.6);backdrop-filter:blur(8px);flex:none}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800}
+.brand .logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--teal),#0b6e8c);display:grid;place-items:center}
+.brand small{display:block;color:var(--muted);font-weight:600;font-size:12px;letter-spacing:1.2px;text-transform:uppercase}
+.brand b{font-family:var(--head);font-size:19px;letter-spacing:-.2px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.tg{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 13px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-weight:600;font-size:13.5px;transition:background .2s}
+.tg:hover{background:rgba(255,255,255,.11)}
+.tg .sw{width:30px;height:18px;border-radius:999px;background:rgba(255,255,255,.18);position:relative;transition:background .2s}
+.tg .sw:after{content:"";position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .2s}
+.tg.on{border-color:rgba(20,211,176,.5);background:rgba(20,211,176,.1)}
+.tg.on .sw{background:var(--teal)}.tg.on .sw:after{transform:translateX(12px)}
+.tg svg{width:17px;height:17px}
+.tg.gold.on{border-color:rgba(255,200,67,.55);background:rgba(255,200,67,.1)}.tg.gold.on .sw{background:var(--gold)}
+
+/* Picker */
+.pick{flex:1;overflow-y:auto;padding:clamp(20px,4vh,48px) clamp(16px,3vw,48px)}
+.pick .inner{max-width:1500px;margin:0 auto}
+.eyebrow{color:var(--teal);font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:13px}
+.pick h1{font-family:var(--head);font-size:clamp(32px,3.6vw,56px);letter-spacing:-1px;line-height:1.05;margin:10px 0 10px}
+.pick h1 em{font-style:normal;background:linear-gradient(90deg,var(--teal),var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pick .lede{color:var(--muted);font-size:clamp(15px,1.25vw,19px);max-width:820px;line-height:1.5}
+.how{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 26px}
+.how span{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#d5dcfa}
+.how i{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:900;background:var(--teal);color:#032}
+.personas{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,1.4vw,22px)}
+.pcard{position:relative;text-align:left;display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--line);transition:transform .2s,border-color .2s,box-shadow .2s;overflow:hidden}
+.pcard:hover,.pcard:focus-visible{transform:translateY(-5px);border-color:rgba(255,255,255,.28);box-shadow:0 20px 50px rgba(0,0,0,.4);outline:none}
+.pcard .stripe{position:absolute;inset:0 0 auto 0;height:4px}
+.av{flex:none;display:grid;place-items:center;border-radius:50%;font-family:var(--head);font-weight:700;color:#fff;box-shadow:inset 0 -6px 14px rgba(0,0,0,.25),0 6px 18px rgba(0,0,0,.3)}
+.pcard .av{width:58px;height:58px;font-size:21px}
+.pcard .who{display:flex;gap:14px;align-items:center}
+.pcard h3{font-family:var(--head);font-size:clamp(18px,1.35vw,22px);letter-spacing:-.3px}
+.pcard .role{color:var(--muted);font-size:13.5px;font-weight:600;line-height:1.35}
+.pcard .title{font-weight:800;font-size:clamp(15px,1.1vw,18px)}
+.pcard .quote{font-size:14px;line-height:1.45;color:#cfd7f7;font-style:italic;border-left:3px solid rgba(255,255,255,.18);padding-left:10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:12px;font-weight:700;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:#d5dcfa;white-space:nowrap}
+.chip.full{background:rgba(20,211,176,.12);border-color:rgba(20,211,176,.45);color:#7ff0d8}
+.diff{display:inline-flex;gap:3px;align-items:center}
+.diff b{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.18)}
+.diff b.on{background:var(--gold)}
+.pcard .go{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-weight:800;color:var(--teal);font-size:15px;padding-top:6px}
+
+/* Brief */
+.brief{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:clamp(18px,3.5vh,44px) clamp(16px,3vw,48px)}
+.dossier{width:min(1240px,100%);display:grid;grid-template-columns:340px 1fr;gap:22px}
+.idcard{border-radius:22px;padding:26px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid var(--line);display:flex;flex-direction:column;gap:14px;align-self:start}
+.idcard .av{width:96px;height:96px;font-size:34px}
+.idcard h2{font-family:var(--head);font-size:30px;letter-spacing:-.5px;line-height:1.1}
+.idcard .kv{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:14px}
+.idcard .kv span{color:var(--muted);font-weight:600}
+.idcard .kv b{font-weight:700}
+.sections{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start}
+.sec{border-radius:18px;padding:20px 22px;background:var(--panel);border:1px solid var(--line)}
+.sec h4{font-size:12.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.sec ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.sec li{font-size:clamp(14px,1.05vw,16.5px);line-height:1.45;padding-left:18px;position:relative}
+.sec li:before{content:"";position:absolute;left:2px;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.sec.mission{grid-column:1/-1;background:linear-gradient(135deg,rgba(20,211,176,.14),rgba(139,92,246,.14));border-color:rgba(20,211,176,.35)}
+.sec.mission p{font-size:clamp(15px,1.2vw,19px);line-height:1.5;font-weight:600}
+.sec.hidden ul{filter:blur(7px);transition:filter .3s;user-select:none}
+.sec.hidden.peek ul{filter:none}
+.peekbtn{font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);letter-spacing:0;text-transform:none;color:#dfe5ff}
+.sec.hidden .note{font-size:13px;color:var(--muted);margin-top:10px}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 24px;border-radius:14px;font-weight:800;font-size:16px;background:linear-gradient(135deg,var(--teal),#0ea5a0);color:#022c26;box-shadow:0 10px 30px rgba(20,211,176,.25);transition:transform .1s,filter .2s}
+.cta:hover{filter:brightness(1.08)}.cta:active{transform:scale(.98)}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 20px;border-radius:14px;font-weight:700;font-size:15px;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+.ghost:hover{background:rgba(255,255,255,.1)}
+.actions{grid-column:1/-1;display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
+kbd{font-family:var(--ui);font-size:11.5px;font-weight:700;padding:2px 6px;border-radius:6px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08)}
+.cta kbd{border-color:rgba(0,0,0,.2);background:rgba(0,0,0,.12)}
+/* Play */
+.play{flex:1;min-height:0;display:grid;grid-template-columns:clamp(260px,21vw,340px) 1fr}
+.side{border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;background:rgba(10,15,36,.5)}
+.panel{border-radius:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--line)}
+.panel h5{font-size:11.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.mini{display:flex;gap:12px;align-items:center}
+.mini .av{width:48px;height:48px;font-size:17px}
+.mini b{display:block;font-family:var(--head);font-size:17px}
+.mini span{color:var(--muted);font-size:12.5px;font-weight:600;line-height:1.3;display:block}
+.pts{font-family:var(--head);font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+.pts small{font-size:13px;color:var(--muted);font-family:var(--ui);font-weight:600;margin-left:6px}
+.dims{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.dim{display:grid;grid-template-columns:86px 1fr 30px;gap:8px;align-items:center;font-size:12.5px;font-weight:700}
+.dim .track{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.dim .fill{height:100%;border-radius:999px;transition:width .6s cubic-bezier(.2,.8,.2,1),background .3s}
+.dim .v{text-align:right;color:var(--muted)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;font-size:12px;font-weight:600;color:#cfd7f7}
+.legend span{display:flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:3px;flex:none}
+.sigcount{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+.sigcount b{font-family:var(--head);font-size:26px}
+.sigcount span{color:var(--muted);font-size:13px;font-weight:600}
+.sidehint{font-size:12.5px;color:var(--muted);line-height:1.45;margin-top:10px}
+.prog{display:flex;gap:4px;margin-top:4px}
+.prog i{flex:1;height:6px;border-radius:999px;background:rgba(255,255,255,.1)}
+.prog i.done{background:var(--teal)}.prog i.now{background:linear-gradient(90deg,var(--teal),rgba(20,211,176,.3))}
+
+.chatcol{display:flex;flex-direction:column;min-height:0;min-width:0}
+.thread{position:relative;flex:1;min-height:0;overflow-y:auto;padding:20px clamp(16px,3vw,48px) 12px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.sysmsg{align-self:center;font-size:12.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:6px 12px;border-radius:999px;border:1px dashed var(--line)}
+.msg{display:flex;gap:12px;max-width:min(880px,86%);animation:msgin .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes msgin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.msg .av{width:40px;height:40px;font-size:14px}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .av{background:linear-gradient(135deg,var(--teal),#0b6e8c)}
+.bub{padding:14px 18px;border-radius:18px;font-size:calc(clamp(15.5px,1.2vw,19px)*var(--fs));line-height:1.55;position:relative}
+.msg.cust .bub{background:var(--panel2);border:1px solid var(--line);border-top-left-radius:6px}
+.msg.me .bub{background:linear-gradient(135deg,rgba(20,211,176,.25),rgba(14,165,160,.18));border:1px solid rgba(20,211,176,.4);border-top-right-radius:6px}
+.bub .nm{display:block;font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted);margin-bottom:4px;text-transform:uppercase}
+.msg.me .bub .nm{color:#7ff0d8}
+.seg{border-radius:5px;padding:1px 0;transition:background .2s,box-shadow .2s}
+body.spot .msg.cust .seg{cursor:crosshair}
+body.spot .msg.cust .seg:hover:not(.found){background:rgba(255,255,255,.1);box-shadow:0 0 0 2px rgba(255,255,255,.14)}
+.seg.found{padding:1px 3px}
+.seg.found.buy{background:rgba(34,197,94,.2);box-shadow:inset 0 -2px 0 var(--green)}
+.seg.found.pain{background:rgba(245,158,11,.2);box-shadow:inset 0 -2px 0 var(--amber)}
+.seg.found.ready{background:rgba(56,189,248,.2);box-shadow:inset 0 -2px 0 var(--sky)}
+.seg.found.red{background:rgba(244,63,94,.2);box-shadow:inset 0 -2px 0 var(--red)}
+.seg.revealed:not(.found){box-shadow:inset 0 -2px 0 rgba(255,255,255,.35);background:rgba(255,255,255,.05)}
+.seg.miss{animation:shake .4s;background:rgba(244,63,94,.12)}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.seg{display:inline}
+.stags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.stag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:10px;background:rgba(0,0,0,.25);border:1px solid var(--line);animation:msgin .3s}
+.stag em{font-style:normal;color:var(--muted);font-weight:600}
+.typing{display:flex;gap:5px;padding:16px 18px}
+.typing i{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+
+.dock{flex:none;border-top:1px solid var(--line);background:rgba(10,15,36,.85);padding:14px clamp(16px,3vw,48px) 16px;max-height:52vh;overflow-y:auto}
+.dockhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:12px}
+.dockhead h6{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.dockhead .gbtns{display:none;gap:8px}
+body.group .dockhead .gbtns{display:flex}
+.sbtn{height:34px;padding:0 12px;border-radius:10px;font-weight:700;font-size:13px;border:1px solid var(--line);background:rgba(255,255,255,.06)}
+.sbtn:hover{background:rgba(255,255,255,.12)}
+.sbtn.pri{background:var(--gold);color:#241900;border:0}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{position:relative;text-align:left;cursor:pointer;outline:none;display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--panel);border:1.5px solid var(--line);font-size:calc(clamp(14px,1.05vw,17px)*var(--fs));line-height:1.45;font-weight:500;transition:border-color .15s,background .15s,transform .1s}
+.choice:focus-visible{border-color:#fff}
+.choice:hover{border-color:rgba(20,211,176,.7);background:#121c40}
+.choice:active{transform:scale(.99)}
+.choice .L{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-weight:900;font-size:14px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+.choice:hover .L{background:var(--teal);color:#022c26;border-color:transparent}
+.choice .txt{flex:1}
+.choice .ideal{display:none;position:absolute;top:-9px;right:12px;font-size:11px;font-weight:900;letter-spacing:1px;padding:3px 8px;border-radius:999px;background:var(--gold);color:#241900}
+body.showideal .choice.best{border-color:rgba(255,200,67,.75);box-shadow:0 0 0 3px rgba(255,200,67,.15)}
+body.showideal .choice.best .ideal{display:block}
+.votes{display:none;flex:none;flex-direction:column-reverse;align-items:center;gap:2px;margin:-4px -4px -4px 4px}
+body.group .votes{display:flex}
+.votes button{width:30px;height:22px;line-height:1;border-radius:8px;background:rgba(255,255,255,.08);font-weight:900}
+.votes button:hover{background:rgba(255,255,255,.18)}
+.votes b{min-width:30px;text-align:center;font-family:var(--head);font-size:19px;line-height:1.1;color:var(--gold)}
+.choice.leading{border-color:rgba(255,200,67,.6)}
+body.group{--fs:1.06}
+@media (min-width:1700px){.side{zoom:1.18}.bar{zoom:1.12}body.group{--fs:1.12}}
+
+.fb{border-radius:16px;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--q);animation:msgin .35s}
+.fbhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.qbadge{display:inline-flex;align-items:center;gap:7px;font-weight:900;font-size:13px;letter-spacing:.6px;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:color-mix(in srgb,var(--q) 20%,transparent);color:var(--q);border:1px solid color-mix(in srgb,var(--q) 55%,transparent)}
+.fbpts{font-family:var(--head);font-weight:700;color:var(--gold);font-size:18px}
+.fbroom{font-size:13px;color:var(--muted);font-weight:600}
+.fb p{font-size:calc(clamp(14.5px,1.1vw,18px)*var(--fs));line-height:1.5}
+.deltas{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.delta{font-size:12.5px;font-weight:800;padding:4px 9px;border-radius:8px}
+.delta.up{background:rgba(34,197,94,.15);color:#86efac}
+.delta.down{background:rgba(244,63,94,.15);color:#fda4af}
+.better{margin-top:12px;padding:10px 14px;border-radius:12px;background:rgba(255,200,67,.08);border:1px dashed rgba(255,200,67,.45);font-size:calc(clamp(13.5px,1vw,16px)*var(--fs));line-height:1.45}
+.better b{color:var(--gold);font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;display:block;margin-bottom:3px}
+.fbactions{display:flex;justify-content:flex-end;margin-top:12px;gap:10px}
+.fbactions .cta{height:46px}
+
+/* Debrief */
+.deb{flex:1;overflow-y:auto;padding:clamp(18px,3vh,36px) clamp(16px,3vw,48px) 48px}
+.deb .inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{border-radius:20px;padding:20px 22px;background:var(--panel);border:1px solid var(--line)}
+.card h4{font-size:12.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.hero{grid-column:1/-1;display:flex;gap:28px;align-items:center;background:linear-gradient(135deg,rgba(20,211,176,.13),rgba(139,92,246,.16));border-color:rgba(255,255,255,.16);padding:24px 28px}
+.ring{position:relative;width:150px;height:150px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .c b{font-family:var(--head);font-size:50px;line-height:1}
+.ring .c span{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:1px}
+.hero h2{font-family:var(--head);font-size:clamp(26px,2.4vw,38px);letter-spacing:-.5px;line-height:1.1}
+.hero .grade{display:inline-block;font-weight:900;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;padding:5px 11px;border-radius:999px;background:rgba(255,200,67,.15);color:var(--gold);border:1px solid rgba(255,200,67,.45);margin-bottom:10px}
+.hero p{color:#d5dcfa;font-size:clamp(15px,1.15vw,18px);line-height:1.5;margin-top:8px;max-width:820px}
+.stats{display:flex;gap:12px;margin-left:auto;flex-wrap:nowrap}
+.stat{min-width:100px;text-align:center;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--line)}
+.stat b{display:block;font-family:var(--head);font-size:28px}
+.stat span{font-size:12px;color:var(--muted);font-weight:700}
+.c5{grid-column:span 5}.c7{grid-column:span 7}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:1/-1}
+.radarwrap{display:flex;justify-content:center}
+.radarwrap svg{width:100%;max-width:420px;height:auto;overflow:visible}
+.siglist{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow-y:auto}
+.sigrow{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line);font-size:14px;line-height:1.4}
+.sigrow.missed{opacity:.75;border-style:dashed}
+.sigrow .st{flex:none;font-size:11px;font-weight:900;letter-spacing:.8px;padding:3px 7px;border-radius:6px;margin-top:1px}
+.sigrow .st.ok{background:rgba(34,197,94,.18);color:#86efac}.sigrow .st.no{background:rgba(255,255,255,.08);color:var(--muted)}
+.sigrow q{display:block;color:#cfd7f7;font-style:italic;quotes:none;margin-bottom:3px}
+.sigrow .lab{font-weight:700}
+.list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.list li{position:relative;padding-left:26px;font-size:clamp(14px,1.05vw,16.5px);line-height:1.45}
+.list li:before{content:"";position:absolute;left:0;top:.2em;width:16px;height:16px;border-radius:5px;background:var(--teal);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/contain no-repeat}
+.list.uc li:before{background:var(--sky)}
+.list.tk li:before{background:var(--gold)}
+.offer{font-family:var(--head);font-size:clamp(17px,1.4vw,22px);font-weight:700;line-height:1.3;margin-bottom:12px}
+.steps{display:flex;flex-direction:column;gap:8px}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.4}
+.step i{flex:none;font-style:normal;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:linear-gradient(135deg,var(--violet),#6d28d9);font-weight:900;font-size:12px}
+.path{display:flex;flex-direction:column;gap:10px}
+.prow{display:grid;grid-template-columns:44px 1fr 1fr;gap:14px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-size:14px;line-height:1.45}
+.prow .n{font-family:var(--head);font-weight:700;font-size:20px;color:var(--muted)}
+.prow .lbl{font-size:11px;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;display:flex;gap:8px;align-items:center}
+.prow .ideal-t{color:#ffe6a3}
+.prow .qb{font-size:10.5px;padding:2px 7px;border-radius:999px;font-weight:900;color:var(--q);background:color-mix(in srgb,var(--q) 18%,transparent)}
+.debactions{grid-column:1/-1;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+
+.toast{position:fixed;left:50%;top:76px;transform:translate(-50%,-14px);opacity:0;z-index:99;padding:10px 16px;border-radius:12px;font-weight:800;font-size:15px;background:#121b3d;border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.45);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.good{border-color:rgba(34,197,94,.6)}.toast.bad{border-color:rgba(244,63,94,.6)}
+.float{position:fixed;z-index:98;pointer-events:none;font-family:var(--head);font-weight:700;font-size:22px;color:var(--gold);animation:floatup 1s ease-out forwards;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+@keyframes floatup{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-50px)}}
+.modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;background:rgba(3,6,20,.72);backdrop-filter:blur(4px)}
+.modal.show{display:grid}
+.sheet{width:min(680px,92vw);background:#0e1530;border:1px solid var(--line);border-radius:22px;padding:26px 30px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.sheet h2{font-family:var(--head);font-size:26px;margin-bottom:14px}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:10px 16px;font-size:15px;align-items:center}
+@media (max-width:1100px){.personas{grid-template-columns:1fr 1fr}.dossier{grid-template-columns:1fr}.c5,.c7,.c4,.c6{grid-column:1/-1}}
+@media (max-height:860px){.bar{padding:10px 20px}.side{gap:10px;padding:12px}.panel{padding:12px 14px}.dock{padding:10px 24px 12px}.choice{padding:10px 12px}}
+@media print{body{overflow:visible}.bar,.debactions{display:none}.screen{height:auto}.deb{overflow:visible}}
+</style>
+</head>
+<body class="spot">
+<div id="app">
+  <div class="bar">
+    <a class="brand" href="index.html" style="color:inherit;text-decoration:none" title="Back to launcher">
+      <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+      <div><small><span class="brandInline">Your Company</span> &middot; Seller Academy</small><b>Customer Role-Play Simulator</b></div>
+    </a>
+    <div class="tools">
+      <button class="tg playonly on" id="tSpot" title="Click customer lines to flag hidden signals (S)"><span class="sw"></span>Signal spotter</button>
+      <button class="tg gold playonly" id="tIdeal" title="Show the ideal answer (I)"><span class="sw"></span>Show ideal path</button>
+      <button class="tg" id="tGroup" title="Room votes, presenter locks in the answer (G)"><span class="sw"></span>Group mode</button>
+      <button class="tg playonly" id="bRestart" title="Restart this scenario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>Restart</button>
+      <button class="tg playonly" id="bExit" title="Back to scenarios"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Scenarios</button>
+      <button class="tg" id="bHelp" title="Help and shortcuts (?)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2.5-3 4.5M12 17.5h.01"/></svg>Help</button>
+    </div>
+  </div>
+
+  <!-- Scenario picker -->
+  <section class="screen show" id="sPick">
+    <div class="pick"><div class="inner">
+      <div class="eyebrow">Choose your customer</div>
+      <h1>Can you turn an <em>AI conversation</em> into a real opportunity?</h1>
+      <p class="lede">Pick a customer and run the meeting. Every reply you choose gets coached and scored on Discovery, Listening, Use-Case ID, Positioning and Trust. Flag the hidden signals in what the customer says to earn bonus points.</p>
+      <div class="how"><span><i>1</i>Read the persona brief</span><span><i>2</i>Choose your response</span><span><i>3</i>Click customer lines to flag signals</span><span><i>4</i>Review your debrief scorecard</span></div>
+      <div class="personas" id="personas"></div>
+    </div></div>
+  </section>
+
+  <!-- Persona brief -->
+  <section class="screen" id="sBrief"><div class="brief"><div class="dossier" id="dossier"></div></div></section>
+
+  <!-- Conversation -->
+  <section class="screen" id="sPlay">
+    <div class="play">
+      <aside class="side">
+        <div class="panel"><div class="mini" id="miniPersona"></div>
+          <div style="margin-top:12px"><h5 style="margin-bottom:6px">Progress <span id="turnLbl">Turn 1</span></h5><div class="prog" id="prog"></div></div>
+        </div>
+        <div class="panel">
+          <h5>Deal score</h5>
+          <div class="pts" id="pts">0<small>pts</small></div>
+          <div class="dims" id="dims"></div>
+        </div>
+        <div class="panel">
+          <h5>Signal spotter</h5>
+          <div class="sigcount"><b id="sigFound">0</b><span id="sigOf">of 0 found</span></div>
+          <div class="legend">
+            <span><i class="dot" style="background:var(--green)"></i>Buying signal</span>
+            <span><i class="dot" style="background:var(--amber)"></i>Pain point</span>
+            <span><i class="dot" style="background:var(--sky)"></i>AI readiness</span>
+            <span><i class="dot" style="background:var(--red)"></i>Red flag</span>
+          </div>
+          <div class="sidehint">Click the phrase in a customer message that hides a signal. <b style="color:var(--gold)">+25</b> for each hit, <b style="color:#fda4af">&minus;5</b> for a miss.</div>
+        </div>
+      </aside>
+      <div class="chatcol">
+        <div class="thread" id="thread"></div>
+        <div class="dock" id="dock"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Debrief -->
+  <section class="screen" id="sDeb"><div class="deb"><div class="inner" id="debrief"></div></div></section>
+</div>
+
+<div class="modal" id="help"><div class="sheet">
+  <h2>How to run it</h2>
+  <div class="keys">
+    <kbd>1&ndash;4</kbd><span>Choose response A&ndash;D</span>
+    <kbd>A&ndash;D</kbd><span>Group mode: add a room vote for that option (Shift removes one)</span>
+    <kbd>L</kbd><span>Group mode: lock in the option with the most votes</span>
+    <kbd>Enter</kbd><span>Continue after feedback</span>
+    <kbd>S</kbd><span>Turn signal spotter on or off</span>
+    <kbd>I</kbd><span>Show or hide the ideal path</span>
+    <kbd>G</kbd><span>Turn group mode on or off</span>
+    <kbd>?</kbd><span>Show this panel</span>
+  </div>
+  <p style="color:var(--muted);margin-top:14px;line-height:1.5;font-size:14.5px"><b style="color:#fff">Group mode:</b> read the customer line out loud, let the room vote with hands or a poll, tally the votes with A&ndash;D, then press <kbd>L</kbd>. Ask the room to shout out signals and click them as they're found.</p>
+  <div style="text-align:right;margin-top:18px"><button class="cta" id="helpClose" style="height:44px">Got it</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ======================= SCENARIOS =======================
+   Customer lines may contain [[phrase|type|coaching label]] where type is
+   buy (buying signal), pain (pain point), ready (AI readiness cue) or red (red flag).
+   Choice quality q: best | good | meh | bad. Score keys s: d=Discovery l=Listening
+   u=Use-Case ID p=Positioning t=Trust.  next: node id or "end".
+=========================================================== */
+const B = BRAND_NAME;
+const SCENARIOS = [
+{
+ id: "cfo", full: true, difficulty: 3, turns: 7, color: ["#f97316", "#be123c"],
+ title: "The Skeptical CFO",
+ persona: { name: "Diane Mercer", initials: "DM", role: "Chief Financial Officer", company: "Brightline Components", industry: "Manufacturing",
+   size: "$420M revenue · 3 plants · 1,800 employees",
+   quote: "Every vendor says AI will transform us. Show me the numbers.",
+   goals: ["Protect margins while material costs are up 11%", "Shorten the 9-day month-end close", "Avoid another failed technology project"],
+   personality: ["Numbers-first", "Skeptical", "Short on time", "Respects candor"],
+   pains: ["AP team keys in ~9,000 invoices a month; three-way-match exceptions eat half their week", "Late fees and missed early-pay discounts cost ~$580K a year", "Last year's $250K analytics pilot never reached production", "Vendor master data is messy; finance and IT disagree on who owns it"] },
+ mission: "Win the CFO's trust, find a use case she can quantify, and leave with a concrete, low-risk next step.",
+ start: "c1",
+ nodes: {
+  c1: { c: "I've got twenty minutes. Honestly, every vendor that walks in here says AI will transform us. [[Last year we spent $250K on an analytics pilot that never made it out of IT.|red|Failed prior initiative: skepticism and pilot-purgatory risk]] So convince me why this is different.",
+   ch: [
+    { t: "That's fair. Honestly, I'd rather not pitch you yet. Can I ask what happened with that pilot, and what you'd need to see to call an AI investment a success?", q: "best", s: { d: 12, l: 12, t: 12 }, next: "c2",
+      fb: "You named the skepticism and turned it into discovery. Asking about the failed pilot shows you were listening, and it gets you the success criteria you'll need later." },
+    { t: "We're different because we partner with all the major hyperscalers and model vendors, so we can bring the best technology.", q: "meh", s: { p: 2, t: -5, l: -5 }, next: "c1b",
+      fb: "Partnerships matter later, but leading with credentials ignores her concern. A skeptical CFO hears \"more tech\", not \"less risk\"." },
+    { t: "AI has come a long way since last year. Generative AI changes everything! Let me show you a quick demo.", q: "bad", s: { t: -12, l: -10, d: -8 }, next: "c1b",
+      fb: "Hype plus a demo is exactly what she's tired of. You brushed past her experience and skipped discovery entirely." },
+    { t: "Totally understand. We focus on outcomes. What are your top financial priorities this year?", q: "good", s: { d: 8, l: 2, t: 4 }, next: "c2",
+      fb: "Pivoting to her priorities is good, but you skipped the failed pilot. That was a chance to learn what went wrong and show you heard her." }
+   ]},
+  c1b: { c: "Hm. [[That's exactly what the last firm told us.|red|Trust is slipping: you sound like the vendor who failed her]] Look, my priority is margins. Material costs are up 11% and I can't add headcount.",
+   ch: [
+    { t: "That's helpful, and I'll drop the pitch. With costs up and no new headcount, where is your team spending the most time on manual work right now?", q: "best", s: { d: 10, l: 8, t: 8 }, next: "c2",
+      fb: "Good recovery. You admitted the misstep and asked an open discovery question tied to the constraint she just gave you." },
+    { t: "AI can definitely help with margins. Most of our clients see 30% cost savings.", q: "bad", s: { t: -10, p: -4 }, next: "c2",
+      fb: "An unsupported statistic to a CFO who is already skeptical? She'll ask for proof you can't give yet. Earn the right to quote numbers." },
+    { t: "Understood. Would it help if I shared how a similar manufacturer cut costs with AI?", q: "good", s: { p: 4, t: 2 }, next: "c2",
+      fb: "References are powerful, but this one is premature. You don't know her pain yet, so you can't choose the right story." }
+   ]},
+  c2: { c: "Fine. Where it hurts? [[Accounts payable. We process about 9,000 supplier invoices a month and my team keys most of them in by hand.|pain|Manual, high-volume document work: a classic document-processing use case]] [[Three-way-match exceptions eat up half their week.|pain|Quantifiable pain: the cost of exception handling]] And month-end close takes nine days.",
+   ch: [
+    { t: "Nine thousand a month with manual keying and match exceptions. That's real cost. What does an exception cost you today in hours or late-payment penalties, and are you missing early-pay discounts?", q: "best", s: { d: 12, l: 12, u: 8 }, next: "c3",
+      fb: "You played back her numbers (listening) and dug in to quantify the pain. That's the ROI case a CFO needs to say yes." },
+    { t: "That sounds like a perfect fit for intelligent document processing. We've done that for lots of manufacturers.", q: "good", s: { u: 12, d: -2, p: 4 }, next: "c3",
+      fb: "You spotted the right use case! But jumping to the solution before quantifying the pain leaves you with no business case." },
+    { t: "Have you thought about outsourcing AP to a shared-services provider?", q: "meh", s: { u: -6, p: -6 }, next: "c3",
+      fb: "That's off track. It isn't our offer, and it ignores an AI opportunity that's sitting right in front of you." },
+    { t: "We could build a gen AI chatbot that answers supplier questions about invoice status.", q: "bad", s: { u: -8, l: -8 }, next: "c3",
+      fb: "A chatbot doesn't touch the keying or match exceptions, which is the real pain. That's solution-first selling." }
+   ]},
+  c3: { c: "Late fees run maybe $180K a year, and [[we miss most early-payment discounts. That's another $400K on the table.|buy|Quantified value: a business case a CFO can take to the CEO]] Invoices come in every format: PDFs, scans, even faxes. [[Our ERP is SAP, but half the vendor master data is a mess.|ready|Data readiness cue: poor vendor master data quality]]",
+   ch: [
+    { t: "So that's roughly $580K in hard savings before we even count staff time. The messy vendor master data matters, because extraction accuracy depends on it. Who owns that data today, and would cleaning it up be in scope?", q: "best", s: { l: 12, u: 8, d: 8, p: 6 }, next: "c4",
+      fb: "You summarized the value AND caught the data-readiness cue. That positions data foundation work naturally instead of hiding the risk." },
+    { t: "Modern document AI handles PDFs, scans and faxes, and we'd integrate it right into SAP.", q: "good", s: { u: 6, p: 6, l: -2 }, next: "c4",
+      fb: "Reassuring and true, but you skipped right past her warning about data quality. That risk will come back later." },
+    { t: "Great. So we can promise you $580K in savings in the first year.", q: "bad", s: { t: -12, p: -6 }, next: "c4",
+      fb: "Over-promising to a skeptic is the fastest way to lose her. Use her numbers to build a case together, not to make guarantees." }
+   ]},
+  c4: { c: "IT owns SAP and finance owns the vendor data, which is part of the problem. [[My CIO, Tom, is cautious. He'll want to know about security and where our data goes.|red|Stakeholder risk: CIO and security approval needed]] [[If I bring this to our CEO, I need numbers that hold up.|buy|Path to an executive sponsor: the CEO needs a defensible case]]",
+   ch: [
+    { t: "Then let's bring Tom in early rather than surprise him. We deploy inside your own cloud tenant with access controls and an AI governance framework. What if we built the business case together, with numbers both Tom and your CEO can sign off on?", q: "best", s: { p: 12, t: 12, l: 8 }, next: "c5",
+      fb: "You pulled a potential blocker in early, answered security directly, and offered to co-create the business case. That's textbook multi-threading." },
+    { t: "Security is built into all of our hyperscaler partners' platforms. Tom won't have any concerns.", q: "meh", s: { p: 4, t: -4 }, next: "c5",
+      fb: "Partner security is real, but waving off the CIO's concerns sounds naive. Governance is about more than the platform." },
+    { t: "Maybe we start without IT and show results first?", q: "bad", s: { t: -10, p: -8 }, next: "c5",
+      fb: "A shadow project with finance data and an SAP integration is a big red flag. Going around the CIO kills deals later, and it kills trust now." }
+   ]},
+  c5: { c: "Okay. So what are you actually proposing? [[I won't sign a seven-figure transformation program.|red|Budget constraint: avoid big-bang proposals]] [[But if you can show me something real in a quarter, I have discretionary budget.|buy|Budget and timeline: discretionary funds for fast, proven value]]",
+   ch: [
+    { t: "Here's what I'd suggest: a two-week AI value assessment focused on AP. We validate the $580K case, check data readiness, and design a 90-day pilot on your top three invoice types, with success metrics agreed up front and a clear path to production. Not another lab experiment.", q: "best", s: { p: 15, u: 8, t: 8 }, next: "c6",
+      fb: "Right-sized and low-risk, it deals with her pilot-purgatory scar directly and ties to her metric and timeline." },
+    { t: "We'd start with a pilot on invoice processing and see how it goes.", q: "good", s: { p: 5, u: 4 }, next: "c6",
+      fb: "Right direction, but too vague. \"See how it goes\" is what killed her last pilot. Define success criteria and the path to production." },
+    { t: "Our full AI transformation program covers strategy, data, platform and 12 use cases. It's the best way to get value at scale.", q: "bad", s: { l: -12, p: -8, t: -6 }, next: "c6",
+      fb: "She just told you she won't sign a big program. This shows you weren't listening." },
+    { t: "We could do a free proof of concept so there's no risk to you.", q: "meh", s: { p: -2, t: 2 }, next: "c6",
+      fb: "Free POCs rarely get executive attention or reach production, which is exactly what happened last time. A small, paid, outcome-scoped engagement beats free." }
+   ]},
+  c6: { c: "Hm. And when this goes live, who maintains it? [[I don't want to hire data scientists.|pain|Skills gap: no in-house ML talent, so position managed services]] [[And my AP team is nervous they'll be replaced.|red|Adoption risk: people fear job loss, so plan change management]]",
+   ch: [
+    { t: "Two parts. We can run it as a managed service: monitoring accuracy, retraining models and handling SAP updates, so you don't need a data science team. And for your AP team, we include change management. They become exception handlers and supplier-relationship owners instead of keyers. Teams usually welcome losing the tedious work.", q: "best", s: { p: 12, t: 10, l: 6 }, next: "c7",
+      fb: "You covered both concerns: managed services for the skills gap and change management for the people. That's how pilots become production." },
+    { t: "We'll train your IT team to maintain it.", q: "good", s: { p: 4, l: -2 }, next: "c7",
+      fb: "Enablement is valuable, but she just said she doesn't want data scientists, and you ignored the AP team's anxiety." },
+    { t: "Honestly, with AI you'll be able to cut AP headcount in half.", q: "bad", s: { t: -12, l: -8 }, next: "c7",
+      fb: "She raised her team's fear and you confirmed it. That sinks adoption and her trust in you." }
+   ]},
+  c7: { c: "Alright. [[You've been more practical than most.|buy|Trust earned: she's open to a next step]] What's the next step?",
+   ch: [
+    { t: "Let's set up 60 minutes next week with you, Tom and your AP manager to scope the assessment. I'll bring a draft business case using the numbers you shared, plus a one-page overview of our security and governance approach for Tom.", q: "best", s: { p: 10, t: 8, d: 4 }, next: "end",
+      fb: "A specific next step with the right stakeholders, and each asset is matched to a concern she raised. Strong close." },
+    { t: "I'll send you a proposal by Friday.", q: "good", s: { p: 4 }, next: "end",
+      fb: "Fine, but it's single-threaded. A proposal without Tom and the AP manager aligned will stall." },
+    { t: "Can we get a signature on a full pilot SOW this week?", q: "bad", s: { t: -10, p: -4 }, next: "end",
+      fb: "That pushes too hard, too soon, for a skeptical buyer who still needs her CIO and CEO on board." }
+   ]}
+ },
+ outcomes: {
+  great: { title: "Deal advanced: scoping session booked", text: "Diane books the session, loops in Tom and her AP manager, and asks for the business case template. You're on track for a paid assessment." },
+  ok: { title: "Interested but cautious", text: "Diane asks for a proposal but hasn't committed stakeholders. The deal could stall without stronger discovery and multi-threading." },
+  poor: { title: "Polite exit", text: "Diane thanks you for your time and says she'll \"reach out if anything changes.\" You sounded like the last vendor." }
+ },
+ useCases: ["Intelligent document processing for accounts payable (invoice extraction, three-way-match exception handling, SAP integration)", "Later phase: cash and working-capital forecasting to capture early-pay discounts"],
+ offering: { headline: "AI Value Assessment → 90-day pilot-to-production → Managed AI service", steps: ["2-week assessment: validate the ~$580K business case and data readiness", "Data foundation: vendor master clean-up and ownership model", "IDP pilot on the top 3 invoice types with agreed KPIs and a production plan", "Governance and security pack for the CIO, plus change management for the AP team", "Managed service: monitoring, retraining, SAP updates"] },
+ takeaways: ["Skeptics respond to curiosity, not credentials. Ask about the failed pilot first.", "Quantify the pain in the customer's own numbers before naming a solution.", "Treat data-quality comments as positioning opportunities, not obstacles.", "Bring the CIO and security in early, because blockers become allies when included.", "Right-size the first step: a short, paid, metric-driven engagement with a path to production."]
+},
+{
+ id: "cio", full: true, difficulty: 2, turns: 7, color: ["#6366f1", "#0ea5e9"],
+ title: "The Excited-but-Unfocused CIO",
+ persona: { name: "Raj Patel", initials: "RP", role: "Chief Information Officer", company: "Harborview Community Bank", industry: "Regional Banking",
+   size: "$9B assets · 60 branches · 2 recent acquisitions",
+   quote: "We want to do AI. Like, everywhere. I've got a list of 23 ideas!",
+   goals: ["Show the board a credible AI strategy within 90 days", "Keep up with a competitor's new AI app", "Modernize without upsetting regulators"],
+   personality: ["Enthusiastic", "Buzzword-heavy", "Unfocused", "Wants quick wins"],
+   pains: ["Contact center wait times hit 11 minutes and NPS is dropping", "New agents take four months to ramp on a 600-page policy manual", "Customer data is split across three CRMs after acquisitions", "The Chief Risk Officer shut down a ChatGPT experiment after a data leak", "Card fraud losses are up 30%"] },
+ mission: "Channel the CIO's enthusiasm into one prioritized, governed use case and a roadmap the board will believe.",
+ start: "b1",
+ nodes: {
+  b1: { c: "Thanks for coming! So, we want to do AI. Like, everywhere. [[Our board asked me last month what our AI strategy is,|buy|Board-level pressure: urgency and likely executive sponsorship]] and honestly, [[our competitor across town just launched an AI assistant in their app.|buy|Competitive pressure: creates urgency]] I've got a list of 23 ideas!",
+   ch: [
+    { t: "Love the energy. 23 ideas is a great problem to have. Before we dig into the list, what did the board actually ask for? Growth, efficiency, risk reduction, or just proof that you have a plan?", q: "best", s: { d: 12, l: 10, t: 6 }, next: "b2",
+      fb: "You channeled his enthusiasm into outcome discovery. What the board asked for defines success and lets you prioritize later." },
+    { t: "Great! Let's walk through all 23 and see which ones we can help with.", q: "good", s: { d: 4, u: 2 }, next: "b2",
+      fb: "Collaborative, but you'll drown in the list. You need prioritization criteria first, and those come from business outcomes." },
+    { t: "Perfect. We can build you an assistant that's even better than your competitor's in eight weeks.", q: "bad", s: { t: -8, p: -8, d: -6 }, next: "b2",
+      fb: "Copying a competitor's feature isn't a strategy, and promising eight weeks at a regulated bank without discovery is reckless." },
+    { t: "What's your budget for AI this year?", q: "meh", s: { d: 2, t: -4 }, next: "b2",
+      fb: "Budget matters, but asking it first feels transactional this early. Earn it with value discovery first." }
+   ]},
+  b2: { c: "The board wants efficiency and a better customer experience. [[Our contact center wait times hit 11 minutes last quarter|pain|Quantified customer-experience pain: points to a contact-center use case]] and NPS dropped. Oh, and I want gen AI for code, for marketing, for loan underwriting, for... everything.",
+   ch: [
+    { t: "Eleven-minute waits with an NPS drop is something the board will feel. When calls run long, what slows your agents down: finding answers, jumping between systems, compliance checks?", q: "best", s: { l: 12, d: 10, u: 8 }, next: "b3",
+      fb: "You zeroed in on the quantified pain tied to the board's goals and let the rest of the wish list wait." },
+    { t: "Let's prioritize. We have a framework that scores use cases by value and feasibility.", q: "good", s: { p: 8, u: 4 }, next: "b3",
+      fb: "Right instinct, wrong moment. Prioritization works best after you understand the pain. Keep it for the next turn." },
+    { t: "Loan underwriting with gen AI is really exciting. Let's start there.", q: "meh", s: { u: -8, p: -4 }, next: "b3",
+      fb: "Underwriting is a high-risk, heavily regulated use case (fair lending, explainability). It's a poor first step for a bank with no AI governance yet." },
+    { t: "We can do all of those. We have accelerators for every one.", q: "bad", s: { t: -6, d: -8, u: -6 }, next: "b3",
+      fb: "Feeding the lack of focus hurts your credibility. Saying yes to everything means you're not helping him choose." }
+   ]},
+  b3: { c: "Agents juggle the core system, three CRMs and a 600-page policy manual on SharePoint. [[New hires take four months to get fully up to speed.|pain|Knowledge and onboarding pain: a fit for knowledge search or an agent copilot]] [[Customer data is spread across those CRMs after two acquisitions, and nobody's sure which one is right.|ready|Data readiness cue: fragmented customer data]]",
+   ch: [
+    { t: "So there are two problems: agents can't find policy answers fast, and customer data is fragmented. An agent-assist copilot that searches your policy content and cites its sources could cut handle time and ramp-up quickly, and it doesn't need the CRM data fixed first. Does that match what you're seeing?", q: "best", s: { u: 15, l: 8, p: 6 }, next: "b4",
+      fb: "You named a specific use case (RAG-based agent assist), separated it from the data-readiness problem, and checked your understanding." },
+    { t: "Sounds like you need a data platform modernization before doing any AI.", q: "good", s: { u: 2, p: 4, d: 2 }, next: "b4",
+      fb: "Data matters, but this stalls the quick win. Knowledge assist can start on documents while the data work runs in parallel." },
+    { t: "A customer-facing chatbot would solve this, since customers wouldn't need agents at all.", q: "bad", s: { u: -8, t: -4 }, next: "b4",
+      fb: "Jumping to customer-facing gen AI at a bank with fragmented data and no governance is high-risk, and it misses the agents' pain." }
+   ]},
+  b4: { c: "Yes! Exactly. But here's the thing: [[our Chief Risk Officer basically shut down a ChatGPT experiment last spring.|red|Governance blocker: risk and compliance must be engaged]] Someone pasted customer info into it.",
+   ch: [
+    { t: "Honestly, she made the right call. The answer isn't to avoid AI, it's to govern it. We'd want her at the table early: private model deployment in your tenant, no customer data used for training, access controls, and a responsible-AI framework with human review. Would she be open to co-designing the guardrails?", q: "best", s: { p: 12, t: 12, l: 6 }, next: "b5",
+      fb: "You agreed with the risk, turned a blocker into a potential ally, and positioned governance as part of the solution." },
+    { t: "Our partner's enterprise models don't train on your data, so that's not an issue anymore.", q: "meh", s: { p: 2, t: -4 }, next: "b5",
+      fb: "Mostly true, but dismissive. Governance is more than a vendor policy, and the CRO still needs to be engaged directly." },
+    { t: "Maybe we keep the CRO out of it until we have a working demo?", q: "bad", s: { t: -14, p: -8 }, next: "b5",
+      fb: "At a regulated bank, going around risk will kill the deal and your credibility." }
+   ]},
+  b5: { c: "She'd probably appreciate that, actually. [[I can get the COO to sponsor this if it moves call-center numbers.|buy|Potential executive sponsor (COO) tied to a measurable KPI]] What else should we look at? [[Card fraud losses are up 30%,|pain|Secondary use case: fraud detection]] too.",
+   ch: [
+    { t: "Fraud is worth a look; it's a proven ML use case. I'd put both into a short AI strategy and prioritization workshop: we score your 23 ideas on value, feasibility and risk with your COO and CRO in the room. My bet is agent assist comes out as the quick win and fraud as a strong second wave.", q: "best", s: { p: 14, u: 8, d: 4 }, next: "b6",
+      fb: "A workshop tames the 23 ideas, brings in the sponsor and the blocker together, and produces a roadmap that leads to the next deal." },
+    { t: "Let's do fraud detection too. We can run both pilots in parallel.", q: "good", s: { u: 6, p: -2 }, next: "b6",
+      fb: "Ambitious, but parallel pilots will stretch a team that's just starting out. Sequence them on a roadmap." },
+    { t: "We need to stay focused, so fraud is out of scope.", q: "meh", s: { u: -4, l: -4 }, next: "b6",
+      fb: "Focus is good, but dismissing a quantified pain throws away value. Park it on the roadmap instead." }
+   ]},
+  b6: { c: "Love it. [[Can we have something live by end of quarter? I'm presenting to the board in 90 days.|buy|Hard deadline with board visibility: strong urgency]]",
+   ch: [
+    { t: "Here's a realistic plan: the workshop in weeks 1–2, then an agent-assist pilot with one contact-center team by week 10, measured on handle time and ramp-up. You'd show the board a roadmap, real pilot results, and a governance model the CRO co-signed. Production rollout follows with MLOps monitoring.", q: "best", s: { p: 12, t: 8, u: 4 }, next: "b7",
+      fb: "Realistic, it hits his board date, and it builds in the path from pilot to production. That's a story he can tell." },
+    { t: "Absolutely. We'll have the full solution in production in 90 days.", q: "bad", s: { t: -10, p: -4 }, next: "b7",
+      fb: "Over-promising. Governance reviews, integration and change management at a bank won't all fit in 90 days." },
+    { t: "Ninety days is tight. Let's see after the workshop.", q: "good", s: { t: 4, p: -2 }, next: "b7",
+      fb: "Honest, but there's no plan. He needs a story for the board, so give him one with realistic milestones." }
+   ]},
+  b7: { c: "This is way more focused than I expected. [[Who else do you need from my side?|buy|Asking about stakeholders and next steps: a strong buying signal]]",
+   ch: [
+    { t: "Ideally your COO as sponsor, the CRO or her delegate, your contact-center leader and whoever owns the policy content. I'll send a workshop agenda and a one-page governance overview for the CRO before we meet. Can we pencil in a date before Friday?", q: "best", s: { p: 10, d: 4, t: 6 }, next: "end",
+      fb: "Multi-threaded, with a sponsor, a blocker turned ally, a process owner and a content owner. Each one gets something useful. Great close." },
+    { t: "Just you for now. We can loop others in later.", q: "good", s: { p: -2, d: -2 }, next: "end",
+      fb: "Single-threaded deals with an enthusiastic CIO often die in the CRO's or COO's office." },
+    { t: "Just procurement, so we can get the paperwork moving.", q: "bad", s: { t: -6, p: -4 }, next: "end",
+      fb: "Too early. You haven't aligned the sponsor or risk yet, and procurement can't buy what nobody has agreed to." }
+   ]}
+ },
+ outcomes: {
+  great: { title: "Workshop booked with COO & CRO", text: "Raj books the strategy workshop with his COO and CRO. You've gone from 23 ideas to a governed quick win and a roadmap." },
+  ok: { title: "Enthusiastic, still unfocused", text: "Raj loves the conversation but there's no clear priority or sponsor. Expect another meeting with a new list of ideas." },
+  poor: { title: "Stalled by risk", text: "The CRO hears about the conversation and puts AI on hold. Your credibility with the bank's leadership takes a hit." }
+ },
+ useCases: ["Contact-center agent-assist copilot: RAG search over policy content with citations", "Second wave: real-time card fraud detection", "Foundation: customer data unification across the three CRMs"],
+ offering: { headline: "AI Strategy & Prioritization Workshop → Governed agent-assist pilot → Roadmap", steps: ["2-week workshop: score the 23 ideas with the COO and CRO", "Responsible-AI and governance framework co-designed with risk", "Agent-assist pilot with one team, measured on handle time and ramp-up", "MLOps and production rollout; fraud detection as wave 2", "Data foundation: CRM consolidation running in parallel"] },
+ takeaways: ["Enthusiasm isn't focus. Anchor on what the board actually asked for.", "Lead with a quantified pain (11-minute waits), not the wish list.", "Internal-facing copilots are the safest first gen AI win in regulated industries.", "Make the risk officer a co-designer of guardrails, never someone you route around.", "Use a prioritization workshop to turn many ideas into a sequenced roadmap."]
+},
+{
+ id: "health", full: false, difficulty: 2, turns: 4, color: ["#10b981", "#0f766e"],
+ title: "Drowning in Paperwork",
+ persona: { name: "Maria Alvarez", initials: "MA", role: "VP of Operations", company: "Cedar Valley Health", industry: "Healthcare Provider",
+   size: "4 hospitals · 38 clinics · 9,000 staff",
+   quote: "We're drowning in faxes. My team is burning out.",
+   goals: ["Cut claim denials", "Reduce staff burnout and turnover", "Show measurable impact to fund further work"],
+   personality: ["Warm", "Overloaded", "People-first", "Pragmatic"],
+   pains: ["4,000 referral faxes and prior-auth forms a week, retyped into Epic", "Denials up 18% due to missing information", "Lost six intake staff to burnout this year", "IT is consumed by an EHR upgrade"] },
+ mission: "Uncover where the paperwork breaks, address HIPAA early, and propose a plan that's light on her IT team.",
+ start: "h1",
+ nodes: {
+  h1: { c: "We're drowning. [[My intake team handles about 4,000 referral faxes and prior-auth forms a week.|pain|High-volume document work: document processing for intake and prior auth]] [[Denials are up 18% because of missing information.|pain|Quantified revenue impact: claim denials]]",
+   ch: [
+    { t: "That's a lot of paper landing on a lot of people. Where does the missing information usually slip through: at intake, during data entry, or when the prior auth is submitted?", q: "best", s: { d: 12, l: 10 }, next: "h2", fb: "Great diagnostic question. You're finding where in the process AI would have the most impact." },
+    { t: "Document AI can read those faxes and auto-fill your EHR.", q: "good", s: { u: 10, d: -2 }, next: "h2", fb: "Right use case! But diagnose before you prescribe; you don't know where it breaks yet." },
+    { t: "Have you considered a patient-facing chatbot?", q: "bad", s: { u: -8, l: -8 }, next: "h2", fb: "That isn't the problem she described. Listen for the pain, not the trend." }
+   ]},
+  h2: { c: "Mostly at data entry. Staff are retyping everything into Epic, and they're exhausted. [[We lost six people to burnout this year.|pain|Staff burnout and attrition: lead with people and change management]] [[Compliance will need to approve anything touching PHI.|red|HIPAA/PHI governance gate: engage compliance early]]",
+   ch: [
+    { t: "Losing six people tells me this is urgent for your team, not just the numbers. Anything we build has to be HIPAA-compliant from day one: PHI stays in your environment, with audit trails and human review on low-confidence extractions. Could we bring your compliance lead in early?", q: "best", s: { l: 10, p: 10, t: 10 }, next: "h3", fb: "You were empathetic, addressed compliance directly, and multi-threaded early. That's the trifecta." },
+    { t: "AI will let you do the same work with fewer staff.", q: "bad", s: { t: -12, l: -8 }, next: "h3", fb: "She's trying to keep her people, not cut them. Wrong value message." },
+    { t: "We're HIPAA-compliant, so that won't be a problem.", q: "meh", s: { p: 4, t: -2 }, next: "h3", fb: "A claim isn't a plan. Show how you handle PHI, and invite compliance in." }
+   ]},
+  h3: { c: "That would help. [[We have budget from a CMS grant if we can show impact by spring.|buy|Funding source plus a deadline]] But [[our IT team is stretched thin with an EHR upgrade.|red|Capacity constraint: limited IT bandwidth]]",
+   ch: [
+    { t: "Then let's keep it light on your IT team: a two-week assessment of the intake workflow, then a pilot on your top three referral types that we deliver, integrate with Epic and run as a managed service. We'd set denial-rate and turnaround metrics so you can show impact to the grant committee by spring.", q: "best", s: { p: 14, u: 8 }, next: "h4", fb: "You designed around her constraint (IT bandwidth), tied it to the funding deadline, and set clear metrics." },
+    { t: "We can wait until the EHR upgrade is done.", q: "meh", s: { t: 2, p: -4 }, next: "h4", fb: "Waiting puts the grant deadline at risk. Find a delivery model that works around IT capacity." },
+    { t: "Your IT team will just need to free up two engineers for six months.", q: "bad", s: { l: -8, p: -8 }, next: "h4", fb: "She just told you IT is maxed out. This shows you didn't listen." }
+   ]},
+  h4: { c: "I like that. [[What do you need from me to get started?|buy|Clear buying signal: she's asking for next steps]]",
+   ch: [
+    { t: "An intro to your compliance lead and intake manager, a sample of anonymized referral documents, and 60 minutes next week to map the workflow. I'll bring a draft success scorecard.", q: "best", s: { p: 8, d: 4, t: 4 }, next: "end", fb: "Concrete, multi-stakeholder, and it shows momentum." },
+    { t: "Just a signed SOW and we'll take it from there.", q: "meh", s: { p: -2 }, next: "end", fb: "Skipping workflow mapping and compliance alignment creates risk." },
+    { t: "Let's start with a big AI strategy across the whole health system first.", q: "bad", s: { l: -6, p: -4 }, next: "end", fb: "She has a burning, specific problem and a deadline. A broad strategy now would slow her down." }
+   ]}
+ },
+ outcomes: {
+  great: { title: "Workflow mapping session booked", text: "Maria introduces you to compliance and her intake manager. The grant-funded pilot is within reach." },
+  ok: { title: "Promising, needs work", text: "Maria is interested, but compliance and IT concerns are unresolved." },
+  poor: { title: "Trust lost", text: "Maria worries you'll create more work for her team. She'll keep looking." }
+ },
+ useCases: ["Intelligent document processing for referral and prior-auth intake into Epic", "Denial prevention: completeness checks before submission"],
+ offering: { headline: "Intake Assessment → HIPAA-compliant IDP pilot → Managed service", steps: ["2-week workflow assessment", "IDP pilot on the top 3 referral types, integrated with Epic", "Governance: PHI handling, audit trails, human-in-the-loop", "Change management for intake staff", "Managed service to protect IT capacity"] },
+ takeaways: ["Diagnose where the process breaks before prescribing AI.", "In healthcare, lead with people and compliance.", "Design around the customer's constraints, like IT capacity.", "Tie the plan to the funding deadline with clear metrics."]
+},
+{
+ id: "cmo", full: false, difficulty: 1, turns: 4, color: ["#ec4899", "#8b5cf6"],
+ title: "\"ChatGPT for Everything\"",
+ persona: { name: "Jordan Blake", initials: "JB", role: "Chief Marketing Officer", company: "Northpeak Outfitters", industry: "Retail / E-commerce",
+   size: "$1.1B revenue · 140 stores · strong e-commerce",
+   quote: "I want ChatGPT for everything. Copy, emails, social, service... the works!",
+   goals: ["Launch products faster", "Personalize marketing at scale", "Impress the CEO with visible AI wins"],
+   personality: ["Visionary", "Impatient", "Brand-protective", "Big ideas"],
+   pains: ["3,000 new SKUs a season; copywriters are 6 weeks behind", "Legal is nervous after a competitor's AI made up a product claim", "No clear owner for AI across marketing"] },
+ mission: "Narrow the CMO's \"everything\" into one high-value gen AI use case with brand guardrails, and a roadmap for the rest.",
+ start: "r1",
+ nodes: {
+  r1: { c: "I want ChatGPT for everything! [[Our CEO saw a demo at a conference and asked why we're not doing this.|buy|Executive interest: a top-down push]] Product copy, emails, social, customer service, the works.",
+   ch: [
+    { t: "I love that your CEO is pushing; that helps. If you could fix only one thing in the next 90 days, which marketing task slows your team down the most?", q: "best", s: { d: 12, l: 8 }, next: "r2", fb: "You kept the excitement but forced a priority. That's the key move with a \"do everything\" buyer." },
+    { t: "We can deploy ChatGPT across your whole company next month.", q: "bad", s: { t: -8, p: -8, u: -6 }, next: "r2", fb: "No use case, no guardrails, no data plan. That's a recipe for a public failure." },
+    { t: "Gen AI is great for content. Let me show you a demo of product description generation.", q: "good", s: { u: 6, d: -2 }, next: "r2", fb: "Good guess at a use case, but confirm the pain before you demo." }
+   ]},
+  r2: { c: "Product descriptions, honestly. [[We launch 3,000 new SKUs a season and our copywriters are six weeks behind.|pain|Quantified content bottleneck: a gen AI content use case]] [[Our product data in the PIM is pretty clean, actually.|ready|Positive data readiness: clean product data in the PIM]]",
+   ch: [
+    { t: "Clean PIM data is a great head start. That's exactly what keeps AI-generated descriptions accurate. A pilot that drafts descriptions from PIM attributes in your brand voice, with copywriters as editors, could clear that backlog fast.", q: "best", s: { u: 14, l: 10, p: 6 }, next: "r3", fb: "You caught the readiness cue and turned it into a grounded, human-in-the-loop use case." },
+    { t: "We can generate all 3,000 descriptions automatically.", q: "meh", s: { u: 8, t: -4 }, next: "r3", fb: "Right use case, but \"fully automatic\" alarms brand and legal teams. Keep humans in the loop." },
+    { t: "Let's start with a customer service chatbot instead. It's a bigger ROI.", q: "bad", s: { l: -8, u: -4 }, next: "r3", fb: "She just told you her biggest pain. Don't override it." }
+   ]},
+  r3: { c: "Love that. But [[Legal freaked out about a competitor whose AI made up a product claim.|red|Brand and legal risk: fear of hallucination]] Can we trust it?",
+   ch: [
+    { t: "Legal is right to ask. We'd build guardrails in: grounding only on PIM data, banned-claim filters, a brand-voice checker, and human approval before anything publishes. We'll build an evaluation set with Legal so they can see accuracy before go-live.", q: "best", s: { p: 12, t: 12 }, next: "r4", fb: "Specific guardrails plus a way to prove accuracy to Legal. That's responsible-AI positioning done right." },
+    { t: "The newest models don't really hallucinate anymore.", q: "bad", s: { t: -12, p: -6 }, next: "r4", fb: "That's false, and it destroys credibility with Legal." },
+    { t: "Your copywriters will review everything, so it's fine.", q: "good", s: { p: 4, t: 2 }, next: "r4", fb: "Human review helps, but Legal will want systematic guardrails and evidence." }
+   ]},
+  r4: { c: "Okay, [[if this works for descriptions, I want it for email and social next.|buy|Expansion potential: a roadmap beyond the pilot]]",
+   ch: [
+    { t: "That's the right sequence: prove it on descriptions with a six-week pilot measured on time-to-publish and conversion, then extend to email and social on the same governed platform. We can run it as a managed service so new channels plug in easily.", q: "best", s: { p: 12, u: 6 }, next: "end", fb: "A land-and-expand path on a governed platform, with metrics. Excellent." },
+    { t: "Let's do all three channels at once to move faster.", q: "meh", s: { p: -2, u: 2 }, next: "end", fb: "Spreading thin raises risk. Prove value first, then scale." },
+    { t: "Email and social are a different project. We'll quote them separately.", q: "meh", s: { t: -4, p: -2 }, next: "end", fb: "That's a missed chance to show a platform roadmap, and it sounds transactional." }
+   ]}
+ },
+ outcomes: {
+  great: { title: "Pilot greenlit with Legal on board", text: "Jordan sponsors a six-week description pilot with Legal as co-designer, and a roadmap for email and social." },
+  ok: { title: "Excited, still risky", text: "Jordan wants to move, but Legal's concerns aren't resolved. Expect delays." },
+  poor: { title: "Shiny-object stall", text: "Without focus or guardrails, Legal blocks the initiative." }
+ },
+ useCases: ["Gen AI product-description generation grounded in PIM data", "Later: personalized email and social content on the same platform"],
+ offering: { headline: "Gen AI Content Pilot with Responsible-AI guardrails → Managed platform", steps: ["6-week pilot: descriptions from PIM data in the brand voice", "Guardrails: grounding, banned-claim filters, human approval", "Evaluation set co-built with Legal", "Expand to email and social on a managed platform"] },
+ takeaways: ["\"Everything\" isn't a use case. Force a 90-day priority.", "Clean data is a buying signal, so call it out.", "Answer hallucination fears with specific guardrails and evidence.", "Land with one use case, then expand on a shared platform."]
+}
+];
+</script>
+<script>
+/* ======================= ENGINE ======================= */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const DIMS = [["d", "Discovery", "#38bdf8"], ["l", "Listening", "#a78bfa"], ["u", "Use-Case ID", "#14d3b0"], ["p", "Positioning", "#ffc843"], ["t", "Trust", "#f472b6"]];
+const SIG = { buy: { label: "Buying signal", col: "#22c55e" }, pain: { label: "Pain point", col: "#f59e0b" }, ready: { label: "AI readiness cue", col: "#38bdf8" }, red: { label: "Red flag", col: "#f43f5e" } };
+const Q = { best: { label: "Ideal move", col: "#22c55e", pts: 100, icon: "&#9733;" }, good: { label: "Solid", col: "#38bdf8", pts: 60, icon: "&#10003;" }, meh: { label: "Missed opportunity", col: "#f59e0b", pts: 20, icon: "&#8776;" }, bad: { label: "Risky move", col: "#f43f5e", pts: 0, icon: "&#10007;" } };
+const LET = ["A", "B", "C", "D"];
+const PREFS_KEY = "aiRoleplay.prefs.v1";
+let prefs = { group: false, spot: true, ideal: false };
+try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch (e) {}
+let R = null;
+
+document.querySelectorAll(".brandInline").forEach(e => e.textContent = BRAND_NAME);
+document.title = "Customer Role-Play Simulator · " + BRAND_NAME;
+
+function show(id){ ["sPick", "sBrief", "sPlay", "sDeb"].forEach(s => $(s).classList.toggle("show", s === id)); document.body.classList.toggle("inplay", id === "sPlay"); }
+function avatar(sc, extra = ""){ return `<div class="av" style="background:linear-gradient(135deg,${sc.color[0]},${sc.color[1]});${extra}">${esc(sc.persona.initials)}</div>`; }
+function diff(n){ return `<span class="diff" title="Difficulty">${[1, 2, 3].map(i => `<b class="${i <= n ? "on" : ""}"></b>`).join("")}</span>`; }
+let toastT;
+function toast(msg, kind = ""){ const t = $("toast"); t.className = "toast show " + kind; t.innerHTML = msg; clearTimeout(toastT); toastT = setTimeout(() => t.className = "toast", 1900); }
+function floatPts(el, text, col){
+  if (!el) return; const r = el.getBoundingClientRect(), f = document.createElement("div");
+  f.className = "float"; f.textContent = text; f.style.left = (r.left + r.width / 2 - 20) + "px"; f.style.top = (r.top - 6) + "px"; if (col) f.style.color = col;
+  document.body.appendChild(f); setTimeout(() => f.remove(), 1000);
+}
+
+/* ---------- Picker ---------- */
+function renderPicker(){
+  $("personas").innerHTML = SCENARIOS.map(sc => `
+    <button class="pcard" data-id="${sc.id}">
+      <span class="stripe" style="background:linear-gradient(90deg,${sc.color[0]},${sc.color[1]})"></span>
+      <div class="who">${avatar(sc)}<div><h3>${esc(sc.persona.name)}</h3><div class="role">${esc(sc.persona.role)}<br>${esc(sc.persona.company)}</div></div></div>
+      <div class="title">${esc(sc.title)}</div>
+      <div class="quote">&ldquo;${esc(sc.persona.quote)}&rdquo;</div>
+      <div class="chips"><span class="chip">${esc(sc.persona.industry)}</span><span class="chip ${sc.full ? "full" : ""}">${sc.full ? "Full scenario" : "Quick play"} &middot; ${sc.turns} turns</span></div>
+      <div class="go"><span style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;font-weight:700">DIFFICULTY ${diff(sc.difficulty)}</span><span>Brief me &rarr;</span></div>
+    </button>`).join("");
+  $("personas").querySelectorAll(".pcard").forEach(b => b.onclick = () => openBrief(b.dataset.id));
+}
+
+/* ---------- Brief ---------- */
+let briefId = null;
+function openBrief(id){
+  const sc = SCENARIOS.find(s => s.id === id); if (!sc) return; briefId = id; const p = sc.persona;
+  const li = a => a.map(x => `<li>${esc(x)}</li>`).join("");
+  $("dossier").innerHTML = `
+    <div class="idcard">
+      ${avatar(sc)}
+      <div><div class="eyebrow" style="color:${sc.color[0]}">${esc(sc.title)}</div><h2>${esc(p.name)}</h2><div style="color:var(--muted);font-weight:600;margin-top:4px">${esc(p.role)}</div></div>
+      <div class="kv"><span>Company</span><b>${esc(p.company)}</b><span>Industry</span><b>${esc(p.industry)}</b><span>Size</span><b>${esc(p.size)}</b><span>Difficulty</span><b>${diff(sc.difficulty)}</b><span>Length</span><b>${sc.turns} turns &middot; ${sc.full ? "full branching" : "quick play"}</b></div>
+      <div class="quote" style="font-size:15px;line-height:1.5;color:#cfd7f7;font-style:italic;border-left:3px solid ${sc.color[0]};padding-left:12px">&ldquo;${esc(p.quote)}&rdquo;</div>
+    </div>
+    <div class="sections">
+      <div class="sec mission"><h4>Your mission</h4><p>${esc(sc.mission)}</p></div>
+      <div class="sec"><h4>Goals</h4><ul>${li(p.goals)}</ul></div>
+      <div class="sec"><h4>Personality</h4><div class="chips" style="gap:8px">${p.personality.map(x => `<span class="chip" style="font-size:14px;padding:7px 12px">${esc(x)}</span>`).join("")}</div>
+        <h4 style="margin-top:18px">You're meeting as</h4><p style="font-size:15px;line-height:1.45">An account executive from <b>${esc(BRAND_NAME)}</b>, a system integrator with AI, data and cloud practices and partnerships across the major hyperscalers and model vendors.</p></div>
+      <div class="sec hidden" id="pains" style="grid-column:1/-1"><h4>Hidden pains <button class="peekbtn" id="peek">Presenter peek</button></h4><ul>${li(p.pains)}</ul><div class="note">Learners: these are what good discovery uncovers. They're all revealed in the debrief.</div></div>
+      <div class="actions"><button class="ghost" id="briefBack">&larr; All scenarios</button><button class="cta" id="briefGo">Start the meeting <kbd>Enter</kbd></button></div>
+    </div>`;
+  $("peek").onclick = () => { const s = $("pains"); s.classList.toggle("peek"); $("peek").textContent = s.classList.contains("peek") ? "Hide" : "Presenter peek"; };
+  $("briefBack").onclick = () => { briefId = null; show("sPick"); };
+  $("briefGo").onclick = () => startScenario(id);
+  show("sBrief");
+}
+
+/* ---------- Parsing customer lines ---------- */
+function segments(text){
+  const out = [], re = /\[\[(.+?)\|(\w+)\|(.+?)\]\]/g; let last = 0, m;
+  const plain = s => (s.match(/[^.!?,;:]+[.!?,;:]*\s*/g) || []).forEach(x => out.push({ text: x }));
+  while ((m = re.exec(text))) { plain(text.slice(last, m.index)); out.push({ text: m[1], sig: { type: m[2], label: m[3] } }); last = re.lastIndex; }
+  plain(text.slice(last));
+  return out;
+}
+const stripMarks = t => t.replace(/\[\[(.+?)\|\w+\|.+?\]\]/g, "$1");
+
+/* ---------- Game state ---------- */
+function seededOrder(id, n){
+  let h = 0; for (const ch of id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const a = [...Array(n).keys()];
+  for (let i = n - 1; i > 0; i--) { h = (h * 1103515245 + 12345) >>> 0; const j = h % (i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function startScenario(id){
+  const sc = SCENARIOS.find(s => s.id === id); if (!sc) return;
+  briefId = null;
+  R = { sc, nodeId: null, hist: [], sigs: [], found: new Set(), tried: new Set(), misses: 0, points: 0, phase: "typing", votes: [0, 0, 0, 0], token: Math.random() };
+  $("thread").innerHTML = `<div class="sysmsg">Meeting with ${esc(sc.persona.name)} &middot; ${esc(sc.persona.company)}</div>`;
+  $("miniPersona").innerHTML = `${avatar(sc)}<div><b>${esc(sc.persona.name)}</b><span>${esc(sc.persona.role)}, ${esc(sc.persona.company)}</span></div>`;
+  show("sPlay"); renderSide(); playNode(sc.start);
+}
+function node(){ return R.sc.nodes[R.nodeId]; }
+function playNode(id){
+  R.nodeId = id; R.phase = "typing"; R.votes = [0, 0, 0, 0];
+  const tok = R.token, sc = R.sc, th = $("thread");
+  $("dock").innerHTML = `<div class="dockhead"><h6>${esc(sc.persona.name.split(" ")[0])} is talking&hellip;</h6></div>`;
+  const typing = document.createElement("div"); typing.className = "msg cust"; typing.innerHTML = avatar(sc) + `<div class="bub"><div class="typing"><i></i><i></i><i></i></div></div>`;
+  th.appendChild(typing); th.scrollTop = th.scrollHeight;
+  setTimeout(() => {
+    if (!R || R.token !== tok) return;
+    typing.remove();
+    const n = sc.nodes[id]; let k = 0;
+    const segs = segments(n.c).map((s, i) => {
+      if (s.sig) { const sid = id + "#" + (k++); R.sigs.push({ id: sid, type: s.sig.type, label: s.sig.label, text: s.text, node: id }); return `<span class="seg" data-sig="${sid}">${esc(s.text)}</span>`; }
+      return `<span class="seg" data-plain="${id}-${i}">${esc(s.text)}</span>`;
+    }).join("");
+    const m = document.createElement("div"); m.className = "msg cust"; m.dataset.node = id;
+    m.innerHTML = avatar(sc) + `<div class="bub"><span class="nm">${esc(sc.persona.name)}</span>${segs}<div class="stags"></div></div>`;
+    th.appendChild(m); th.scrollTop = th.scrollHeight;
+    R.phase = "choose"; renderChoices(); renderSide();
+  }, 850);
+}
+function scores(){
+  const out = {};
+  DIMS.forEach(([k]) => {
+    let earned = 0, ideal = 0;
+    R.hist.forEach(h => { const n = R.sc.nodes[h.node]; earned += n.ch[h.idx].s[k] || 0; ideal += Math.max(0, ...n.ch.map(c => c.s[k] || 0)); });
+    out[k] = Math.max(0, Math.min(100, Math.round(50 + 50 * earned / Math.max(ideal, 20))));
+  });
+  return out;
+}
+function renderSide(){
+  if (!R) return;
+  const sc = scores();
+  $("pts").innerHTML = R.points + "<small>pts</small>";
+  $("dims").innerHTML = DIMS.map(([k, name, col]) => `<div class="dim"><span>${name}</span><div class="track"><div class="fill" style="width:${sc[k]}%;background:${col}"></div></div><span class="v">${sc[k]}</span></div>`).join("");
+  $("sigFound").textContent = R.found.size; $("sigOf").textContent = "of " + R.sigs.length + " found so far";
+  const total = R.sc.turns, done = R.hist.length;
+  $("turnLbl").textContent = "Turn " + Math.min(done + (R.phase === "feedback" ? 0 : 1), Math.max(total, done + 1)) + " of " + total;
+  $("prog").innerHTML = Array.from({ length: Math.max(total, done) }, (_, i) => `<i class="${i < done ? "done" : i === done && R.phase !== "feedback" ? "now" : ""}"></i>`).join("");
+}
+function renderChoices(){
+  const n = node(), order = seededOrder(R.sc.id + R.nodeId, n.ch.length);
+  R.order = order;
+  $("dock").innerHTML = `<div class="dockhead"><h6>How do you respond?</h6><div class="gbtns"><button class="sbtn" id="vReset">Reset votes</button><button class="sbtn pri" id="vLock">Lock in room vote <kbd style="border-color:rgba(0,0,0,.2)">L</kbd></button></div></div>
+    <div class="choices">${order.map((oi, pos) => { const c = n.ch[oi]; return `
+      <div class="choice ${c.q === "best" ? "best" : ""}" role="button" tabindex="0" data-pos="${pos}">
+        <span class="ideal">&#9733; IDEAL</span><span class="L">${LET[pos]}</span><span class="txt">${esc(c.t)}</span>
+        <span class="votes" data-pos="${pos}"><button class="vm" title="Remove vote">&minus;</button><b>0</b><button class="vp" title="Add vote">+</button></span>
+      </div>`; }).join("")}</div>`;
+  $("dock").querySelectorAll(".choice").forEach(b => b.addEventListener("click", e => {
+    if (e.target.closest(".votes")) return;
+    choose(+b.dataset.pos);
+  }));
+  $("dock").querySelectorAll(".votes").forEach(v => {
+    const pos = +v.dataset.pos;
+    v.querySelector(".vp").onclick = e => { e.stopPropagation(); vote(pos, 1); };
+    v.querySelector(".vm").onclick = e => { e.stopPropagation(); vote(pos, -1); };
+  });
+  $("vReset").onclick = () => { R.votes = [0, 0, 0, 0]; paintVotes(); };
+  $("vLock").onclick = lockVote;
+  $("dock").scrollTop = 0;
+  fitThread();
+}
+function fitThread(){
+  const th = $("thread"), all = th.querySelectorAll(".msg.cust"), last = all[all.length - 1];
+  th.style.scrollBehavior = "auto"; th.scrollTop = th.scrollHeight;
+  if (last && last.offsetTop - 10 < th.scrollTop) th.scrollTop = last.offsetTop - 10;
+  th.style.scrollBehavior = "";
+}
+function vote(pos, d){ if (!R || R.phase !== "choose" || pos >= node().ch.length) return; R.votes[pos] = Math.max(0, R.votes[pos] + d); paintVotes(); }
+function paintVotes(){
+  const max = Math.max(...R.votes);
+  $("dock").querySelectorAll(".choice").forEach(b => { const p = +b.dataset.pos; b.querySelector(".votes b").textContent = R.votes[p]; b.classList.toggle("leading", max > 0 && R.votes[p] === max); });
+}
+function lockVote(){
+  if (!R || R.phase !== "choose") return;
+  const n = node().ch.length, v = R.votes.slice(0, n), max = Math.max(...v);
+  if (max === 0) { toast("No votes yet. Tally the room with A&ndash;D or the + buttons"); return; }
+  const top = v.map((x, i) => x === max ? i : -1).filter(i => i >= 0);
+  if (top.length > 1) { toast("It's a tie between " + top.map(i => LET[i]).join(" & ") + ". Click the winner"); return; }
+  choose(top[0], true);
+}
+function choose(pos, viaVote){
+  if (!R || R.phase !== "choose") return;
+  const n = node(); if (pos < 0 || pos >= n.ch.length) return;
+  const idx = R.order[pos], c = n.ch[idx], q = Q[c.q];
+  const totalVotes = R.votes.reduce((a, b) => a + b, 0);
+  R.hist.push({ node: R.nodeId, idx, pos, votes: totalVotes ? { n: R.votes[pos], of: totalVotes } : null });
+  R.points += q.pts; R.phase = "feedback";
+  const th = $("thread"), m = document.createElement("div");
+  m.className = "msg me"; m.innerHTML = `<div class="av">You</div><div class="bub"><span class="nm">You &middot; ${esc(BRAND_NAME)}</span>${esc(c.t)}</div>`;
+  th.appendChild(m); th.scrollTop = th.scrollHeight;
+  const best = n.ch.find(x => x.q === "best");
+  const deltas = DIMS.filter(([k]) => c.s[k]).map(([k, name]) => `<span class="delta ${c.s[k] > 0 ? "up" : "down"}">${c.s[k] > 0 ? "+" : ""}${c.s[k]} ${name}</span>`).join("");
+  const room = R.hist[R.hist.length - 1].votes;
+  $("dock").innerHTML = `<div class="fb" style="--q:${q.col}">
+      <div class="fbhead"><span class="qbadge">${q.icon} ${q.label}</span><span class="fbpts">+${q.pts} pts</span>${room ? `<span class="fbroom">The room chose ${LET[pos]} &middot; ${room.n} of ${room.of} votes</span>` : ""}</div>
+      <p>${esc(c.fb)}</p>
+      <div class="deltas">${deltas}</div>
+      ${c.q !== "best" ? `<div class="better"><b>&#9733; Stronger move</b>${esc(best.t)}</div>` : ""}
+      <div class="fbactions"><button class="cta" id="next">${c.next === "end" ? "See your debrief" : "Continue"} &rarr; <kbd>Enter</kbd></button></div>
+    </div>`;
+  $("next").onclick = next;
+  th.style.scrollBehavior = "auto"; th.scrollTop = th.scrollHeight; th.style.scrollBehavior = "";
+  floatPts($("pts"), "+" + q.pts, q.col);
+  renderSide();
+}
+function next(){
+  if (!R || R.phase !== "feedback") return;
+  const h = R.hist[R.hist.length - 1], c = R.sc.nodes[h.node].ch[h.idx];
+  if (c.next === "end") debrief(); else playNode(c.next);
+}
+
+/* ---------- Signal spotter ---------- */
+$("thread").addEventListener("click", e => {
+  const seg = e.target.closest(".msg.cust .seg"); if (!seg || !R || !prefs.spot) return;
+  if (seg.dataset.sig) {
+    const sid = seg.dataset.sig; if (R.found.has(sid)) return;
+    const s = R.sigs.find(x => x.id === sid); if (!s) return;
+    R.found.add(sid); R.points += 25;
+    seg.classList.add("found", s.type);
+    const tags = seg.closest(".bub").querySelector(".stags");
+    tags.insertAdjacentHTML("beforeend", `<span class="stag"><i class="dot" style="background:${SIG[s.type].col}"></i>${SIG[s.type].label}<em>&middot; ${esc(s.label)}</em></span>`);
+    toast(`<span style="color:${SIG[s.type].col}">${SIG[s.type].label} spotted!</span> +25`, "good");
+    floatPts(seg, "+25", SIG[s.type].col);
+  } else {
+    const key = seg.dataset.plain; seg.classList.remove("miss"); void seg.offsetWidth; seg.classList.add("miss");
+    if (R.tried.has(key)) return; R.tried.add(key); R.misses++; R.points = Math.max(0, R.points - 5);
+    toast("No signal hiding there &minus;5", "bad");
+  }
+  renderSide();
+});
+
+/* ---------- Debrief ---------- */
+function radar(sc){
+  const W = 440, H = 380, cx = W / 2, cy = 190, rad = 130, n = DIMS.length;
+  const pt = (i, r) => { const a = -Math.PI / 2 + i * 2 * Math.PI / n; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r]; };
+  let g = "";
+  [25, 50, 75, 100].forEach(v => { g += `<polygon points="${DIMS.map((_, i) => pt(i, rad * v / 100).join(",")).join(" ")}" fill="${v === 100 ? "rgba(255,255,255,.03)" : "none"}" stroke="rgba(255,255,255,${v === 100 ? .22 : .1})" stroke-width="1"/>`; });
+  DIMS.forEach((_, i) => { const [x, y] = pt(i, rad); g += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,.1)"/>`; });
+  const poly = DIMS.map(([k], i) => pt(i, rad * sc[k] / 100).join(",")).join(" ");
+  g += `<g style="transform-origin:${cx}px ${cy}px;animation:grow .9s cubic-bezier(.2,.9,.3,1.1)"><polygon points="${poly}" fill="rgba(20,211,176,.28)" stroke="#14d3b0" stroke-width="2.5" stroke-linejoin="round"/>`;
+  DIMS.forEach(([k, , col], i) => { const [x, y] = pt(i, rad * sc[k] / 100); g += `<circle cx="${x}" cy="${y}" r="5.5" fill="${col}" stroke="#0e1530" stroke-width="2"/>`; });
+  g += `</g>`;
+  DIMS.forEach(([k, name, col], i) => {
+    const [x, y] = pt(i, rad + 30), anchor = Math.abs(x - cx) < 10 ? "middle" : x > cx ? "start" : "end";
+    g += `<text x="${x}" y="${y - 2}" text-anchor="${anchor}" fill="#dfe5ff" font-size="14" font-weight="700" font-family="Inter,sans-serif">${name}</text><text x="${x}" y="${y + 16}" text-anchor="${anchor}" fill="${col}" font-size="15" font-weight="800" font-family="Space Grotesk,Inter,sans-serif">${sc[k]}</text>`;
+  });
+  return `<svg viewBox="-40 0 ${W + 80} ${H}" role="img" aria-label="Skills radar chart"><style>@keyframes grow{from{transform:scale(0)}to{transform:scale(1)}}</style>${g}</svg>`;
+}
+function debrief(){
+  const sc = R.sc, s = scores(), avg = DIMS.reduce((a, [k]) => a + s[k], 0) / DIMS.length;
+  const totalSig = R.sigs.length, found = R.found.size;
+  const overall = Math.round(.85 * avg + 15 * (totalSig ? found / totalSig : 0));
+  const grade = overall >= 90 ? ["A", "Trusted Advisor"] : overall >= 80 ? ["B", "Strong Seller"] : overall >= 65 ? ["C", "Getting There"] : ["D", "Back to Discovery"];
+  const out = overall >= 78 ? sc.outcomes.great : overall >= 58 ? sc.outcomes.ok : sc.outcomes.poor;
+  const ideal = R.hist.filter(h => sc.nodes[h.node].ch[h.idx].q === "best").length;
+  const C = 2 * Math.PI * 64, ringCol = overall >= 80 ? "#14d3b0" : overall >= 65 ? "#ffc843" : "#f43f5e";
+  const li = a => a.map(x => `<li>${esc(x)}</li>`).join("");
+  $("debrief").innerHTML = `
+    <div class="card hero">
+      <div class="ring"><svg viewBox="0 0 150 150"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="12"/><circle id="ringArc" cx="75" cy="75" r="64" fill="none" stroke="${ringCol}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" style="transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)"/></svg><div class="c"><div><b>${overall}</b><br><span>DEAL SCORE</span></div></div></div>
+      <div style="min-width:0"><span class="grade">Grade ${grade[0]} &middot; ${grade[1]}</span><h2>${esc(out.title)}</h2><p>${esc(out.text)}</p></div>
+      <div class="stats"><div class="stat"><b style="color:var(--gold)">${R.points}</b><span>POINTS</span></div><div class="stat"><b>${ideal}/${R.hist.length}</b><span>IDEAL MOVES</span></div><div class="stat"><b>${found}/${totalSig}</b><span>SIGNALS</span></div></div>
+    </div>
+    <div class="card c5"><h4>Skills scorecard</h4><div class="radarwrap">${radar(s)}</div></div>
+    <div class="card c7"><h4>Signals in this conversation (${found} of ${totalSig} spotted${R.misses ? ` &middot; ${R.misses} miss${R.misses === 1 ? "" : "es"}` : ""})</h4><div class="siglist">${R.sigs.map(x => `
+      <div class="sigrow ${R.found.has(x.id) ? "" : "missed"}"><span class="st ${R.found.has(x.id) ? "ok" : "no"}">${R.found.has(x.id) ? "FOUND" : "MISSED"}</span><i class="dot" style="background:${SIG[x.type].col};margin-top:5px"></i><div><q>&ldquo;${esc(x.text)}&rdquo;</q><span class="lab" style="color:${SIG[x.type].col}">${SIG[x.type].label}:</span> ${esc(x.label)}</div></div>`).join("")}</div></div>
+    <div class="card c4"><h4>Use cases identified</h4><ul class="list uc">${li(sc.useCases)}</ul><h4 style="margin-top:18px">Hidden pains</h4><ul class="list" style="gap:6px">${li(sc.persona.pains)}</ul></div>
+    <div class="card c4"><h4>Recommended ${esc(BRAND_NAME)} offering</h4><div class="offer">${esc(sc.offering.headline)}</div><div class="steps">${sc.offering.steps.map((x, i) => `<div class="step"><i>${i + 1}</i><span>${esc(x)}</span></div>`).join("")}</div></div>
+    <div class="card c4"><h4>Key takeaways</h4><ul class="list tk">${li(sc.takeaways)}</ul></div>
+    <div class="card c12"><h4>Your path vs. the ideal path</h4><div class="path">${R.hist.map((h, i) => {
+      const n = sc.nodes[h.node], c = n.ch[h.idx], q = Q[c.q], best = n.ch.find(x => x.q === "best"), cust = stripMarks(n.c);
+      return `<div class="prow"><div class="n">${i + 1}</div><div><div class="lbl">${esc(sc.persona.name.split(" ")[0])} said</div>${esc(cust)}</div>
+        <div><div class="lbl">You said <span class="qb" style="--q:${q.col}">${q.label}</span></div>${esc(c.t)}${c.q !== "best" ? `<div class="lbl" style="margin-top:8px;color:var(--gold)">&#9733; Ideal</div><div class="ideal-t">${esc(best.t)}</div>` : ""}</div></div>`; }).join("")}</div></div>
+    <div class="debactions"><button class="ghost" id="dPick">&larr; Choose another customer</button><button class="ghost" id="dPrint">Print / save as PDF</button><button class="cta" id="dReplay">Replay this scenario</button></div>`;
+  $("dPick").onclick = () => { R = null; show("sPick"); };
+  $("dReplay").onclick = () => startScenario(sc.id);
+  $("dPrint").onclick = () => window.print();
+  R.phase = "done"; show("sDeb"); document.querySelector("#sDeb .deb").scrollTop = 0;
+  requestAnimationFrame(() => setTimeout(() => { const a = $("ringArc"); if (a) a.style.strokeDashoffset = C * (1 - overall / 100); }, 60));
+}
+
+/* ---------- Toggles, help, keyboard ---------- */
+function applyPrefs(){
+  document.body.classList.toggle("group", prefs.group); document.body.classList.toggle("spot", prefs.spot); document.body.classList.toggle("showideal", prefs.ideal);
+  $("tGroup").classList.toggle("on", prefs.group); $("tSpot").classList.toggle("on", prefs.spot); $("tIdeal").classList.toggle("on", prefs.ideal);
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
+}
+function toggle(k, label){ prefs[k] = !prefs[k]; applyPrefs(); toast(label + (prefs[k] ? " on" : " off")); }
+$("tGroup").onclick = () => { toggle("group", "Group mode"); if (R && R.phase === "choose") fitThread(); };
+$("tSpot").onclick = () => toggle("spot", "Signal spotter");
+$("tIdeal").onclick = () => toggle("ideal", "Ideal path");
+$("bRestart").onclick = () => { if (R) startScenario(R.sc.id); };
+$("bExit").onclick = () => { if (R) R.token = null; R = null; show("sPick"); };
+$("bHelp").onclick = () => $("help").classList.add("show");
+$("helpClose").onclick = () => $("help").classList.remove("show");
+$("help").onclick = e => { if (e.target.id === "help") $("help").classList.remove("show"); };
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if ($("help").classList.contains("show")) { if (k === "escape" || k === "enter" || k === "?") { e.preventDefault(); $("help").classList.remove("show"); } return; }
+  if (k === "?") { $("help").classList.add("show"); return; }
+  if (k === "g") { toggle("group", "Group mode"); if (R && R.phase === "choose") fitThread(); return; }
+  if ($("sBrief").classList.contains("show")) { if (k === "enter" && briefId) { e.preventDefault(); startScenario(briefId); } if (k === "escape") show("sPick"); return; }
+  if (!R || !$("sPlay").classList.contains("show")) return;
+  if (k === "s") { toggle("spot", "Signal spotter"); return; }
+  if (k === "i") { toggle("ideal", "Ideal path"); return; }
+  if (R.phase === "choose") {
+    const d = /^(Digit|Numpad)([1-4])$/.exec(e.code);
+    if (d) { e.preventDefault(); choose(+d[2] - 1); return; }
+    if (prefs.group && ["a", "b", "c", "d"].includes(k)) { vote("abcd".indexOf(k), e.shiftKey ? -1 : 1); return; }
+    if (prefs.group && k === "l") { lockVote(); return; }
+    if (k === "enter" && document.activeElement && document.activeElement.classList.contains("choice")) { e.preventDefault(); choose(+document.activeElement.dataset.pos); }
+  } else if (R.phase === "feedback" && (k === "enter" || k === " ")) { e.preventDefault(); next(); }
+});
+
+applyPrefs(); renderPicker();
+</script>
+</body>
+</html>
