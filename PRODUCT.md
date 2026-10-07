@@ -41,7 +41,7 @@ These describe the current prototypes. They do not commit the actual product to 
 
 ### Open product decisions
 
-- The company whose offerings sellers will learn to position, and the actual offering catalog.
+- The approved offering catalog. The prototype uses CDW as the seller identity, but Default's illustrative offers do not establish catalog approval.
 - The scope of the first release and which prototype capabilities it should retain.
 - Whether the actual product uses scripted conversations, live AI conversations, or both.
 - The production stack and deployment target.
@@ -58,7 +58,9 @@ These describe the current prototypes. They do not commit the actual product to 
 - `prototype/seller-ai-training/screenshots/`: 12 supplied captures of prototype screens and states.
 - `prototype/seller-ai-training.zip`: the supplied prototype archive.
 
-The prototype calls itself "AI Seller Academy" and uses "Your Company" as a placeholder. Neither establishes a final brand commitment.
+The prototype calls itself "AI Seller Academy" and uses CDW as the seller identity. The original fictional content now lives in one Default pack shared by both activities. The change preserves customers, branches, choices, scores, and signals. Exactly 5 Jeopardy strings replace the original seller placeholder with CDW.
+
+Default shows this notice. "Fictional training scenarios. Default's illustrative offers are not a verified CDW catalog." The prototype retains its existing browser saves and game rules. No alternate pack or Settings screen exists yet.
 
 Customer personas, company names, financial figures, and service claims in the scenarios are training examples. Do not treat them as customer evidence or confirmed facts about the actual offerings. No real testimonials, measured training results, or approved offering catalog have been supplied.
 
