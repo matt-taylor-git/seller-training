@@ -251,7 +251,7 @@
           "offering": "FirstTouch AI",
           "section": "3, Payments; 5.1; 6.F; 10",
           "date": "2026-10-07",
-          "caveat": "Payment automation remains emerging in the compilation. The exercise separates intake from refunds rather than promising autonomous payment execution.",
+          "caveat": "The compilation describes agent-initiated payments as emerging. This lesson separates first contact from refund authority without asserting that ordinary payment automation is new.",
           "locations": [
             "nodes.authority.c",
             "nodes.authority.ch[0].t",
