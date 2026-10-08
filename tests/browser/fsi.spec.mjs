@@ -47,7 +47,7 @@ function record(name, value) {
 }
 async function startMeeting(page, scenario) {
   await page.goto('/roleplay.html');
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services');
   await expect(page.locator('.pcard')).toHaveCount(4);
   await page.locator(`.pcard[data-id="${scenario.id}"]`).click();
   await expect(page.locator('.idcard h2')).toHaveText(scenario.persona.name);
@@ -92,7 +92,7 @@ async function meeting(page, id, route = 'ideal') {
 }
 async function board(page) {
   await page.goto('/jeopardy.html');
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services');
   await expect(page.locator('.tile')).toHaveCount(30);
   await page.locator('#soundBtn').click();
 }
@@ -184,7 +184,7 @@ async function clues(page, categories, lane) {
 
 test('Lane 1. Bank ideal ends with qualified stakeholders and a concrete next step.', async ({ page }) => {
   await meeting(page, 'fsi-bank');
-  for (const phrase of ['security', 'finance', 'policy owner', 'Private AI Launch Workshop', 'prerequisite']) await expect(page.locator('#debrief')).toContainText(phrase);
+  for (const phrase of ['security', 'finance', 'policy owner', 'Private AI Launch Workshop', 'requirements']) await expect(page.locator('#debrief')).toContainText(phrase);
   await capture(page, 'fsi-bank.png');
 });
 
@@ -200,7 +200,7 @@ test('Lane 3. Insurance ideal and recovery explain human review and data quality
   await capture(page, 'fsi-insurance.png');
   const trace = await meeting(page, 'fsi-insurance', 'recovery');
   expect(trace.map(turn => turn.nodeId)).toEqual(['i1', 'ir', 'i3', 'i4', 'i5', 'i6', 'i7']);
-  expect(trace[1].coaching).toContain('retract');
+  expect(trace[1].coaching).toContain('withdrew');
   expect(trace[1].response).toContain('representative sample');
   await expect(page.locator('#debrief')).toContainText('human review');
   await expect(page.locator('#debrief')).toContainText('Data Quality');
@@ -211,17 +211,17 @@ test('Lane 4. Wealth keeps consent, advisor approval, and useful adoption explic
   const trace = await meeting(page, 'fsi-wealth');
   expect(trace[1].response).toContain('client consent');
   expect(trace[1].response).toContain('advisor review');
-  expect(trace[2].coaching).toContain('is a promise');
-  await expect(page.locator('#debrief')).toContainText('autonomous advice');
+  expect(trace[2].coaching).toContain('Neither service promises');
+  await expect(page.locator('#debrief')).toContainText('investment advice without advisor approval');
   await capture(page, 'fsi-wealth.png');
 });
 
 test('Lane 5. Payments qualifies the platform before FirstTouch AI and rejects payment guarantees.', async ({ page }) => {
   const trace = await meeting(page, 'fsi-payments');
-  expect(trace[0].response).toContain('Which contact center platform');
+  expect(trace[0].response).toContain('Which system have your service centers chosen');
   expect(trace[1].response).toContain('Five9');
-  expect(trace[2].coaching).toContain('does not establish deployment at scale');
-  await expect(page.locator('#debrief')).toContainText('Refund authority remains separate');
+  expect(trace[2].coaching).toContain('does not show widespread use');
+  await expect(page.locator('#debrief')).toContainText('Authority to issue refunds stays separate');
   await capture(page, 'fsi-payments.png');
 });
 

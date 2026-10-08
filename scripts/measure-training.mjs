@@ -51,7 +51,7 @@ async function measure(browser, origin, activity, packId, verifyPack) {
         const usable = activityName === 'jeopardy'
           ? document.querySelectorAll('#board .tile').length === 30 && document.querySelectorAll('#teams .team').length >= 2
           : document.querySelectorAll('#personas .pcard').length === 4;
-        const label = packId === 'fsi' ? 'FSI' : 'Default';
+        const label = packId === 'fsi' ? 'Financial services' : 'Default';
         const pinned = !verifyPack || document.querySelector('#selectionNotice')?.textContent.includes(`Current pack: ${label}.`);
         if (usable && pinned) window.__trainingUsable = performance.now();
         else requestAnimationFrame(ready);
@@ -105,7 +105,7 @@ async function measureSettings(browser, origin, activity, packId, version) {
       if (location.pathname !== `/${activity}.html`) return;
       function ready() {
         const usable = activity === 'jeopardy' ? document.querySelectorAll('#board .tile').length === 30 : document.querySelectorAll('#personas .pcard').length === 4;
-        const pinned = version === 'baseline' || document.querySelector('#selectionNotice')?.textContent.includes(`Current pack: ${packId === 'fsi' ? 'FSI' : 'Default'}.`);
+        const pinned = version === 'baseline' || document.querySelector('#selectionNotice')?.textContent.includes(`Current pack: ${packId === 'fsi' ? 'Financial services' : 'Default'}.`);
         if (usable && pinned) window.__journeyMs = performance.timeOrigin + performance.now() - Number(sessionStorage.getItem('journeyStart'));
         else requestAnimationFrame(ready);
       }
