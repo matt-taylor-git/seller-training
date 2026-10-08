@@ -201,7 +201,7 @@ test('Lane 3. Insurance ideal and recovery explain human review and data quality
   const trace = await meeting(page, 'fsi-insurance', 'recovery');
   expect(trace.map(turn => turn.nodeId)).toEqual(['i1', 'ir', 'i3', 'i4', 'i5', 'i6', 'i7']);
   expect(trace[1].coaching).toContain('withdrew');
-  expect(trace[1].response).toContain('representative sample');
+  expect(trace[1].response).toContain('approved sample that reflects actual documents');
   await expect(page.locator('#debrief')).toContainText('human review');
   await expect(page.locator('#debrief')).toContainText('Data Quality');
   await capture(page, 'fsi-insurance-recovery.png');
@@ -218,9 +218,9 @@ test('Lane 4. Wealth keeps consent, advisor approval, and useful adoption explic
 
 test('Lane 5. Payments qualifies the platform before FirstTouch AI and rejects payment guarantees.', async ({ page }) => {
   const trace = await meeting(page, 'fsi-payments');
-  expect(trace[0].response).toContain('Which system have your service centers chosen');
+  expect(trace[0].response).toContain('Which system have you chosen for handling customer calls and messages');
   expect(trace[1].response).toContain('Five9');
-  expect(trace[2].coaching).toContain('does not show widespread use');
+  expect(trace[2].coaching).toContain('without evidence of widespread use');
   await expect(page.locator('#debrief')).toContainText('Authority to issue refunds stays separate');
   await capture(page, 'fsi-payments.png');
 });

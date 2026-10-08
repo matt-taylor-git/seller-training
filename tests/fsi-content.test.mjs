@@ -93,7 +93,7 @@ test('Source checking requires the actual reviewed compilation, not a substitute
 test('Standalone survey clues preserve their sample, dates, units, and limits.', () => {
   const uk = fsi.jeopardy.categories[3].clues[4];
   for (const phrase of ['118', '2024-11-21', 'United Kingdom', 'sample', 'not a global rate', '2026-10-07']) assert(uk.why.includes(phrase), phrase);
-  assert(uk.a.includes('2%') && uk.a.includes('uses'));
+  assert(uk.a.includes('2 percent') && uk.a.includes('uses'));
   const nvidia = fsi.jeopardy.categories[5].clues[2];
   for (const phrase of ['839', '2026-01', '2025-08', '2025-09', 'NVIDIA channels', 'self-reported', 'self-selected', 'not audited']) assert(nvidia.why.includes(phrase), phrase);
   assert(nvidia.a.includes('not a financial return'));
