@@ -132,7 +132,8 @@ test('Lane 3. Switching both ways restores each pack board and no neighboring sc
   await expect(page.locator('#team0 .score')).toHaveText('$0');
   await scoreClue(page);
   await page.locator('#team0 .adj button').first().click();
-  const fsi = await stored(page, 'aiDealJeopardy.v2.fsi.1');
+  const fsi = await stored(page, `aiDealJeopardy.v2.fsi.${fsiPack.revision}`);
+  expect(fsi).not.toBeNull();
   expect(await stored(page, 'aiDealJeopardy.v2.default.1')).toBe(original);
   await choose(settings, 'default');
   page.once('dialog', dialog => dialog.accept());
@@ -141,7 +142,7 @@ test('Lane 3. Switching both ways restores each pack board and no neighboring sc
   await expect(page.locator('#team0 .score')).toHaveText('$100');
   await expect(page.locator('.tile[data-key="0-0"]')).toHaveClass(/used/);
   await expect(page.locator('.cat')).toHaveText(defaultPack.jeopardy.categories.map(category => category.name));
-  expect(await stored(page, 'aiDealJeopardy.v2.fsi.1')).toBe(fsi);
+  expect(await stored(page, `aiDealJeopardy.v2.fsi.${fsiPack.revision}`)).toBe(fsi);
   await capture(page, 'default-return.png');
   await choose(settings, 'fsi');
   page.once('dialog', dialog => dialog.accept());

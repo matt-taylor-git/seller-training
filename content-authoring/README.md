@@ -1,48 +1,78 @@
-# FSI authoring record
+# Financial services authoring record
 
-FSI contains 4 fictional financial-services conversations and a complete Jeopardy board. The pack teaches discovery and qualification, not a guaranteed customer outcome.
+Revision 2 replaces the earlier financial-services curriculum. The product contract is [PRODUCT.md](../PRODUCT.md). The [lesson map](fsi-lesson-map.md) records the outline written before the pack, each node's knowledge progression, and every quiz premise.
 
-The served pack contains 23 nodes, 69 choices, 12 outcomes, and 20 takeaways. Its bank and insurance routes each use 7 choices. Wealth and payments each use 4 choices. Insurance recovery uses an alternate second node, so it does not show an eighth turn against a 7-turn label.
+The pack contains:
 
-The board contains 6 categories with 5 progressively harder clues each and 1 Final. The existing engine selects 2 Daily Doubles. No game rules changed.
+- 4 fictional situations across banking, insurance, wealth management, and payments.
+- 2 full scenarios with 6 turns each and 2 quick scenarios with 4 turns each.
+- 22 reachable nodes, 66 seller replies, and 22 marked signals.
+- 12 outcome descriptions and 16 takeaways.
+- 30 standalone clues across 6 skill categories and 1 Final.
+- 1,620 terminating choice routes, all at the advertised turn depth.
 
-## Presenter reading budget
+The bank and insurance each have an alternate second turn. Early premature suggestions cause a different customer response. Recovery can improve the score without adding a turn. Outcomes assess the approach rather than claiming that a high score booked a meeting.
 
-Regular answers contain at most 25 words. Their coaching contains at most 40 words, with at most 65 words combined. Final allows 45 answer words, 40 coaching words, and 85 combined words. Word counts use whitespace-separated words.
+## Reading budgets
 
-Final asks for one bounded task, 2 signals, one qualified CDW next step with owners, and one rejected promise. Its model answer contains 37 words. Its coaching contains 31 words. Role-play and provenance retain the broader discovery detail.
+Regular questions contain 18 to 29 words. Answers contain 7 to 14 words and at most 82 characters. Explanations contain 18 to 26 words. Final contains 34 answer words and 28 explanation words.
 
-Browser lanes 6 through 9 count actual text lines and record text height, element height, font size, and line height. They test 1440 by 900 and 1920 by 1080 pixels. Regular answers allow 3 lines. Final allows 4 answer lines. Supporting notes allow 3 lines. Tests pin the existing font sizes and wait for reveal animations to finish. They still check clipping and scoring.
+The limits remain 25 answer words, 110 answer characters, and 40 explanation words for regular clues. Final allows 45 answer words and 40 explanation words. The tests also preserve the combined limits of 65 and 85 words.
 
-## Evidence and review limits
+Browser checks render all 30 answers at 1440 by 900 and 1920 by 1080 pixels. They preserve the existing limits of 3 answer lines, 3 explanation lines, and 4 Final answer lines. The observed regular maximum is 2 answer lines and 2 explanation lines at both sizes. Final uses 3 answer lines and 2 explanation lines.
 
-`fsi-provenance.json` maps all 35 content items to 56 material claim entries. Scenario claims also identify their locations. Each claim names sections, dates, and limits from the supplied playbook compiled on 2026-10-07. Its SHA-256 hash identifies the exact compilation. Offering dates identify that compilation, not live catalog publication dates.
+The browser tests pin the original answer font sizes. They check clipping and exercise the longest seller reply in group mode at both sizes. They do not shrink fonts or change layout. The test browser blocks remote font requests and uses the existing fallback fonts.
 
-The integration task reports an independent source review of the draft with PASS and 2 minor notes. This pack spells out United Kingdom and restructures insurance recovery. The integrator also read the complete compilation and compared offering claims and answers. The readability revision rechecked all changed clue fields and Final against that compilation. Final now omits the customer-facing launch and its possible future services. Its evidence record follows the narrower scored task. The parent must review the final committed pack separately. No linked offering page or external source was independently fetched for this change.
+## Evidence
 
-All customers, dialogue, customer metrics, and outcomes are fictional. Scoping meetings, evaluation cohorts, sample controls, and stop rules are authored recommendations. They are not additional service deliverables.
+[fsi-provenance.json](fsi-provenance.json) maps all 35 items to 46 evidence entries. Each entry distinguishes a source claim, a fictional fact, or an authored recommendation. Source claims carry section references, dates, limits, and content locations.
 
-The source is CDW Internal. This directory stays outside the served application. Neither the source file nor its prices, personal contacts, routing instructions, campaign tags, or SharePoint URLs belongs in served files. The repository does not contain a raw copy of the source.
+Each item also carries a hash of its complete authored content. If that content changes, review the evidence before updating its hash. The checker confirms that every occurrence of the 5 selected offering names has a source-claim location. A hash or location check does not prove that the source supports the claim.
 
-Availability reflects the supplied snapshot. Coming Soon plays remain unavailable. Assessments do not grant regulatory approval. Penetration tests do not guarantee security. Private hosting does not establish lower costs or compliance. Survey results describe their own samples, not audited returns.
+The evidence refers to the complete internal compilation dated 2026-10-07. Its SHA-256 is `31530f3c151f34e3f18d33cdc2ced30f4733361519bef5b35ee70e763118092b`. The author read that supplied compilation. Linked research and offering pages were not independently retrieved, and current availability remains unverified.
 
-## Run content checks
+All people, companies, dialogue, figures, work practices, and outcomes are fictional. Working meetings, document samples, consent rules, test designs, and measures are authored recommendations. They are not extra service deliverables or guaranteed returns.
+
+The pack uses only these source-described offers:
+
+- Private AI Launch Workshop.
+- AI Readiness Data Quality Assessment.
+- AI Risk Assessment.
+- Copilot Adoption and Change Management.
+- FirstTouch AI.
+
+The pack does not claim a turnkey claims or wealth integration. FirstTouch AI's first-contact scope does not imply refund authority. Private hosting does not guarantee security or approval. An assessment does not grant regulatory approval.
+
+The raw source stays private and outside this repository's served tree. Prices, personal contacts, internal links, campaign tags, and routing instructions do not belong in the lessons. Coming Soon and under-construction exclusions remain in the checker and evidence policy even though those offers do not appear in this curriculum.
+
+## Checks
 
 From the repository root, run:
 
 ```sh
-node scripts/check-content.mjs
-node --test tests/fsi-content.test.mjs
-```
-
-The report must show 35 evidence items and 56 claim entries. The checks require complete games, terminating graphs, complete sentences, corrected unavailable plays, and local acronym definitions in standalone explanations.
-
-To check the supplied compilation and exclude its named contacts, run:
-
-```sh
+npm run lint
+npm run typecheck
+npm test
 node scripts/check-content.mjs --source /path/to/FSI_AI_Research_and_CDW_Seller_Playbook.md
+npm run test:browser
 ```
 
-The source must match the recorded hash. The report must show 4 source contacts checked. Keep the source local. Do not commit or publish it.
+The source-aware check must report 35 evidence items, 46 evidence entries, and 4 excluded source contacts. Keep the supplied source local.
 
-Distribution still requires a separately approved audience and hosting decision. Content review does not supply that approval.
+The completed author run passed 189 unit tests and 42 browser tests. Browser coverage includes all 4 scenarios, both recoveries, a poor route, all clues, Final, Daily Doubles, signals, group voting, Settings, and persistence. Revision-1 progress remains intact. The trainer can recover valid team names, but must explicitly create revision-2 progress.
+
+The first full browser run timed out opening Settings from a Default clue. The unchanged test passed on a focused retry and on the next full run. No engine or generic assertion changed to hide that failure. The evidence retains the first log and trace.
+
+## Retired revision-1 assumptions
+
+The old behavior fixture froze identities, scores, graph structure, signal positions, and question size classes. Those expectations contradicted the approved fresh curriculum. The unused `tests/fixtures/fsi-original.json` was removed. A small revision-1 checkpoint fixture preserves compatibility testing without keeping the old lessons active.
+
+The old copy tests also froze quiz meanings and positions, ordered catalog lists, 11 option-list questions, and technical prerequisites. New tests cover the new goals, exact route depths, score dimensions, attainable outcomes, independent premises, and evidence locations. Headings no longer need sentence punctuation. The old minimum of 56 claims no longer forces unrelated catalog content into the lessons.
+
+The reduced test count does not remove generic engine tests. Default checks, pack validation, generic state tests, and generic browser suites remain intact. The only Settings test change uses the current FSI revision key and asserts that a save actually exists.
+
+## Review limits
+
+[The author review](fsi-author-review.md) records branch checks and concrete editorial corrections. No test proves natural dialogue or an eighth-grade reading level. No independent reader or learner study ran in this task.
+
+The parent still owns independent review, final Linux and performance checks, audience approval, and publication. This local commit does not authorize distribution.

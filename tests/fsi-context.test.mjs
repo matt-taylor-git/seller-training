@@ -3,64 +3,89 @@ import assert from 'node:assert/strict';
 import fsi from '../prototype/seller-ai-training/packs/fsi.mjs';
 
 const [bank, insurance, wealth, payments] = fsi.roleplay.scenarios;
-const spoken = text => text.replace(/\[\[(.+?)\|\w+\|.+?\]\]/g, '$1');
+const spoken = text => text.replace(/\[\[([^|]+)\|[^|]+\|[^\]]+\]\]/g, '$1');
+const ideal = node => node.ch.find(choice => choice.q === 'best');
 
-test('Wealth introduces Microsoft 365 Copilot and meeting notes before discussing low use.', () => {
-  const opening = spoken(wealth.nodes.w1.c);
-  assert.match(opening, /Microsoft 365 Copilot/);
-  assert.match(opening, /(?:client meeting|meeting notes)/);
-  assert.match(opening, /50 minutes/);
-  assert.match(opening, /20 percent/);
-  assert(opening.indexOf('Microsoft 365 Copilot') < opening.indexOf('20 percent'));
+test('The bank opens on a procedure disagreement, not equipment or a service quiz.', () => {
+  const opening = spoken(bank.nodes.counter.c);
+  assert.match(opening, /changing a customer's address/);
+  assert.match(opening, /different answers/);
+  assert.match(ideal(bank.nodes.counter).t, /What did those two branches look at/);
+  assert.doesNotMatch(JSON.stringify(bank), /GPU|Kubernetes|Factory Accelerator/);
 });
 
-test('Payments opens with repeated dispute details and investigates the phone handoff, not a product quiz.', () => {
-  const opening = spoken(payments.nodes.p1.c);
-  assert.match(opening, /(?:repeat|twice)/);
-  assert.match(opening, /dispute/);
-  assert.match(opening, /(?:phone|call)/);
-  assert.doesNotMatch(opening, /FirstTouch|recommend|what do you need to know/i);
-  assert.match(payments.nodes.p1.ch[0].t, /Which phone system/);
-  assert.match(payments.nodes.p1.ch[0].t, /(?:information|details).*(?:see|receive)/);
+test('Both bank second turns reveal all three sources before asking about document authority.', () => {
+  for (const id of ['folders', 'reset']) {
+    const line = spoken(bank.nodes[id].c);
+    for (const source of ['staff site', 'PDF', 'branch chat']) assert(line.includes(source));
+    assert.match(ideal(bank.nodes[id]).t, /Who decides which version/);
+  }
+  assert.match(spoken(bank.nodes.authority.c), /operations team owns the staff site/);
 });
 
-test('Reported seller options are replies to the customer rather than directions to the learner.', () => {
-  assert.match(wealth.nodes.w1.ch[0].t, /Could you walk me through/);
-  assert.match(wealth.nodes.w1.ch[1].t, /I.*recommend.*licenses/);
-  assert.match(wealth.nodes.w1.ch[2].t, /I.*show.*advisors/);
-  assert.match(insurance.nodes.i2.ch[0].t, /(?:Could we|Let.s).*sample/);
-  assert.match(bank.nodes.b6.ch[2].t, /(?:We can|I can).*90/);
-  assert.match(payments.nodes.p4.ch[1].t, /(?:We can|I can).*cost per call/);
+test('Insurance establishes actual returned work only after discovering the missing estimate.', () => {
+  for (const id of ['handoff', 'pushback']) {
+    const line = spoken(insurance.nodes[id].c);
+    assert.match(line, /address and loss date/);
+    assert.match(line, /repair estimate/);
+    assert.match(ideal(insurance.nodes[id]).t, /Who notices/i);
+  }
+  assert.match(spoken(insurance.nodes.missing.c), /sends it back to the coordinator/);
+  assert.match(ideal(insurance.nodes.missing).t, /required documents before assignment/);
 });
 
-test('Measure-before-test clue names the staff, copying task, source, and destination without inventing a queue.', () => {
-  const clue = fsi.jeopardy.categories[5].clues[0];
-  assert.match(clue.q, /Claims staff/);
-  assert.match(clue.q, /copy.*(?:claim|reference) numbers/);
-  assert.match(clue.q, /scanned forms/);
-  assert.match(clue.q, /claims system/);
-  assert.match(clue.q, /before.*(?:test|trial)/);
-  assert.match(clue.a, /before the (?:test|trial)/);
-  assert.match(clue.why, /copying/);
-  assert.doesNotMatch(clue.why, /queue/);
-  assert.match(clue.a, /claims lead/);
+test('Insurance does not turn quicker checks into faster claim resolution.', () => {
+  assert.match(spoken(insurance.nodes.measure.c), /claims still took just as long/);
+  assert.match(ideal(insurance.nodes.measure).t, /checking and corrections separately from waiting/);
+  const clue = fsi.jeopardy.categories[5].clues[4];
+  assert.match(clue.q, /total resolution time is unchanged/);
+  assert.match(clue.a, /Faster claim resolution is not yet shown/);
 });
 
-test('Insurance plans measurements for next month rather than requesting results that do not exist.', () => {
-  assert.match(spoken(insurance.nodes.i6.c), /start measuring.*next month/);
-  assert.match(insurance.nodes.i7.ch[0].t, /agree what to measure next month/);
-  assert.doesNotMatch(insurance.nodes.i7.ch[0].t, /today.s measurements/);
+test('Wealth names the chosen product and its purpose before asking about the work.', () => {
+  const opening = spoken(wealth.nodes.evenings.c);
+  assert.match(opening, /Microsoft 365 Copilot to help with notes after client meetings/);
+  assert.match(opening, /finishing those notes at home/);
+  assert.match(ideal(wealth.nodes.evenings).t, /between the end of a meeting and a note/);
 });
 
-test('The copying clue distinguishes repetitive work from confirmed rework.', () => {
-  const clue = fsi.jeopardy.categories[0].clues[0];
-  assert.match(clue.a, /repetitive document work/);
-  assert.doesNotMatch(`${clue.a} ${clue.why}`, /redoing|staff repeat work/);
+test('Wealth reveals corrections and recording concerns before asking for a review plan.', () => {
+  const line = spoken(wealth.nodes.corrections.c);
+  assert.match(line, /fixing who promised/);
+  assert.match(line, /clients don't want a recording/);
+  assert.match(ideal(wealth.nodes.corrections).t, /non-recording route/);
+  assert.match(ideal(wealth.nodes.corrections).t, /check actions before saving notes or sending follow-up/);
+  assert.match(ideal(wealth.nodes.habits).t, /current scope fits/);
 });
 
-test('Cost evidence names a suitable assessment or technical test rather than unexplained Accelerator results.', () => {
-  const clue = fsi.jeopardy.categories[5].clues[3];
-  assert.match(clue.a, /suitable assessment or test results/);
-  assert.match(clue.why, /AI Factory Accelerator.s technical test/);
-  assert.match(clue.why, /not guarantee savings/);
+test('Payments discovers the chosen phone system before qualifying FirstTouch AI.', () => {
+  assert.doesNotMatch(spoken(payments.nodes.repeat.c), /FirstTouch|Five9|recommend/);
+  assert.match(ideal(payments.nodes.repeat).t, /Which phone system/);
+  assert.match(ideal(payments.nodes.repeat).t, /what information reaches/);
+  assert.match(spoken(payments.nodes.transfer.c), /Five9/);
+  assert.match(spoken(payments.nodes.transfer.c), /not the reason/);
+  assert.match(ideal(payments.nodes.transfer).t, /confirm this handoff fits/);
+});
+
+test('The copying and board clues reject diagnoses that their facts do not establish.', () => {
+  const copying = fsi.jeopardy.categories[0].clues[0];
+  assert.match(copying.q, /copy loss dates from forms into a claims system/);
+  assert.match(copying.a, /not proven rework/);
+  const board = fsi.jeopardy.categories[0].clues[3];
+  assert.match(board.q, /nobody has agreed to own it/);
+  assert.match(board.a, /not a confirmed sponsor/);
+});
+
+test('The time-comparison clue states every number needed for its answer.', () => {
+  const clue = fsi.jeopardy.categories[5].clues[1];
+  for (const number of ['3 minutes', '12 to check', '10 minutes total']) assert(clue.q.includes(number));
+  assert.match(clue.a, /15 minutes.*5 minutes longer/);
+});
+
+test('Final supplies a real handoff problem without requiring a role-play or earlier clue.', () => {
+  const final = fsi.jeopardy.final;
+  for (const premise of ['copy loss dates from emails', 'Adjusters return files', 'repair estimates are missing', 'nobody has measured']) assert(final.q.includes(premise));
+  assert.match(final.a, /checking for missing estimates before assignment/);
+  assert.match(final.a, /coordinator and adjuster leads/);
+  assert.match(final.a, /checking and correction time.*total resolution time/);
 });

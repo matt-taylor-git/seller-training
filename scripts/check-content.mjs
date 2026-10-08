@@ -6,8 +6,29 @@ import { resolve } from 'node:path';
 import fsiPack from '../prototype/seller-ai-training/packs/fsi.mjs';
 import { validatePack } from '../prototype/seller-ai-training/shared/pack-contract.mjs';
 
-export const categoryNames = ['Listen for what the customer needs.', 'Match the tool to the job.', 'Choose the CDW service that fits.', 'Check the data and the risks.', 'Check whether the customer qualifies.', 'Check whether the results are worth it.'];
-const expansions = { AI: 'artificial intelligence', GPU: 'graphics processing unit', LLM: 'large language model', M365: 'Microsoft 365', AWS: 'Amazon Web Services', FinOps: 'financial operations' };
+export const categoryNames = ['Hear the problem', 'Find a useful task', 'Ask what is missing', 'Handle the risk', 'Earn the next step', 'Judge the results'];
+const offerings = ['Private AI Launch Workshop', 'AI Readiness Data Quality Assessment', 'AI Risk Assessment', 'Copilot Adoption and Change Management', 'FirstTouch AI'];
+const words = text => text.trim().split(/\s+/).length;
+const atPath = (value, path) => path.replace(/\[(\d+)\]/g, '.$1').split('.').reduce((part, key) => part?.[key], value);
+
+function checkEvidence(item, content) {
+  assert.equal(item.contentSha256, digest(JSON.stringify(content)), `Evidence needs review after content changes: ${item.itemId}`);
+  for (const claim of item.claims) {
+    assert(['source-claim', 'fictional-fact', 'authored-recommendation'].includes(claim.kind), 'Identify the kind of evidence.');
+    assert(claim.locations?.length, 'Claims need locations.');
+    for (const location of claim.locations) assert(atPath(content, location) !== undefined, `Dangling claim location: ${item.itemId}.${location}`);
+  }
+  function visit(value, path = '') {
+    if (typeof value === 'string') {
+      for (const offering of offerings) {
+        if (!value.includes(offering)) continue;
+        assert(item.claims.some(claim => claim.kind === 'source-claim' && claim.locations.some(location => path === location || path.startsWith(location + '.') || path.startsWith(location + '['))), `Unmapped offering claim: ${item.itemId}.${path}`);
+      }
+    } else if (Array.isArray(value)) value.forEach((entry, index) => visit(entry, `${path}[${index}]`));
+    else if (value && typeof value === 'object') for (const [key, entry] of Object.entries(value)) visit(entry, path ? `${path}.${key}` : key);
+  }
+  visit(content);
+}
 const unavailable = ['FinOps for AI', 'AI Value Assurance', 'Agents & Workflow Automation', 'Security from AI', 'Hyperscaler AI Foundation', 'AI-Accelerated Engineering', 'Modern Data Ecosystem Design Workshop'];
 const digest = value => createHash('sha256').update(value).digest('hex');
 const nonempty = value => typeof value === 'string' && value.trim().length > 0;
@@ -16,9 +37,11 @@ const sentence = value => assert(/[.!?]$/.test(value.replace(/\[\[([^|]+)\|[^|]+
 export function checkContent(pack, provenance, source) {
   validatePack(pack);
   assert.equal(pack.id, 'fsi');
-  assert.equal(pack.revision, 1);
+  assert.equal(pack.revision, 2);
   assert.equal(pack.label, 'Financial services');
   assert.equal(pack.roleplay.scenarios.length, 4);
+  assert.deepEqual(pack.roleplay.scenarios.map(scenario => scenario.full), [true, true, false, false]);
+  assert.deepEqual(pack.roleplay.scenarios.map(scenario => scenario.persona.industry), ['Banking', 'Insurance', 'Wealth management', 'Payments']);
   assert.deepEqual(pack.jeopardy.categories.map(category => category.name), categoryNames);
   assert.match(pack.disclaimer, /fictional training scenarios/i);
   assert.match(pack.disclaimer, /2026-10-07/);
@@ -31,6 +54,9 @@ export function checkContent(pack, provenance, source) {
   assert.equal(provenance.packId, pack.id);
   assert.equal(provenance.packRevision, pack.revision);
   assert.equal(provenance.source.compiledDate, '2026-10-07');
+  assert(nonempty(provenance.reviewStatus) && /independent.*review/i.test(provenance.reviewStatus), 'Record review limits.');
+  for (const key of ['fiction', 'measurement', 'misconceptions', 'proposedControls', 'availability', 'distribution']) assert(nonempty(provenance.authoringPolicy[key]));
+  assert(provenance.authoringPolicy.exclusions.length >= 6, 'Keep private-source exclusions.');
   assert.match(provenance.source.sha256, /^[a-f0-9]{64}$/);
   let sourceContactsChecked = null;
   if (source !== undefined) {
@@ -58,14 +84,9 @@ export function checkContent(pack, provenance, source) {
   const scenarios = pack.roleplay.scenarios.map(scenario => {
     const item = items.get(`roleplay.scenarios[id=${scenario.id}]`);
     assert(item?.fictionalCustomer, `Missing scenario evidence: ${scenario.id}`);
-    assert(item.claims.every(claim => claim.locations?.length), 'Scenario material claims need locations.');
-    for (const claim of item.claims) {
-      for (const location of claim.locations) {
-        let value = scenario;
-        for (const part of location.replace(/\[(\d+)\]/g, '.$1').split('.')) value = value?.[part];
-        assert(value !== undefined, `Dangling claim location: ${scenario.id}.${location}`);
-      }
-    }
+    checkEvidence(item, scenario);
+    assert(item.claims.some(claim => claim.kind === 'fictional-fact'), 'Mark fictional scenario facts.');
+    assert(item.claims.some(claim => claim.kind === 'authored-recommendation'), 'Mark authored recommendations.');
     assert.match(scenario.persona.size, /fictional/i);
     assert(scenario.takeaways.length >= 4);
     const nodes = Object.values(scenario.nodes);
@@ -105,24 +126,28 @@ export function checkContent(pack, provenance, source) {
   });
   for (const [categoryIndex, category] of pack.jeopardy.categories.entries()) {
     for (const [clueIndex, clue] of category.clues.entries()) {
-      assert(items.has(`jeopardy.categories[${categoryIndex}].clues[${clueIndex}]`), 'Missing clue evidence.');
+      const item = items.get(`jeopardy.categories[${categoryIndex}].clues[${clueIndex}]`);
+      assert(item?.fictionalSituation, 'Missing clue evidence.');
+      checkEvidence(item, clue);
       for (const value of Object.values(clue)) sentence(value);
+      assert(words(clue.q) <= 40, 'Regular questions allow at most 40 words.');
+      assert(words(clue.a) <= 25 && clue.a.length <= 110, 'Regular answer reading budget.');
+      assert(words(clue.why) <= 40 && words(clue.a) + words(clue.why) <= 65, 'Regular explanation reading budget.');
     }
   }
-  assert(items.has('jeopardy.final'), 'Final evidence required.');
-  for (const clue of [...pack.jeopardy.categories.flatMap(category => category.clues), pack.jeopardy.final]) {
-    for (const [abbreviation, expansion] of Object.entries(expansions)) {
-      if (new RegExp(`\\b${abbreviation}\\b`).test(clue.why)) assert(clue.why.toLowerCase().includes(expansion.toLowerCase()), `Expand ${abbreviation} locally.`);
-    }
-  }
-  assert(!/\bUK\b/.test(pack.jeopardy.categories[3].clues[4].q + pack.jeopardy.categories[3].clues[4].why));
+  const finalItem = items.get('jeopardy.final');
+  assert(finalItem?.fictionalSituation, 'Final evidence required.');
+  checkEvidence(finalItem, pack.jeopardy.final);
+  const final = pack.jeopardy.final;
+  for (const value of [final.q, final.a, final.why]) sentence(value);
+  assert(words(final.a) <= 45 && words(final.why) <= 40 && words(final.a) + words(final.why) <= 85, 'Final reading budget.');
   const totals = { scenarios: scenarios.length, nodes: scenarios.reduce((n, s) => n + s.nodes, 0), choices: scenarios.reduce((n, s) => n + s.choices, 0), outcomes: scenarios.reduce((n, s) => n + s.outcomes, 0),
     takeaways: scenarios.reduce((n, s) => n + s.takeaways, 0), signals: scenarios.reduce((n, s) => n + s.signals, 0), categories: 6, clues: 30, finalClues: 1, evidenceItems: items.size,
     claimEntries: provenance.items.reduce((sum, item) => sum + item.claims.length, 0) };
   assert(totals.nodes >= 22 && totals.choices >= 66 && totals.outcomes >= 12);
-  assert(totals.claimEntries >= 56, 'Keep all reviewed material claims.');
+  assert(totals.claimEntries >= 35, 'Each lesson needs evidence, not a historical claim quota.');
   return { status: 'pass', totals, scenarios, sourceSha256: provenance.source.sha256, sourceContactsChecked,
-    scope: 'Contract, terminating graphs, copy, exclusions, and evidence coverage. Source citations refer to the supplied compilation, not independently fetched live pages.' };
+    scope: 'Contract, exact-depth graphs, reading budgets, exclusions, evidence hashes, and offering locations. These checks do not prove natural speech or source entailment. Citations refer to the supplied compilation, not independently fetched live pages.' };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
