@@ -188,6 +188,29 @@ test('Broad fiction and authored recommendations remain valid when they include 
   assert.equal(checkContent(...inputs).status, 'pass');
 });
 
+test('Rendered signals cannot hide an unavailable offering name.', () => {
+  const inputs = fixture(pack => {
+    pack.roleplay.scenarios[0].nodes.counter.c = 'Use Agents & [[Workflow Automation|ready|This service is available today.]] today.';
+  });
+  assert.throws(() => checkContent(...inputs), /Unavailable offering/);
+});
+
+test('Rendered signals cannot hide an offering from its evidence requirement.', () => {
+  const inputs = fixture(pack => {
+    pack.roleplay.scenarios[0].nodes.counter.c = 'We might use First[[Touch|ready|A service to consider.]] AI.';
+  });
+  assert.throws(() => checkContent(...inputs), /Unmapped offering/);
+});
+
+test('Rendered offering mentions keep the original dialogue leaf for evidence.', () => {
+  const inputs = fixture((pack, evidence) => {
+    pack.roleplay.scenarios[0].nodes.counter.c = 'We might use First[[Touch|ready|A service to consider.]] AI.';
+    evidence.items[0].claims.push({ kind: 'source-claim', offering: 'FirstTouch AI', claim: 'FirstTouch AI covers the first minute of contact.',
+      section: '6.F', date: '2026-10-07', caveat: 'Check current scope and platform support.', locations: ['nodes.counter.c'] });
+  });
+  assert.equal(checkContent(...inputs).status, 'pass');
+});
+
 test('Headings remain labels without full-sentence punctuation.', () => {
   const inputs = fixture(pack => { pack.roleplay.scenarios[0].offering.headline = 'Check the documents'; });
   assert.equal(checkContent(...inputs).status, 'pass');

@@ -15,16 +15,22 @@ const containsPath = (ancestor, path) => path === ancestor || path.startsWith(an
 
 function visibleText(value, path = '', fields = new Map()) {
   if (typeof value === 'string') {
-    if (!/(?:^|\.)(?:id|revision|start|next)$|\.ch\[\d+\]\.(?:q|s\.[^.]+)$/.test(path)) fields.set(path, value);
+    if (!/(?:^|\.)(?:id|revision|start|next)$|\.ch\[\d+\]\.(?:q|s\.[^.]+)$/.test(path)) {
+      const explanations = [];
+      const displayed = /(?:^|\.)nodes\.[^.]+\.c$/.test(path)
+        ? value.replace(/\[\[([^|]+)\|[^|]+\|([^\]]+)\]\]/g, (_signal, phrase, explanation) => { explanations.push(explanation); return phrase; })
+        : value;
+      fields.set(path, [displayed, ...explanations]);
+    }
   } else if (Array.isArray(value)) value.forEach((entry, index) => visibleText(entry, `${path}[${index}]`, fields));
   else if (value && typeof value === 'object') for (const [key, entry] of Object.entries(value)) visibleText(entry, path ? `${path}.${key}` : key, fields);
   return fields;
 }
 
 function checkAvailability(pack) {
-  for (const [path, text] of visibleText(pack)) {
+  for (const [path, texts] of visibleText(pack)) {
     for (const offering of unavailable) {
-      if (!mentions(text, offering)) continue;
+      if (!texts.some(text => mentions(text, offering))) continue;
       const choicePath = path.match(/^(.*\.ch\[\d+\])\.(?:t|fb)$/)?.[1];
       const choice = choicePath && atPath(pack, choicePath);
       assert(choice && choice.q !== 'best' && mentions(choice.t, offering)
@@ -49,9 +55,9 @@ function checkEvidence(item, content) {
       if (claim.offering !== undefined) assert(fields.has(location), `Offering location must be an exact visible string: ${item.itemId}.${location}`);
     }
   }
-  for (const [path, text] of fields) {
+  for (const [path, texts] of fields) {
     for (const offering of [...offerings, ...unavailable]) {
-      if (!mentions(text, offering)) continue;
+      if (!texts.some(text => mentions(text, offering))) continue;
       assert(item.claims.some(claim => claim.kind === 'source-claim' && claim.offering === offering && claim.locations.includes(path)), `Unmapped offering claim: ${item.itemId}.${path} (${offering})`);
     }
   }
