@@ -9,25 +9,52 @@ import { validatePack } from '../prototype/seller-ai-training/shared/pack-contra
 export const categoryNames = ['Hear the problem', 'Find a useful task', 'Ask what is missing', 'Handle the risk', 'Earn the next step', 'Judge the results'];
 const offerings = ['Private AI Launch Workshop', 'AI Readiness Data Quality Assessment', 'AI Risk Assessment', 'Copilot Adoption and Change Management', 'FirstTouch AI'];
 const words = text => text.trim().split(/\s+/).length;
-const atPath = (value, path) => path.replace(/\[(\d+)\]/g, '.$1').split('.').reduce((part, key) => part?.[key], value);
+const atPath = (value, path) => path.replace(/\[(\d+)\]/g, '.$1').split('.').reduce((part, key) => part && typeof part === 'object' && Object.hasOwn(part, key) ? part[key] : undefined, value);
+const mentions = (text, offering) => text.toLowerCase().includes(offering.toLowerCase());
+const containsPath = (ancestor, path) => path === ancestor || path.startsWith(ancestor + '.') || path.startsWith(ancestor + '[');
+
+function visibleText(value, path = '', fields = new Map()) {
+  if (typeof value === 'string') {
+    if (!/(?:^|\.)(?:id|revision|start|next)$|\.ch\[\d+\]\.(?:q|s\.[^.]+)$/.test(path)) fields.set(path, value);
+  } else if (Array.isArray(value)) value.forEach((entry, index) => visibleText(entry, `${path}[${index}]`, fields));
+  else if (value && typeof value === 'object') for (const [key, entry] of Object.entries(value)) visibleText(entry, path ? `${path}.${key}` : key, fields);
+  return fields;
+}
+
+function checkAvailability(pack) {
+  for (const [path, text] of visibleText(pack)) {
+    for (const offering of unavailable) {
+      if (!mentions(text, offering)) continue;
+      const choicePath = path.match(/^(.*\.ch\[\d+\])\.(?:t|fb)$/)?.[1];
+      const choice = choicePath && atPath(pack, choicePath);
+      assert(choice && choice.q !== 'best' && mentions(choice.t, offering)
+        && choice.fb === `${offering} is unavailable. Do not recommend it.`, `Unavailable offering outside a corrected nonideal reply: ${offering} at ${path}`);
+    }
+  }
+}
 
 function checkEvidence(item, content) {
   assert.equal(item.contentSha256, digest(JSON.stringify(content)), `Evidence needs review after content changes: ${item.itemId}`);
+  const fields = visibleText(content);
   for (const claim of item.claims) {
     assert(['source-claim', 'fictional-fact', 'authored-recommendation'].includes(claim.kind), 'Identify the kind of evidence.');
     assert(claim.locations?.length, 'Claims need locations.');
-    for (const location of claim.locations) assert(atPath(content, location) !== undefined, `Dangling claim location: ${item.itemId}.${location}`);
+    if (claim.offering !== undefined) {
+      assert.equal(claim.kind, 'source-claim', 'Offering metadata requires a source claim.');
+      assert([...offerings, ...unavailable].includes(claim.offering), `Unknown offering: ${claim.offering}`);
+    }
+    for (const location of claim.locations) {
+      assert(atPath(content, location) !== undefined, `Dangling claim location: ${item.itemId}.${location}`);
+      assert([...fields.keys()].some(path => containsPath(location, path)), `Claim location must contain visible text: ${item.itemId}.${location}`);
+      if (claim.offering !== undefined) assert(fields.has(location), `Offering location must be an exact visible string: ${item.itemId}.${location}`);
+    }
   }
-  function visit(value, path = '') {
-    if (typeof value === 'string') {
-      for (const offering of offerings) {
-        if (!value.includes(offering)) continue;
-        assert(item.claims.some(claim => claim.kind === 'source-claim' && claim.locations.some(location => path === location || path.startsWith(location + '.') || path.startsWith(location + '['))), `Unmapped offering claim: ${item.itemId}.${path}`);
-      }
-    } else if (Array.isArray(value)) value.forEach((entry, index) => visit(entry, `${path}[${index}]`));
-    else if (value && typeof value === 'object') for (const [key, entry] of Object.entries(value)) visit(entry, path ? `${path}.${key}` : key);
+  for (const [path, text] of fields) {
+    for (const offering of [...offerings, ...unavailable]) {
+      if (!mentions(text, offering)) continue;
+      assert(item.claims.some(claim => claim.kind === 'source-claim' && claim.offering === offering && claim.locations.includes(path)), `Unmapped offering claim: ${item.itemId}.${path} (${offering})`);
+    }
   }
-  visit(content);
 }
 const unavailable = ['FinOps for AI', 'AI Value Assurance', 'Agents & Workflow Automation', 'Security from AI', 'Hyperscaler AI Foundation', 'AI-Accelerated Engineering', 'Modern Data Ecosystem Design Workshop'];
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -36,6 +63,7 @@ const sentence = value => assert(/[.!?]$/.test(value.replace(/\[\[([^|]+)\|[^|]+
 
 export function checkContent(pack, provenance, source) {
   validatePack(pack);
+  checkAvailability(pack);
   assert.equal(pack.id, 'fsi');
   assert.equal(pack.revision, 2);
   assert.equal(pack.label, 'Financial services');
@@ -99,19 +127,9 @@ export function checkContent(pack, provenance, source) {
       for (const choice of node.ch) {
         sentence(choice.t); sentence(choice.fb);
         assert(Object.values(choice.s).some(score => score !== 0), 'Nonzero score deltas required.');
-        if (choice.q === 'best') {
-          for (const play of unavailable) assert(!choice.t.includes(play), `Unavailable ideal offering: ${play}`);
-        } else {
-          for (const play of unavailable) {
-            if (choice.t.includes(play)) assert(/Coming Soon|under construction|unavailable|not.*available/i.test(choice.fb), `Availability correction required: ${play}`);
-          }
-        }
       }
     }
-    for (const step of scenario.offering.steps) {
-      sentence(step);
-      for (const play of unavailable) assert(!step.includes(play), `Unavailable offered play: ${play}`);
-    }
+    for (const step of scenario.offering.steps) sentence(step);
     for (const value of [scenario.mission, scenario.persona.quote, ...scenario.persona.goals, ...scenario.persona.personality, ...scenario.persona.pains, ...scenario.useCases, ...scenario.takeaways, ...Object.values(scenario.outcomes).map(outcome => outcome.text)]) sentence(value);
     const lengths = new Set();
     let terminalChoicePaths = 0;
@@ -145,9 +163,8 @@ export function checkContent(pack, provenance, source) {
     takeaways: scenarios.reduce((n, s) => n + s.takeaways, 0), signals: scenarios.reduce((n, s) => n + s.signals, 0), categories: 6, clues: 30, finalClues: 1, evidenceItems: items.size,
     claimEntries: provenance.items.reduce((sum, item) => sum + item.claims.length, 0) };
   assert(totals.nodes >= 22 && totals.choices >= 66 && totals.outcomes >= 12);
-  assert(totals.claimEntries >= 35, 'Each lesson needs evidence, not a historical claim quota.');
   return { status: 'pass', totals, scenarios, sourceSha256: provenance.source.sha256, sourceContactsChecked,
-    scope: 'Contract, exact-depth graphs, reading budgets, exclusions, evidence hashes, and offering locations. These checks do not prove natural speech or source entailment. Citations refer to the supplied compilation, not independently fetched live pages.' };
+    scope: 'Contract, exact-depth graphs, reading budgets, exclusions, all visible availability mentions, evidence hashes, and same-offering exact text locations. These checks do not prove natural speech or source entailment. Citations refer to the supplied compilation, not independently fetched live pages.' };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

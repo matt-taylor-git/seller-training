@@ -34,7 +34,7 @@
       "activity": "roleplay",
       "locator": "roleplay.scenarios[id=branch-answers]",
       "fictionalCustomer": true,
-      "contentSha256": "4176d70f1d19c1b4a4b8abcac6c0b17df85b0086d5f8f40d31e046429b44af90",
+      "contentSha256": "e46f0477f2fed5ade85b44e23ee16c4660d6dc1554c7a342dc95924b81ff6d6b",
       "claims": [
         {
           "kind": "fictional-fact",
@@ -67,6 +67,7 @@
         {
           "kind": "source-claim",
           "claim": "AI Readiness Data Quality Assessment is a source-described response to fragmented or untrusted data and document-search needs.",
+          "offering": "AI Readiness Data Quality Assessment",
           "section": "6.C",
           "date": "2026-10-07",
           "caveat": "Positioned only if structured investigation is needed. Confirm current scope and availability. No named deliverables beyond the supplied scope are claimed.",
@@ -91,7 +92,7 @@
       "activity": "roleplay",
       "locator": "roleplay.scenarios[id=claim-handoff]",
       "fictionalCustomer": true,
-      "contentSha256": "684c010d352d3a5af0467731e5d1482c21d0cf16f2972cc0b46ee4c585b38043",
+      "contentSha256": "b4178491f2dee3e5d14b8919091e44d50bc4b115f4af146a02257b76f18f5503",
       "claims": [
         {
           "kind": "fictional-fact",
@@ -138,7 +139,7 @@
       "activity": "roleplay",
       "locator": "roleplay.scenarios[id=advisor-notes]",
       "fictionalCustomer": true,
-      "contentSha256": "178201e6c74d7cdf935621b48f1d051a0e89206bac467b07363b68b38822de29",
+      "contentSha256": "83dcbb8d503b576e3e9912910b22459d3f2f9225e87c36d41e2b5728e99c4b80",
       "claims": [
         {
           "kind": "fictional-fact",
@@ -171,6 +172,7 @@
         {
           "kind": "source-claim",
           "claim": "Copilot Adoption and Change Management appears under AI Assistants for customers on a chosen platform with adoption needs.",
+          "offering": "Copilot Adoption and Change Management",
           "section": "6.E",
           "date": "2026-10-07",
           "caveat": "The fictional firm chose Microsoft 365 Copilot. Current scope and availability require confirmation. No notes integration, recording entitlement, or guaranteed savings are asserted.",
@@ -197,7 +199,7 @@
       "activity": "roleplay",
       "locator": "roleplay.scenarios[id=dispute-transfer]",
       "fictionalCustomer": true,
-      "contentSha256": "c407d0dfecfef7650f4ff3f390e580550d30bb3586fe655219d52c619d51c7ea",
+      "contentSha256": "5b0d04da8516824bd5f048187753211b4da2c4e41c342552bc60f034606c96e1",
       "claims": [
         {
           "kind": "fictional-fact",
@@ -214,14 +216,15 @@
         {
           "kind": "source-claim",
           "claim": "FirstTouch AI covers the first minute of contact on supported platforms, including Five9. Platform support alone does not establish a particular transfer integration.",
+          "offering": "FirstTouch AI",
           "section": "6.F",
           "date": "2026-10-07",
           "caveat": "The source describes scope as of compilation, not verified current availability. Trace this fictional handoff before recommending a service. No dispute decision or refund authority follows.",
           "locations": [
-            "nodes.transfer.ch[0]",
-            "nodes.transfer.ch[1]",
-            "nodes.authority.ch[0].fb",
-            "nodes.authority.ch[2].fb",
+            "nodes.transfer.ch[0].t",
+            "nodes.transfer.ch[0].fb",
+            "nodes.transfer.ch[1].t",
+            "nodes.transfer.ch[1].fb",
             "offering.headline",
             "offering.steps[1]"
           ]
@@ -245,12 +248,18 @@
         {
           "kind": "source-claim",
           "claim": "The source does not demonstrate that FirstTouch AI decides or issues refunds. Consequential actions need separately bounded authority.",
+          "offering": "FirstTouch AI",
           "section": "3, Payments; 5.1; 6.F; 10",
           "date": "2026-10-07",
           "caveat": "Payment automation remains emerging in the compilation. The exercise separates intake from refunds rather than promising autonomous payment execution.",
           "locations": [
-            "nodes.authority",
-            "nodes.compare.ch[1]",
+            "nodes.authority.c",
+            "nodes.authority.ch[0].t",
+            "nodes.authority.ch[0].fb",
+            "nodes.authority.ch[1].t",
+            "nodes.authority.ch[1].fb",
+            "nodes.authority.ch[2].t",
+            "nodes.authority.ch[2].fb",
             "takeaways[2]"
           ]
         }
@@ -492,7 +501,7 @@
       "activity": "jeopardy",
       "locator": "jeopardy.categories[2].clues[1]",
       "fictionalSituation": true,
-      "contentSha256": "df3b0eadeb8cbb71a6233956bcc72ac3d5c20e273522fdfb2cf66ee178ad9532",
+      "contentSha256": "d6110f98000f819b6ef014337186e351b72c8110bc8d03bc516e1171fdde8184",
       "claims": [
         {
           "kind": "authored-recommendation",
@@ -555,11 +564,12 @@
       "activity": "jeopardy",
       "locator": "jeopardy.categories[2].clues[4]",
       "fictionalSituation": true,
-      "contentSha256": "9982f0210f5a57cd8a5873096b8fad9e9035160e3aae9c260a39a4280a189052",
+      "contentSha256": "d445220c45937d4836aa904b9d2311a33309db2cdd95ed4b1ce7c7d24e2db331",
       "claims": [
         {
           "kind": "source-claim",
-          "claim": "FirstTouch AI qualification requires a platform decision and current service-fit checks.",
+          "claim": "FirstTouch AI covers the first minute of customer contact on supported platforms. Qualification requires a platform decision and current service-fit checks.",
+          "offering": "FirstTouch AI",
           "section": "6.F",
           "date": "2026-10-07",
           "caveat": "The source excludes customers without a platform decision. A supported platform does not guarantee a particular task or integration.",
@@ -644,6 +654,7 @@
         {
           "kind": "source-claim",
           "claim": "AI Risk Assessment informs risk decisions and does not grant approval.",
+          "offering": "AI Risk Assessment",
           "section": "6.D; 7",
           "date": "2026-10-07",
           "caveat": "Current scope requires confirmation. The assessment does not replace bank approval or guarantee compliance or security.",
@@ -723,18 +734,28 @@
       "activity": "jeopardy",
       "locator": "jeopardy.categories[4].clues[2]",
       "fictionalSituation": true,
-      "contentSha256": "fdfa74df9e48e6a5a40f6156f17c590ac45686f1a9b6306b5b0b00cfd846ed8c",
+      "contentSha256": "3939577d5249ba21e9cb74516a5d8702df57be3a0e51386b498b8dce6399fcb2",
       "claims": [
         {
           "kind": "source-claim",
           "claim": "Copilot Adoption and Change Management is a source-described option for support on a chosen platform.",
+          "offering": "Copilot Adoption and Change Management",
           "section": "6.E",
           "date": "2026-10-07",
-          "caveat": "The access and training facts are fictional. Confirm current scope and inspect correction effort before promising a solution.",
+          "caveat": "The service appears in coaching, not the required answer. Confirm current scope and inspect correction effort before promising a solution.",
+          "locations": [
+            "why"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore work-specific training and support for reviewing meeting notes when generic training omitted that work.",
+          "section": "5.5; 6.E",
+          "date": "2026-10-07",
+          "caveat": "The chosen platform, access, and training gap are fictional. The proposed support follows those premises without requiring service-name recall.",
           "locations": [
             "q",
-            "a",
-            "why"
+            "a"
           ]
         }
       ]
@@ -769,14 +790,24 @@
       "claims": [
         {
           "kind": "source-claim",
-          "claim": "Agree a useful task, information needs, and decision owners. Private AI Launch Workshop may fit strategy and privacy exploration.",
+          "claim": "Private AI Launch Workshop may fit strategy and privacy exploration.",
+          "offering": "Private AI Launch Workshop",
           "section": "6.A; 7",
           "date": "2026-10-07",
-          "caveat": "The working session is an authored recommendation. Confirm current workshop scope, and do not imply deployment or a required hosting choice.",
+          "caveat": "The service appears in coaching. Confirm current workshop scope, and do not imply deployment or a required hosting choice.",
+          "locations": [
+            "why"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Agree a useful task, information needs, and decision owners in a first working session.",
+          "section": "6.A; 7",
+          "date": "2026-10-07",
+          "caveat": "The competing ideas and privacy concerns are fictional. The working session is an authored recommendation, not a named-service deliverable.",
           "locations": [
             "q",
-            "a",
-            "why"
+            "a"
           ]
         }
       ]

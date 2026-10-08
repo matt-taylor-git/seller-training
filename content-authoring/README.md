@@ -25,9 +25,9 @@ The browser tests pin the original answer font sizes. They check clipping and ex
 
 ## Evidence
 
-[fsi-provenance.json](fsi-provenance.json) maps all 35 items to 46 evidence entries. Each entry distinguishes a source claim, a fictional fact, or an authored recommendation. Source claims carry section references, dates, limits, and content locations.
+[fsi-provenance.json](fsi-provenance.json) maps all 35 items to 48 evidence entries. Each entry distinguishes a source claim, a fictional fact, or an authored recommendation. Source claims carry section references, dates, limits, and content locations.
 
-Each item also carries a hash of its complete authored content. If that content changes, review the evidence before updating its hash. The checker confirms that every occurrence of the 5 selected offering names has a source-claim location. A hash or location check does not prove that the source supports the claim.
+Each item also carries a hash of its complete authored content. If that content changes, review the evidence before updating its hash. Within each evidence item, the checker requires each visible offering mention to have a source claim for the same offering at the exact text location. It checks known names without relying on capitalization. A hash or location check does not prove that the source supports the claim.
 
 The evidence refers to the complete internal compilation dated 2026-10-07. Its SHA-256 is `31530f3c151f34e3f18d33cdc2ced30f4733361519bef5b35ee70e763118092b`. The author read that supplied compilation. Linked research and offering pages were not independently retrieved, and current availability remains unverified.
 
@@ -45,6 +45,28 @@ The pack does not claim a turnkey claims or wealth integration. FirstTouch AI's 
 
 The raw source stays private and outside this repository's served tree. Prices, personal contacts, internal links, campaign tags, and routing instructions do not belong in the lessons. Coming Soon and under-construction exclusions remain in the checker and evidence policy even though those offers do not appear in this curriculum.
 
+### Claim locations and offering identity
+
+The record remains schema 1. A source claim can now carry an optional `offering` string. This additive authoring metadata does not change the served pack or storage contract.
+
+The checker accepts only the 5 selected offering names listed above and the 7 unavailable names in `authoringPolicy.availability`. Fictional facts and authored recommendations cannot carry `offering`. A source claim without that field cannot cover an offering mention, even if its prose contains the name.
+
+Offering claims use exact visible string locations, such as `nodes.transfer.ch[1].t`, `offering.steps[1]`, or `why`. Every mention within an item needs a source claim whose `offering` matches the named service and whose `locations` contains that exact path. Ancestor objects such as `nodes`, `offering`, and a whole choice cannot supply offering coverage. Human review still checks whether the cited source actually supports the mapped text.
+
+Other claims can use broader locations when they contain authored visible text. The checker traverses only own properties. Locations that resolve only to identifiers, revisions, graph links, choice quality, scores, numbers, array length, or functions do not count. Paths use dot-separated property names and bracketed array indexes.
+
+### Unavailable offering mentions
+
+The checker covers every visible text field, including headings, persona text, signals, coaching, outcomes, quiz text, labels, descriptions, and disclaimers. No unavailable offering appears in the current curriculum.
+
+The sole permitted exception pairs a nonideal seller reply with this exact immediate coaching template:
+
+```text
+<official offering name> is unavailable. Do not recommend it.
+```
+
+Both fields also need exact source-claim locations with matching `offering` metadata. The same coaching cannot excuse a mention elsewhere or an ideal reply. Headings do not need sentence punctuation. A negated explanation outside this pair still fails, because the local policy does not attempt to interpret arbitrary negation.
+
 ## Checks
 
 From the repository root, run:
@@ -57,11 +79,11 @@ node scripts/check-content.mjs --source /path/to/FSI_AI_Research_and_CDW_Seller_
 npm run test:browser
 ```
 
-The source-aware check must report 35 evidence items, 46 evidence entries, and 4 excluded source contacts. Keep the supplied source local.
+The source-aware check must report 35 evidence items, 48 evidence entries, and 4 excluded source contacts. Keep the supplied source local.
 
-The completed author run passed 189 unit tests and 42 browser tests. Browser coverage includes all 4 scenarios, both recoveries, a poor route, all clues, Final, Daily Doubles, signals, group voting, Settings, and persistence. Revision-1 progress remains intact. The trainer can recover valid team names, but must explicitly create revision-2 progress.
+The final correction run passed 281 Node tests and 42 browser tests. The Node total includes 88 boundary tests with fresh content hashes. Browser coverage includes all 4 scenarios, both recoveries, a poor route, all clues, Final, Daily Doubles, signals, group voting, Settings, and persistence. Revision-1 progress remains intact. The trainer can recover valid team names, but must explicitly create revision-2 progress.
 
-The first full browser run timed out opening Settings from a Default clue. The unchanged test passed on a focused retry and on the next full run. No engine or generic assertion changed to hide that failure. The evidence retains the first log and trace.
+The original author's first full browser run timed out opening Settings from a Default clue. The unchanged test passed on a focused retry and on the next full run. No engine or generic assertion changed to hide that failure. The evidence retains the first log and trace.
 
 ## Retired revision-1 assumptions
 

@@ -11,7 +11,7 @@ const provenance = JSON.parse(readFileSync(new URL('../content-authoring/fsi-pro
 
 test('FSI contains two complete activities, revision-2 evidence, and exact-depth branches.', () => {
   const report = checkContent(fsi, provenance);
-  assert.deepEqual(report.totals, { scenarios: 4, nodes: 22, choices: 66, outcomes: 12, takeaways: 16, signals: 22, categories: 6, clues: 30, finalClues: 1, evidenceItems: 35, claimEntries: 46 });
+  assert.deepEqual(report.totals, { scenarios: 4, nodes: 22, choices: 66, outcomes: 12, takeaways: 16, signals: 22, categories: 6, clues: 30, finalClues: 1, evidenceItems: 35, claimEntries: 48 });
   assert.equal(report.scenarios.reduce((sum, scenario) => sum + scenario.terminalChoicePaths, 0), 1620);
   assert.deepEqual(report.scenarios.map(scenario => scenario.turnLengths), [[6], [6], [4], [4]]);
   assert(Object.isFrozen(fsi) && Object.isFrozen(fsi.roleplay.scenarios[1].nodes.pushback));

@@ -48,7 +48,7 @@ const fsiPack = {
             ]
           },
           authority: {
-            c: "Our operations team owns the staff site. [[That's where the approved procedure lives.|ready|There is an identified owner and an approved source.]] The trouble is that people save a copy for busy days and keep using it after we make a change.",
+            c: "We haven't counted the calls or timed the searches yet. Our operations team owns the staff site. [[That's where the approved procedure lives.|ready|There is an identified owner and an approved source.]] The trouble is that people save a copy for busy days and keep using it after we make a change.",
             ch: [
               { t: 'We should replace the staff site with a new document platform first.', q: 'bad', s: { d: -4, u: -8, p: -6 }, next: 'boundaries', fb: 'A platform change is a large prescription for a problem you have only begun to understand. It would not settle how staff use saved copies.' },
               { t: 'Could operations remind everyone to delete their old copies?', q: 'good', s: { u: 5, l: 4 }, next: 'boundaries', fb: 'That may reduce confusion now. You still need to learn how staff would reliably find and check the current procedure.' },
@@ -149,7 +149,7 @@ const fsiPack = {
           measure: {
             c: "A supervisor already tried a checklist on a few files. [[She says checking got quicker, but claims still took just as long to finish.|pain|A faster step has not yet changed total resolution time.]] I need to explain that without making her work sound pointless.",
             ch: [
-              { t: 'We can call the quicker checks a reduction in claim turnaround time.', q: 'bad', s: { p: -8, t: -10 }, next: 'next', fb: 'That would misstate the result. The checks got quicker, but Marcus explicitly said total resolution time did not improve.' },
+              { t: 'If we roll the quicker checks out to everyone, claims should start finishing sooner too.', q: 'bad', s: { p: -8, t: -10 }, next: 'next', fb: 'A quicker check has not reduced total claim time in this example. Expanding it does not prove the wait for estimates will shrink.' },
               { t: 'Could we count how many files the supervisor checks each day?', q: 'good', s: { d: 4, p: 3 }, next: 'next', fb: 'Daily volume adds context, but it does not explain the remaining wait or the time spent correcting checks.' },
               { t: "Quicker checking may still help her day. Let's measure checking and corrections separately from waiting for estimates and finishing the claim.", q: 'best', s: { d: 8, l: 10, p: 12, t: 10 }, next: 'next', fb: 'You preserved the possible local benefit without claiming faster resolution. Separate measures can show what improved and what still needs work.' }
             ]
@@ -202,11 +202,11 @@ const fsiPack = {
             ch: [
               { t: 'Could we keep a non-recording route and have advisors check actions before saving notes or sending follow-up?', q: 'best', s: { u: 12, l: 10, p: 8, t: 12 }, next: 'habits', fb: 'You respected client choice and kept advisor approval separate from consent. Those are proposed work rules, not proof that every draft will be correct.' },
               { t: 'Could advisors check the action list at the end of the day?', q: 'good', s: { u: 4, t: 2 }, next: 'habits', fb: 'A review step helps, but end-of-day checking could preserve the evening workload. It also leaves the recording concern unanswered.' },
-              { t: 'Since the firm approved the tool, we can record every meeting and let clients opt out afterward.', q: 'bad', s: { l: -8, t: -12 }, next: 'habits', fb: 'Tool approval is not client consent. Resolve the firm\'s consent rules before collecting meeting information.' }
+              { t: 'The firm has approved the tool, so that should cover recording client meetings.', q: 'bad', s: { l: -8, t: -12 }, next: 'habits', fb: 'Tool approval is not client consent. Resolve the firm\'s consent rules before collecting meeting information.' }
             ]
           },
           habits: {
-            c: "There are a few advisors who find it useful. [[Others open a draft, see the corrections, and write their own instead.|pain|Use varies because the result is not consistently useful to advisors.]] Our training showed the buttons, but not how to check a real meeting note.",
+            c: "I won't ask clients to record against their wishes. And advisors still need to check the notes. There are a few advisors who find it useful. [[Others open a draft, see the corrections, and write their own instead.|pain|Use varies because the result is not consistently useful to advisors.]] Our training showed the buttons, but not how to check a real meeting note.",
             ch: [
               { t: 'We should buy more licenses so the rest of the firm can build the habit.', q: 'bad', s: { l: -8, u: -6, p: -8 }, next: 'usefulness', fb: 'More licenses do not fix the correction work or the training gap. Learn from the current advisors before expanding.' },
               { t: 'Could the advisors who like it show the rest of the team what they do?', q: 'good', s: { d: 4, u: 5, p: 3 }, next: 'usefulness', fb: 'Peer examples may help. Include advisors who abandon drafts so the discussion does not overlook the reasons it fails them.' },
@@ -276,7 +276,7 @@ const fsiPack = {
             c: "I want to start with the transfer problem. [[If callers repeat less but staff miss important details, we haven't improved much.|red|The handoff must preserve useful information as well as reduce repetition.]] How would we check that?",
             ch: [
               { t: 'We can compare average call length before and after the change.', q: 'good', s: { p: 3, u: 2 }, next: 'end', fb: 'Call length is useful context, but a shorter call can still lose details or force a caller to repeat them.' },
-              { t: 'We can count every automated opening as a successfully handled dispute.', q: 'bad', s: { l: -8, p: -8, t: -10 }, next: 'end', fb: 'An automated opening does not resolve a dispute. Count the actual handoff result rather than treating tool activity as success.' },
+              { t: "I'd track how many automated openings finish without a technical error. A high completion rate would show the transfer is working.", q: 'bad', s: { l: -8, p: -8, t: -10 }, next: 'end', fb: 'A technical success does not show whether useful details reached staff. Check missing information and repeated questions, not just completed openings.' },
               { t: 'Could your phone owner and dispute supervisor compare repeated questions, missing details, and staff checking time on approved calls before and after?', q: 'best', s: { d: 8, u: 6, p: 12, l: 10, t: 8 }, next: 'end', fb: 'You matched the evidence to Owen\'s concern and named the people who can judge it. The proposed comparison is not a promised service result.' }
             ]
           }
@@ -321,10 +321,10 @@ const fsiPack = {
         name: 'Ask what is missing',
         clues: [
           { q: 'An insurer wants help copying loss dates into its claims system. You have not seen the incoming documents. What should you ask to understand the input?', a: 'Where do the dates come from, and what do those documents look like?', why: 'Source formats and missing or unclear dates affect the task. Do not assume every document resembles a clean demonstration form.' },
-          { q: 'A bank has two versions of an address-change procedure with conflicting instructions. What must you establish before using them for search?', a: 'Which version is approved, and who can decide that?', why: 'A model cannot settle document authority from a file date alone. The owner must resolve the conflict and how future changes reach staff.' },
+          { q: 'A bank has two versions of an address-change procedure with conflicting instructions. What must you establish before using them for search?', a: 'Which version is approved, and who can decide that?', why: 'Search software cannot settle document authority from a file date alone. The owner must resolve the conflict and how future changes reach staff.' },
           { q: 'A payments system records the dispute reason, but the next employee cannot see it after transfer. What would you inspect together?', a: 'Trace one approved call from capture through transfer to the employee screen.', why: 'The reason exists somewhere, so do not assume callers need another question. Trace where it stops reaching the next person.' },
           { q: 'A claims manager says checking a file takes 10 minutes. You want to compare a new check fairly. What is missing from that measure?', a: 'Ask which work the 10 minutes includes, such as searching and corrections.', why: 'A fair comparison needs the same start and end points. Faster checking can hide extra work elsewhere if the measure excludes it.' },
-          { q: 'A processor wants help with the first minute of customer calls but has not chosen a phone system. What must happen before recommending FirstTouch AI?', a: 'Settle the platform choice and confirm current service fit.', why: 'The supplied source excludes customers without a platform decision. A supported platform is still only part of checking the proposed task and integration.' }
+          { q: "FirstTouch AI covers the first minute of customer calls and requires a chosen, supported phone system. A processor hasn't chosen one. What must the seller settle before recommending it?", a: 'Settle the platform choice and confirm current service fit.', why: 'The supplied source excludes customers without a platform decision. A supported platform is still only part of checking the proposed task and integration.' }
         ]
       },
       {
@@ -342,7 +342,7 @@ const fsiPack = {
         clues: [
           { q: 'A claims manager offers files containing customer details for an initial discussion. What should you agree before accepting them?', a: 'Agree which examples may be shared and how to protect customer information.', why: 'Use approved examples that still help explain the work. A willing manager does not settle every data-use or access rule.' },
           { q: 'Claim files return from adjusters to coordinators for missing documents. The teams disagree about when gaps get noticed. Who should join the next meeting, and what should they examine?', a: 'Invite both handoff owners with approved examples of returned and completed files.', why: 'The disagreement concerns work across teams. Comparing actual examples can establish where a check belongs and who handles gaps.' },
-          { q: 'A wealth firm chose Microsoft 365 Copilot. Advisors have access, but training skipped how to review meeting notes. What support could you explore?', a: 'Explore Copilot Adoption and Change Management after confirming current scope.', why: 'The stated gap concerns using the chosen tool in daily work. Observe correction effort too, rather than assuming support will solve every issue.' },
+          { q: 'A wealth firm chose Microsoft 365 Copilot. Advisors have access, but training skipped how to review meeting notes. What support could you explore?', a: 'Explore work-specific training and support for reviewing meeting notes.', why: 'Copilot Adoption and Change Management may fit this support gap, subject to current scope. Observe correction effort too, rather than assuming support will solve every issue.' },
           { q: 'A bank needs a board update in 6 weeks. Procedure documents and risk approvals remain unchecked. What next step can you offer without promising a launch?', a: 'Offer a dated review of document readiness, risks, and what a test must prove.', why: 'A decision plan gives the board something concrete without turning a deadline into evidence that the tool is ready.' },
           { q: 'A bank has several artificial intelligence ideas, no agreed task, and privacy concerns. What should a first working session settle?', a: 'Agree one useful task, its information needs, and the people who must decide.', why: 'Private AI Launch Workshop may fit this exploration, subject to current scope. A working session does not commit the bank to a deployment or hosting choice.' }
         ]

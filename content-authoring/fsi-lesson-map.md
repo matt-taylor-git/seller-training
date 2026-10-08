@@ -32,12 +32,12 @@ Elena Park runs branches at fictional Alder Crossing Bank. She wants staff to gi
 | counter | Role, branch concern, inconsistent answers | Staff interrupt Elena for instructions about changing an account address | Ask for a recent example rather than pitch search |
 | folders | Staff need an address-change procedure, seller asked about work | Staff use the staff site, saved PDFs, then the branch chat | Investigate which version staff should trust |
 | reset | Same opening, seller pitched training or search | Elena challenges that pitch and describes the same three sources | Admit the missing discovery and ask which version is approved |
-| authority | Three sources and uncertain version authority on every path | Operations owns the staff site, but staff keep old PDFs | Bound the candidate task to approved procedure search |
+| authority | Three sources and uncertain version authority on every path | Calls and searches are unmeasured. Operations owns the staff site, but staff keep old PDFs | Bound the candidate task to approved procedure search |
 | boundaries | Document owner and possible internal search task | Risk lead needs access rules and a response when instructions conflict | Include risk and document owners without treating review as approval |
 | evidence | Customer requires risk review on every path | Elena fears a fast wrong answer more than a slow correct one | Measure correctness and checking time, not just speed |
 | invitation | Work, owner, risks, and evaluation need are visible | Elena can spare a branch supervisor and asks what to bring | Propose a working meeting using approved examples, with a qualified assessment only if needed |
 
-Both folders and reset lead to authority. Authority says what operations owns. It does not say the seller asked the right question. Boundaries, evidence, and invitation express customer requirements regardless of the preceding reply. Six choices end every route.
+Both folders and reset lead to authority. Authority answers the possible timing and call-count questions before naming the document owner. It does not say the seller asked the right question. Boundaries, evidence, and invitation express customer requirements regardless of the preceding reply. Six choices end every route.
 
 Possible offering direction is AI Readiness Data Quality Assessment if document problems need structured investigation. The meeting is an authored recommendation, not a promised service deliverable.
 
@@ -56,6 +56,8 @@ Marcus Bell manages property claims at fictional Juniper Mutual. He sees a press
 
 Handoff and pushback have the same depth and disclose the same task facts. Missing states the adjuster's problem without assuming the seller recovered. Later nodes never accept a premature promise. Six choices end every route.
 
+The wrong measurement reply assumes wider use of quicker checks will shorten claims. Immediate coaching distinguishes that inference from evidence about the remaining wait.
+
 The next step is a workflow meeting. No packaged claims implementation or automated settlement capability is asserted.
 
 ## Wealth. Notes after everyone leaves
@@ -65,10 +67,10 @@ Priya Shah leads advisors at fictional Linden Row Wealth. The firm bought Micros
 | Node | Already visible | Customer reveals now | Seller decision |
 | evenings | Advisor leader and follow-up workload | Copilot was bought for meeting notes, but evening work continues | Ask what happens between a meeting and the finished note |
 | corrections | Chosen product and unmet purpose | Advisors correct who promised each action, and some clients decline recording | Retain a non-recording route and advisor checking before follow-up |
-| habits | Corrections, client choice, and review needs | A few advisors find it useful, others abandon drafts, and training covered buttons only | Explore work-specific support without diagnosing all low use as a training problem |
+| habits | Corrections, client choice, and review needs | Priya preserves client choice and advisor checking, then describes abandoned drafts and button-only training | Explore work-specific support without diagnosing all low use as a training problem |
 | usefulness | Uneven usefulness and shallow training | Priya values a reliable record and less evening work over login counts | Agree a small comparison including review time, corrections, and advisor use |
 
-All transitions introduce observations, not agreement. Four choices end every route. Copilot Adoption and Change Management is a qualified discussion after workflow discovery. The pack does not claim a turnkey meeting-recording integration or particular Copilot feature entitlement.
+The wrong consent reply confuses firm approval with client consent. Immediate coaching corrects it. The next customer line restates client choice and advisor checking on every path, then explains uneven use. Four choices end every route. Copilot Adoption and Change Management is a qualified discussion after workflow discovery. The pack does not claim a turnkey meeting-recording integration or particular Copilot feature entitlement.
 
 ## Payments. Please don't make me say it again
 
@@ -80,7 +82,7 @@ Owen Reed runs customer service at fictional Clearpath Payments. He hears compla
 | authority | Chosen system and missing dispute reason | Owen asks whether a faster start could also mean immediate refunds | Keep refund decisions separate from intake and transfer |
 | compare | Handoff task and refund boundary | Owen wants proof callers repeat less without losing key details | Agree a test with phone owner and dispute supervisor |
 
-Four choices end every route. FirstTouch AI source scope is the first minute of contact on supported platforms. Five9 appears on the supplied list. Current integration and scope remain unverified.
+The wrong measurement reply treats error-free automated openings as handoff success. Immediate coaching asks whether useful details reached staff. Four choices end every route. FirstTouch AI source scope is the first minute of contact on supported platforms. Five9 appears on the supplied list. Current integration and scope remain unverified.
 
 ## Quiz premise map
 
@@ -99,10 +101,10 @@ Every clue supplies its own facts. Rows grow through tradeoffs, not product-name
 | 1-3 | Address missing information rather than just writing speed | Claims wait for estimates despite quick summaries |
 | 1-4 | Choose a task whose information is available | Payment staff lack dispute reasons after transfer, refund rules are unsettled |
 | 2-0 | Find information sources | Insurer wants help copying loss dates, source documents are unknown |
-| 2-1 | Find authority over conflicting documents | Bank has two conflicting versions of a procedure |
+| 2-1 | Find authority over conflicting documents | Bank has two conflicting versions of a procedure. Coaching names search software, not an unexplained model |
 | 2-2 | Observe a handoff | Dispute reason is captured but absent from the next employee's screen |
 | 2-3 | Clarify a measure's scope | Claims manager says checking takes 10 minutes without defining included work |
-| 2-4 | Qualify service fit after platform choice | Processor wants first-contact help but has not chosen a phone system |
+| 2-4 | Apply an explicit service prerequisite | FirstTouch AI covers the first minute and requires a chosen, supported phone system. The processor has not chosen one |
 | 3-0 | Respond to an invented fact | Draft claim summary includes a loss date absent from the file |
 | 3-1 | Separate client consent from tool access | Advisor can record but client has not consented |
 | 3-2 | Keep access restrictions in search | Bank procedure search exposes restricted documents to branch staff |
@@ -110,7 +112,7 @@ Every clue supplies its own facts. Rows grow through tradeoffs, not product-name
 | 3-4 | Separate validated intake from refund authority | Dispute transfer test works, manager proposes automatic refunds next |
 | 4-0 | Ask for evidence that can be shared | Claims manager offers examples containing customer details |
 | 4-1 | Bring the handoff owners | Adjusters return incomplete files, and the teams disagree about when gaps get noticed |
-| 4-2 | Offer work-specific support after discovery | Copilot users have access but generic training did not cover reviewing notes |
+| 4-2 | Infer work-specific support without service-name recall | Copilot users have access but training omitted reviewing notes. The service name and scope appear only in coaching |
 | 4-3 | Plan a decision rather than promise a date | Bank needs a board update in 6 weeks but documents and approvals remain unchecked |
 | 4-4 | Fit the next step to competing needs | Bank has many ideas, no agreed task, and privacy concerns |
 | 5-0 | Establish a comparison | Claims team is about to test copying dates from forms |
