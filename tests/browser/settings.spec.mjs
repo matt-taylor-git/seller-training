@@ -314,6 +314,7 @@ test('Lane 8. Native keyboard controls show focus and game navigation never cons
   await expect(page.getByRole('link', { name: 'Settings', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+  await expect(radio(page, 'default')).toBeChecked();
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Home', exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
