@@ -689,9 +689,13 @@ $("helpClose").onclick = () => $("help").classList.remove("show");
 $("help").onclick = e => { if (e.target.id === "help") $("help").classList.remove("show"); };
 document.addEventListener("keydown", e => {
   if (e.target.closest('input, textarea, select, [contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return;
-  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('a, button')) return;
   const k = e.key.toLowerCase();
-  if ($("help").classList.contains("show")) { if (k === "escape" || k === "enter" || k === "?") { e.preventDefault(); $("help").classList.remove("show"); } return; }
+  if ($("help").classList.contains("show")) {
+    if (k === "escape" || k === "enter" || k === "?") { e.preventDefault(); $("help").classList.remove("show"); }
+    else if (k === " " && !e.target.closest('#help')) e.preventDefault();
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('a, button')) return;
   if (k === "?") { $("help").classList.add("show"); return; }
   if (k === "g") { toggle("group", "Group mode"); if (R && R.phase === "choose") fitThread(); return; }
   if ($("sBrief").classList.contains("show")) { if (k === "enter" && briefId) { e.preventDefault(); startScenario(briefId); } if (k === "escape") show("sPick"); return; }
