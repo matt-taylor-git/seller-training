@@ -6,84 +6,212 @@
 
 web
 
-The product runs in desktop browsers for trainer-led sessions. Mobile use is out of scope. No native app requirement has been established.
+The current product runs in desktop browsers for trainer-led sessions, in a room or over screen share. Mobile and native applications are outside this build.
 
-## Users
+## Users and their jobs
 
-- Trainers lead sessions and operate the training activities.
-- Sellers participate in trainer-led sessions to practice selling AI services.
+Sales representatives at a systems integrator practice customer conversations about artificial intelligence. Experience varies. The lessons must not require an engineering background or prior knowledge of a service catalog.
 
-Trainer-led sessions are the confirmed primary use. Independent seller training is not an established requirement.
+The learner wants to know what to say next, why that response helps, and when a service might fit. The goal is better judgment in a customer meeting, not memorizing a script or naming the most products.
 
-## Product Purpose
+A trainer operates the shared screen, invites discussion, records team votes, and judges quiz answers. The trainer needs clear situations and defensible answers without supplying missing context from private notes.
 
-Help sellers identify AI use cases and position offerings against customer needs.
+Customers are fictional business leaders. They care about their work, staff, costs, time, customers, and risk. They are not instructors testing whether the seller remembers a service name.
 
-Success means sellers can recognize a relevant AI use case in a customer conversation and explain which offering addresses it. How to measure this improvement remains undecided.
+## Product purpose
 
-## Operating Context
+Help sellers discover a useful business problem, understand its constraints, and agree on a credible next step with the customer.
 
-The user likes the existing prototypes as references for building the actual product. They are not the finished product or a fixed specification.
+The activities reward sellers who:
 
-The prototypes support training in a room or over screen share. A presenter operates the shared screen, records team scores, and enters room votes. Group voting does not currently connect participant devices.
+- Acknowledge the concern the customer actually expressed.
+- Ask how people do the work today before diagnosing the problem.
+- Separate observed facts from guesses about causes or solutions.
+- Identify a useful, bounded task rather than proposing artificial intelligence everywhere.
+- Find the people who own the work, information, and decisions.
+- Check risks and service fit before making commitments.
+- Agree how to judge results, including errors and review effort.
+- Leave with a specific next step the customer has reason to accept.
 
-## Capabilities and Constraints
+Game scores provide coaching within the activity. They do not establish improved real-world sales performance. How to measure learning outside the game remains open.
 
-### Existing prototype capabilities
+## Reference and scope
 
-- A launcher connects the team quiz and customer role-play activities.
-- AI Deal Jeopardy has 6 categories, 30 clues, 2 Daily Doubles, and a final round. It supports 2 to 4 teams, presenter scoring, a timer, sound, and browser-local game state.
-- Customer role-play uses 4 scripted customer personas with branching responses, coaching, signal spotting, group voting, and a debrief scorecard.
-- Role-play scores discovery, listening, use-case identification, positioning, and trust.
-- The prototypes use static HTML, CSS, and JavaScript. Conversations and coaching come from authored content, not a live AI model.
+Matt selected the Default pack as the reference for lesson design. Its strongest pattern is a recognizable customer concern, followed by discovery, new facts, a qualified response, and a concrete next step.
 
-These describe the current prototypes. They do not commit the actual product to the same activities, scoring, technical stack, or conversation mechanism.
+Borrow that pattern, the conversational rhythm, and the distinction between a good idea and a good idea at the wrong moment. Do not treat Default's illustrative offerings, technical shorthand, unsupported claims, or occasional conversation discontinuities as requirements.
 
-### Open product decisions
+The financial services rebuild starts from this product brief and the supplied research, not from the previous financial services scripts. The research limits factual claims. It does not dictate a lesson for every offering or survey statistic.
 
-- The approved offering catalog. The prototype uses CDW as the seller identity, but Default's illustrative offers do not establish catalog approval.
-- The scope of the first release and which prototype capabilities it should retain.
-- Whether the actual product uses scripted conversations, live AI conversations, or both.
-- The production stack and deployment target.
-- Any need for accounts, participant devices, saved learning history, or trainer reports.
-- A measure of improved seller performance.
-- Product-specific accessibility requirements.
-- The final product name.
+Keep the existing game engines, visual design, shared Settings behavior, and Default content unchanged. The replacement financial services pack may have new fictional customers, questions, conversation paths, and authored choice scores within the existing game rules. Its content revision must change when the new questions replace the old board.
 
-## Evidence on Hand
+## What the learner has already seen
 
-- `prototype/seller-ai-training/index.html`: the existing launcher.
-- `prototype/seller-ai-training/jeopardy.html`: quiz content and presenter controls.
-- `prototype/seller-ai-training/roleplay.html`: customer scenarios, authored coaching, and scoring logic.
-- `prototype/seller-ai-training/screenshots/`: 12 supplied captures of prototype screens and states.
-- `prototype/seller-ai-training.zip`: the supplied prototype archive.
+### Home and Settings
 
-The prototype calls itself "AI Seller Academy" and uses CDW as the seller identity. The original fictional content now lives in one Default pack shared by both activities. The change preserves customers, branches, choices, scores, and signals. Exactly 5 Jeopardy strings replace the original seller placeholder with CDW.
+The learner can see the selected pack, activity descriptions, category previews, and a customer preview. This is orientation, not a prerequisite lesson. Either activity can be opened first.
 
-Default shows this notice. "Fictional training scenarios. Default's illustrative offers are not a verified CDW catalog." The prototype retains its existing browser saves and game rules. FSI supplies a second complete pack for both activities. Settings saves one browser-local choice for both games. Home previews reflect that choice. Open games retain their current pack until the trainer deliberately reopens them.
+Settings saves one browser-local pack choice for both games. Open activities retain their current pack until the trainer deliberately reopens them.
 
-Customer personas, company names, financial figures, and service claims in the scenarios are training examples. Do not treat them as customer evidence or confirmed facts about the actual offerings. No real testimonials, measured training results, or approved offering catalog have been supplied.
+### Customer selection and brief
 
-### FSI content
+The picker introduces a person, their company, role, and concern. The brief adds business goals, personality, company context, and the seller's mission.
 
-FSI adds 4 fictional scenarios about banking, insurance, wealth, and payments. Its conversations contain 23 nodes, 69 choices, 12 outcomes, and 20 takeaways. Bank and insurance take 7 choices, including insurance recovery. Wealth and payments take 4 choices. Its quiz contains 6 categories, 30 clues, and 1 Final. The engines and Default content remain unchanged.
+The mission says what the seller should accomplish in the meeting. It must not name the hidden diagnosis or prescribe an offering before discovery.
 
-The content teaches governed data, human review, stakeholder discovery, platform qualification, workload-specific hosting, and measured value. It does not promise autonomous investment advice, claims settlement, refunds, regulatory approval, security, or financial returns.
+Hidden pains are trainer information. They remain visually concealed until the presenter chooses to reveal them. They cannot supply facts needed to choose a good response. This is a presentation aid, not a protected trainer account.
 
-`content-authoring/fsi-provenance.json` covers 35 items with 56 material claims. It cites the supplied compilation dated 2026-10-07. It does not independently verify the linked reports or current offering pages. The task reports independent review of the draft with PASS and 2 minor notes. The integrated pack addresses both notes and still needs parent review at its final head.
+### Conversation
 
-All FSI customers, dialogue, customer metrics, and outcomes are invented. Coming Soon offerings remain unavailable. The source is internal and stays outside the repository. Provenance stays outside the web root. Distribution requires a separate approved audience and hosting decision.
+The learner sees the customer's current line and the conversation so far. They also see the available seller replies. Choices appear in a shuffled order, so their displayed position cannot carry meaning.
 
-### Shared Settings
+The learner has not necessarily read hidden pains, clicked a signal, selected an alternative reply, or played another scenario. An optional signal explanation cannot be the only place where a necessary term is explained.
 
-Trainers choose Default or FSI once, then launch either activity from Home. Radio changes are drafts until Save succeeds. Native radio controls, visible keyboard focus, and a polite status message support keyboard use.
+After a choice, the learner sees feedback and may see a stronger response. Coaching speaks to the learner, not the customer. It cannot retroactively turn an unspoken suggestion into something the customer heard.
 
-Games open Settings in a separate tab. Switching the saved choice never interrupts an active meeting, clue, or Final stage. A deliberate relaunch asks before losing an unfinished meeting or Jeopardy stage. Jeopardy restores only the selected pack's compatible board. Reset and Replay stay on the current pack.
+When several choices lead to one customer line, that line must make sense after every incoming reply. A customer must not say "That sounds good" after both a careful proposal and a careless promise.
 
-Settings and saves remain local to one browser profile and origin. Role-play meetings, open clues, Final stages, and undo history do not persist. Same-pack Jeopardy tabs remain last-write-wins. This feature adds no accounts, backend, live AI calls, uploads, cross-device settings, or hosting approval.
+### Debrief
 
-## Product Principles
+The debrief reviews the learner's choices, skill scores, signals, possible uses, an offering direction, and takeaways. It also reveals hidden pains.
 
-- Make trainer-led sessions the primary workflow.
-- Center learning on identifying AI use cases and positioning relevant offerings.
-- Use the liked prototypes as references for the actual product, not as a fixed specification.
+Some debrief sections are static, and the outcome depends on aggregate scores. Do not claim the learner obtained a specific commitment merely because their total score was high. Separate what a strong approach would achieve from what the conversation established.
+
+### Quiz and Final
+
+The trainer can choose any unused clue. Learners may skip another clue's answer or explanation, and they may play Final before clearing the board.
+
+Every question must stand alone. Its category may orient the learner, but it cannot replace the situation or supply a missing definition. Another question, a role-play, or the research document is never required reading.
+
+The answer and explanation appear after reveal. They may teach the reason, but cannot introduce a fact that was necessary to answer fairly.
+
+## Rules for each kind of copy
+
+### Customer dialogue
+
+Write what this person would say to a seller in a real meeting. Give them a reason to speak and a concern that matters to their job.
+
+Let them describe the current work, react credibly, answer discovery questions, question a promise, or ask for practical help. They may ask about a product when that interest has a believable cause. Do not make them deliver assessment prompts such as "What do you need to know before recommending it?"
+
+Reveal details gradually. Do not make the opening a complete case study, a glossary, or a list of qualification criteria. Every later choice must still have enough visible context to be fair.
+
+### Seller choices
+
+Every choice is a reply the seller could say aloud to this customer now. Use direct questions, acknowledgments, offers, and recommendations.
+
+Do not write instructions such as "Ask the owner," "Follow the process," or "Buy more licenses" as if they were dialogue. A natural response could be "Could you walk me through how your team does that today?"
+
+The best choice earns its rating through relevance and judgment, not extra length, more product names, or a longer checklist. Keep options comparable in detail where practical.
+
+Wrong choices should be believable mistakes. Examples include offering a demonstration too early, measuring speed without corrections, or involving the wrong people. Avoid caricatures that openly announce deception or invite harm merely to make the correct choice obvious.
+
+An incomplete choice can identify a useful idea while missing timing, ownership, or evidence. Its feedback must explain that distinction.
+
+### Coaching and signal explanations
+
+These surfaces deliberately address the learner. Explain what their response did and why that matters in this situation.
+
+Use 1 or 2 friendly sentences. Refer to the customer's actual concern. Avoid repeating generic cautions after every turn or burying the lesson under catalog details.
+
+Signals identify evidence in what the customer said. They do not reveal an unrelated fact or diagnose a cause the conversation has not established.
+
+### Quiz questions, answers, and explanations
+
+Use a concrete situation and one clear learning decision. Name the actor, work, information, and consequence when the decision depends on them.
+
+A short open question is often better than a long list of obvious alternatives. Let difficulty grow through judgment and tradeoffs, not obscure terminology or missing information.
+
+The answer gives the essential response concisely. The explanation says why and, when useful, what the seller could ask next. Accept equivalent reasoning rather than requiring a memorized sentence.
+
+Do not infer confirmed rework from repetitive work, savings from faster drafts, approval from tool access, or sponsorship from executive pressure.
+
+### Headings, briefs, and next steps
+
+Headings and category names are short labels, not dialogue. They need not become full sentences merely to satisfy a prose rule.
+
+Briefs and missions may directly instruct the learner. Offering steps and takeaways may also be instructional. Keep that voice out of customer and seller speech.
+
+A next step identifies an action, relevant people, and what they need to decide or learn. It need not be a product sale. Discovery can end with a useful meeting or an agreed way to gather evidence.
+
+## Context and language
+
+Use plain, conversational English. Aim for roughly an eighth-grade reading level without claiming a grade from sentence counts alone. Most sentences should have about 20 words or fewer, but preserve meaning rather than forcing fragments.
+
+Use full sentences in dialogue and explanations. Contractions are welcome in speech. Avoid headline fragments, "Label: value" dialogue, unexplained abbreviations, arrows, and slashes used instead of words. Write "for example" and "versus."
+
+Name products precisely when the distinction matters. "Microsoft" is not enough when the question concerns Microsoft 365 Copilot. Explain necessary technical terms where learners first need them. Retain official offering names rather than inventing simpler names.
+
+Use concrete work descriptions rather than generic replacements for jargon:
+
+- Say which claim details staff copy, where they find them, and where they enter them.
+- Say whether measured time includes searching, copying, checking, correcting, or waiting.
+- Say what information reaches an employee after a call transfer.
+- Say what an advisor needs to record after a client meeting.
+
+Do not add all these details to every sentence. Establish the facts once, then use clear references. Repetition and unnecessary explanation also make a conversation unnatural.
+
+## Financial services content
+
+The pack contains 4 fictional customer situations, 6 quiz categories with 5 clues each, and Final. It teaches discovery and qualification in financial services through the same activities as Default.
+
+Scenarios should offer different pressures and useful decisions, not repeat one service-selection checklist with different job titles. Banking, insurance, wealth management, and payments provide the current sector coverage.
+
+Use a small, relevant selection of source-supported offerings after the need becomes clear. Product-name recall, survey trivia, and equipment prerequisites are not the main curriculum. Include a technical detail only when it changes the seller's decision in that lesson.
+
+A fresh pack does not need to preserve the old script's exact words, graph, signal positions, or question meanings. It must preserve engine compatibility and clear, fair scoring. Every route must terminate, every node must be reachable, and displayed turn counts must match the authored paths.
+
+## Evidence and claim boundaries
+
+Default's offers are illustrative, not an approved CDW catalog. The supplied financial services research and seller playbook supports the financial services claims. It is an internal compilation dated 2026-10-07, not proof of current service availability.
+
+Keep four kinds of content distinct:
+
+- Fictional customers, conversations, figures, and outcomes.
+- Findings from cited research or company disclosures.
+- Proposed discovery questions, controls, and evaluation plans.
+- Source-described CDW offerings and their stated requirements.
+
+Fictional figures may establish a realistic situation. They must remain consistent and must not look like measured customer results or promised returns.
+
+Only include material claims the supplied source supports. A useful proposed task does not establish that CDW sells a ready-made implementation for it. Confirm current scope and availability before a real recommendation.
+
+Preserve relevant limits where the lesson needs them. Risk assessments do not grant regulatory approval. Private hosting does not guarantee security or savings. Human review does not prevent every error. Consent and approval are separate decisions. Evidence for one task does not authorize a different, more consequential task.
+
+Do not import internal prices, named contacts, routing instructions, campaign tags, internal links, or the raw source into served lessons. Evidence records stay outside the web root. Distribution requires separate approval of the audience and hosting.
+
+## Existing capabilities and constraints
+
+The application uses static HTML, CSS, and JavaScript modules. The current scope adds no backend, framework, accounts, uploads, live generation, or public hosting.
+
+Role-play includes authored branches, signal spotting, optional ideal-path help, trainer-entered room votes, coaching, and a debrief. Scores cover discovery, listening, identifying useful tasks, positioning, and trust.
+
+The quiz supports 2 to 4 teams, 30 regular clues, 2 Daily Doubles, Final, a timer, sound, and presenter scoring. It stores board progress in the browser by pack and revision.
+
+Role-play meetings, open clue stages, Final stages, and undo history do not persist. Same-pack tabs remain last-write-wins. A replacement pack must not silently reuse old board progress for different questions.
+
+Preserve existing keyboard access, reduced-motion support, desktop reading limits, and readable font sizes. Do not solve long copy by shrinking text or relaxing clipping checks.
+
+## Acceptance checks
+
+Before treating a pack as ready:
+
+- Read every customer line and every choice aloud in context, including poor paths and recovery.
+- Check each decision against information visible at that moment, excluding hidden pains and unchosen replies.
+- Check each shared destination against every incoming choice.
+- Read every quiz question by itself, then verify the answer follows from its stated facts.
+- Check the distinction between customer speech, seller speech, and learner-directed coaching.
+- Compare all material claims with their source and record their limits.
+- Inspect real screens, including group mode and long answers, without changing fonts to fit.
+- Exercise scoring, navigation, saves, pack switching, and all conversation paths.
+- Compare Default and the shared application against their unchanged baseline.
+
+Automated tests protect structure, specific regressions, and display limits. They do not prove that a conversation sounds human. Editorial review must include concrete examples and cannot consist only of a passing test count.
+
+## Open decisions
+
+- How to measure improved seller performance outside the game.
+- The audience and hosting approval required for distribution.
+- Verification of current offering availability before real-world use.
+- Future requirements for accounts, participant devices, reporting, or live conversations.
+
+These are not blockers for the approved static training rebuild. They must not become features or promises by implication.
