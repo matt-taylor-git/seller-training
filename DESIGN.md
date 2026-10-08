@@ -309,7 +309,7 @@ Settings is a desktop task screen. It uses the same dark canvas, flat panels, In
 
 A centered column has a 760px maximum width and 24px side padding. The header pairs seller identity with Home navigation. A 30px heading introduces one labeled radio group. Each option contains the pack's name, description, and derived activity counts. The selected option combines the native radio mark, red boundary, and tinted background. Selection never relies on color alone.
 
-Save and Cancel follow the choices. A polite status message reports unsaved drafts, success, external changes, and errors. Return to Home remains a separate navigation link. The pack's disclaimer follows the controls. The page scrolls vertically at 200 percent zoom, with no fixed action bar or clipped controls. It adds no motion, and it respects reduced-motion preferences.
+Save and Cancel follow the choices. A polite status message reports unsaved drafts, success, external changes, and errors. Return to Home remains a separate navigation link. The pack's disclaimer follows the controls. The page scrolls vertically at 200 percent CSS zoom, with no fixed action bar or clipped controls. This check does not verify browser zoom. It adds no motion, and it respects reduced-motion preferences.
 
 Home previews use the selected pack without changing the launcher layout. Game links open Settings in a new tab. The changed-selection action appears beside the pinned-pack notice. Jeopardy also exposes it within clues and Final, so a trainer does not need to close a stage just to open Settings.
 

@@ -95,7 +95,7 @@ async function measureSettings(browser, origin, activity, packId, version) {
           const start = performance.now();
           const observer = new MutationObserver(() => {
             if (document.querySelector('#saveStatus')?.textContent.includes('selected for both activities')) {
-              window.__saveFeedbackMs = performance.now() - start;
+              window.__saveStatusDomMs = performance.now() - start;
               observer.disconnect();
             }
           });
@@ -122,13 +122,13 @@ async function measureSettings(browser, origin, activity, packId, version) {
       if (request.isNavigationRequest()) route = new URL(request.url()).pathname;
       requests.push({ route, path: new URL(request.url()).pathname });
     });
-    let saveFeedbackMs = null;
+    let saveStatusDomMs = null;
     if (version === 'candidate') {
       await page.goto(`${origin}/settings.html`);
       await page.locator(`input[value="${packId}"]`).check();
       await page.locator('#saveSelection').click();
-      await page.waitForFunction(() => Number.isFinite(window.__saveFeedbackMs));
-      saveFeedbackMs = await page.evaluate(() => window.__saveFeedbackMs);
+      await page.waitForFunction(() => Number.isFinite(window.__saveStatusDomMs));
+      saveStatusDomMs = await page.evaluate(() => window.__saveStatusDomMs);
       await page.locator('#returnHome').click();
       await page.waitForFunction(() => document.querySelector('#currentPack')?.textContent.startsWith('Current pack:'));
     } else { await page.goto(`${origin}/index.html`); }
@@ -137,7 +137,7 @@ async function measureSettings(browser, origin, activity, packId, version) {
     const usableMs = await page.evaluate(() => window.__journeyMs);
     if (errors.length) throw new Error(JSON.stringify(errors));
     const requestsPerRoute = Object.fromEntries([...new Set(requests.map(request => request.route))].map(route => [route, requests.filter(request => request.route === route).length]));
-    return { usableMs, saveFeedbackMs, requestsPerRoute, totalJourneyRequests: requests.length, requests };
+    return { usableMs, saveStatusDomMs, requestsPerRoute, totalJourneyRequests: requests.length, requests };
   } finally { await context.close(); }
 }
 
@@ -226,11 +226,11 @@ try {
       }
       const baselineP95Ms = p95(versions.baseline.map(item => item.usableMs));
       const candidateP95Ms = p95(versions.candidate.map(item => item.usableMs));
-      const saveFeedbackP95Ms = p95(versions.candidate.map(item => item.saveFeedbackMs));
+      const saveStatusDomP95Ms = p95(versions.candidate.map(item => item.saveStatusDomMs));
       const maxFirstPartyRequestsPerRoute = Math.max(...versions.candidate.flatMap(item => Object.values(item.requestsPerRoute)));
-      settings[`${packId}.${activity}`] = { baselineP95Ms, candidateP95Ms, deltaMs: candidateP95Ms - baselineP95Ms, saveFeedbackP95Ms,
+      settings[`${packId}.${activity}`] = { baselineP95Ms, candidateP95Ms, deltaMs: candidateP95Ms - baselineP95Ms, saveStatusDomP95Ms,
         maxFirstPartyRequestsPerRoute, maxTotalJourneyRequests: Math.max(...versions.candidate.map(item => item.totalJourneyRequests)),
-        passed: saveFeedbackP95Ms <= 100 && candidateP95Ms <= 1000 && candidateP95Ms - baselineP95Ms <= 150 && maxFirstPartyRequestsPerRoute <= 10,
+        passed: saveStatusDomP95Ms <= 100 && candidateP95Ms <= 1000 && candidateP95Ms - baselineP95Ms <= 150 && maxFirstPartyRequestsPerRoute <= 10,
         measurements: versions };
     }
   }
@@ -249,7 +249,7 @@ try {
   const report = { samplesPerRoutePerVersion: samples, packs, baselineComparison: 'Each requested candidate pack uses an actual cold baseline Default entry screen. No synthetic FSI baseline is claimed.', browser: browser.version(), viewport: { width: 1440, height: 900 },
     fontsBlocked: true, coldContexts: true, baseline: { path: resolve(baseline), sha: sha(baseline) },
     candidate: { path: resolve(candidate), sha: sha(candidate), dirty: Boolean(execFileSync('git', ['-C', resolve(candidate), 'status', '--porcelain'], { encoding: 'utf8' }).trim()) },
-    settingsComparison: 'Baseline Home activity click to usable game. Candidate Return to Home click in Settings, then activity click to usable game. Save feedback runs from Save click to status mutation. Requests count every first-party request per document route and across the full journey.',
+    settingsComparison: 'Baseline Home activity click to usable game. Candidate Return to Home click in Settings, then activity click to usable game. Save status timing runs from Save click to the status DOM mutation, not browser paint. Requests count every first-party request per document route and across the full journey.',
     summary, storage, settings, order };
   if (option('--output')) await writeFile(resolve(option('--output')), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));

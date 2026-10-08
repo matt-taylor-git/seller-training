@@ -485,7 +485,7 @@ test('Lane 9. Blocked reads, failed writes, uncertain confirmation, and invalid 
   await expect(page.locator('#saveStatus')).toContainText('FSI selected for both activities');
 });
 
-test('Lane 10. Settings stays readable at both desktop sizes, 200 percent zoom, and reduced motion.', async ({ page }) => {
+test('Lane 10. Settings stays readable at both desktop sizes, 200 percent CSS zoom, and reduced motion.', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   for (const viewport of [{ width: 1100, height: 800 }, { width: 1920, height: 1080 }]) {
     await page.setViewportSize(viewport);

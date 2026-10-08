@@ -696,10 +696,14 @@ document.addEventListener("keydown", e => {
     } else if (e.key === "Escape") { t.blur(); if (cur && !t.isContentEditable) closeClue(); else if (F && !t.isContentEditable) closeFinal(); }
     return;
   }
-  if ((e.key === 'Enter' || e.key === ' ') && t.closest('a, .openSelected')) return;
   const k = e.key.toLowerCase();
   const digit = /^(Digit|Numpad)([1-4])$/.exec(e.code);
-  if ($("help").classList.contains("show")) { if (k === "escape" || k === "?" || k === "enter") { e.preventDefault(); toggleHelp(false); } return; }
+  if ($("help").classList.contains("show")) {
+    if (k === "escape" || k === "?" || k === "enter") { e.preventDefault(); toggleHelp(false); }
+    else if (k === " " && !t.closest('#help')) e.preventDefault();
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && t.closest('a, .openSelected')) return;
   if (k === "?" || (k === "/" && e.shiftKey)) { toggleHelp(); return; }
   if (k === "m") { toggleMute(); return; }
   if (F) {
