@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings · CDW Seller Academy</title>
+<style>
+:root{color-scheme:dark;--bg:#101216;--panel:#191d23;--ink:#f4f5f7;--muted:#b0b7c2;--line:#424a56;--action:#cc0000;--accent:#ff8585}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 24px 48px}
+nav{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:40px}
+a{color:var(--ink);text-underline-offset:4px}
+h1{font-size:30px;line-height:1.15;margin:0 0 12px;letter-spacing:-.02em}
+p{margin:0 0 20px;color:var(--muted)}
+fieldset{border:0;padding:0;margin:28px 0 24px;min-width:0}
+legend{font-size:18px;font-weight:600;margin-bottom:12px}
+.option{display:flex;align-items:flex-start;gap:14px;padding:20px;border:1px solid var(--line);border-radius:8px;margin:0 0 12px;cursor:pointer;background:var(--panel)}
+.option:has(:checked){border-color:var(--accent);background:#2e1c22}
+.option:hover{border-color:var(--accent)}
+input{accent-color:var(--accent);width:20px;height:20px;flex:none;margin:3px 0 0}
+.option strong,.option small{display:block}
+.option strong{font-size:18px;margin-bottom:4px}
+.option small{color:var(--muted);font-size:15px;line-height:1.5}
+.counts{margin-top:8px}
+.actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+button{min-height:52px;padding:10px 24px;border:0;border-radius:6px;background:var(--action);color:#fff;font-family:inherit;font-size:16px;line-height:1.5;font-weight:700;cursor:pointer}
+button:hover:not(:disabled){filter:brightness(1.08)}
+button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+#saveStatus{margin:20px 0 12px;color:var(--ink);min-height:1.5em}
+#selectionStatus{margin-bottom:12px}
+#packNotice{font-size:13px;margin-top:28px}
+::selection{background:var(--accent);color:#160b0d}
+html{scrollbar-color:var(--line) var(--bg)}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<main>
+  <nav aria-label="Main"><b><span class="brandInline">CDW</span> · Seller Academy</b><a href="index.html">Home</a></nav>
+  <h1>Settings</h1>
+  <p id="scope">Applies to role playing and Jeopardy.</p>
+  <form id="settingsForm">
+    <fieldset aria-describedby="scope"><legend>Content pack</legend><div id="packChoices"></div></fieldset>
+    <p id="selectionStatus"></p>
+    <div class="actions"><button id="saveSelection" type="submit">Save</button><a href="index.html">Cancel</a></div>
+  </form>
+  <p id="saveStatus" role="status" aria-live="polite" aria-atomic="true"></p>
+  <a id="returnHome" href="index.html">Return to Home</a>
+  <p id="packNotice"></p>
+</main>
+<script type="module">
+import { SELLER_NAME } from './shared/identity.mjs';
+import { training } from './shared/training.mjs';
+const packs = training.listPacks();
+const choices = document.getElementById('packChoices');
+const status = document.getElementById('saveStatus');
+const savedStatus = document.getElementById('selectionStatus');
+const save = document.getElementById('saveSelection');
+let selected = training.readSelection();
+let draftId = null;
+for (const pack of packs) {
+  const label = document.createElement('label');
+  label.className = 'option';
+  const radio = document.createElement('input');
+  radio.type = 'radio'; radio.name = 'pack'; radio.value = pack.id;
+  radio.setAttribute('aria-labelledby', `name-${pack.id}`);
+  radio.setAttribute('aria-describedby', `description-${pack.id} counts-${pack.id}`);
+  const copy = document.createElement('span');
+  const name = document.createElement('strong');
+  name.id = `name-${pack.id}`; name.textContent = pack.label;
+  const description = document.createElement('small');
+  description.id = `description-${pack.id}`; description.textContent = pack.description;
+  const counts = document.createElement('small');
+  counts.id = `counts-${pack.id}`; counts.className = 'counts';
+  counts.textContent = `${pack.roleplay.scenarios.length} scenarios · ${pack.jeopardy.categories.length} categories · ${pack.jeopardy.categories.reduce((n, category) => n + category.clues.length, 0)} clues + Final`;
+  copy.append(name, description, counts); label.append(radio, copy); choices.append(label);
+  radio.addEventListener('change', () => { draftId = radio.value; status.textContent = 'Unsaved choice. Select Save to apply it.'; render(); });
+}
+function render() {
+  const id = draftId ?? selected.packId;
+  for (const radio of choices.querySelectorAll('input')) radio.checked = radio.value === id;
+  save.disabled = selected.valid && id === selected.packId;
+  const current = packs.find(pack => pack.id === selected.packId);
+  savedStatus.textContent = selected.status === 'unavailable'
+    ? 'Cannot read the saved choice. Allow browser storage, then retry Save.'
+    : selected.message || `Current pack: ${current?.label || selected.packId}.`;
+  document.getElementById('packNotice').textContent = packs.find(pack => pack.id === id)?.disclaimer || '';
+}
+training.observeSelection(selection => {
+  const changed = selected.packId !== selection.packId || selected.status !== selection.status;
+  selected = selection;
+  if (changed) status.textContent = draftId === null
+    ? 'Saved choice updated.'
+    : 'Saved choice updated. Your unsaved choice is kept. Select Save to apply it.';
+  render();
+});
+document.getElementById('settingsForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const result = training.selectPack(draftId ?? selected.packId);
+  selected = result.selection;
+  if (result.ok) draftId = null;
+  render();
+  status.textContent = result.message + (result.ok ? '' : ' Allow browser storage and retry, or reopen Settings.');
+});
+document.querySelector('.brandInline').textContent = SELLER_NAME;
+document.title = `Settings · ${SELLER_NAME} Seller Academy`;
+</script>
+</body>
+</html>

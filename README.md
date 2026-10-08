@@ -8,7 +8,7 @@ The repository currently contains supplied prototypes and a product record. The 
 
 Read [PRODUCT.md](PRODUCT.md) for confirmed product facts and open decisions.
 
-Read [DESIGN.md](DESIGN.md) for the customer role-playing page's CDW-inspired dark design. It records the current colors, typography, components, and desktop layout. Jeopardy and the launcher remain outside its scope.
+Read [DESIGN.md](DESIGN.md) for the customer role-playing page and Settings screen's CDW-inspired dark design. It records the colors, typography, components, and desktop layout. Jeopardy and Home keep their existing designs.
 
 [The Impeccable design companion](.impeccable/design.json) contains component previews and motion guidance. Its generated color ramps are preview aids, not additional application tokens.
 
@@ -27,7 +27,7 @@ Open http://localhost:8000 to see the launcher. Choose either activity:
 
 The prototypes use static HTML, CSS, and JavaScript modules. Serve the pages over HTTP rather than opening local files directly. They do not call a live AI model. Google Fonts requires an internet connection, but the pages include fallback fonts.
 
-All 3 pages use CDW as the seller identity. Default preserves the original fictional customers, scenarios, and clues. Its illustrative offers are not a verified CDW catalog.
+All 4 pages use CDW as the seller identity. Default preserves the original fictional customers, scenarios, and clues. Its illustrative offers are not a verified CDW catalog.
 
 The trainer operates the shared screen. Group mode lets the trainer tally room votes manually, rather than connecting participant devices.
 
@@ -70,11 +70,11 @@ The probe starts Python servers and interleaves cold browser contexts with fonts
 
 Each page pins its pack when it opens. Reset, Replay, timers, and Final keep that pack. Selection changes update a notice, never an active game. Reopening an activity adopts the saved selection. Storage events, focus, and browser history restoration refresh the notice.
 
-Selection uses `aiTraining.selection.v1` with `{schema: 1, packId}`. A missing selection uses Default. An invalid or unknown selection also uses Default, but retains an invalid status until an explicit save repairs it. A known pack that fails content checks blocks entry instead of showing another pack under its name. The registry contains Default and FSI. No Settings screen exists yet. Browser test setup selects FSI until the later Settings change.
+Selection uses `aiTraining.selection.v1` with `{schema: 1, packId}`. A missing selection uses Default. An invalid or unknown selection also uses Default, but retains an invalid status until an explicit save repairs it. A known pack that fails content checks blocks entry instead of showing another pack under its name. The registry contains Default and FSI. Settings saves one choice for both activities. Home reads that choice and derives its previews, counts, and notice from the complete pack.
 
 Jeopardy uses durable `localStorage` under `aiDealJeopardy.v2.<packId>.<revision>`. Each record contains `{schema: 2, packId, packRevision, state}`. The state contains teams, scores, used tiles, Daily Doubles, timer settings, and sound settings. It does not contain an open clue, Final stage, or undo history. Different packs and revisions never share a board.
 
-A valid `aiDealJeopardy.v1` record imports once into Default revision 1 when its destination is absent. The legacy record remains unchanged. The separate `aiDealJeopardy.imported.v1` receipt prevents later deletion of the new save from resurrecting legacy progress. The receipt precedes the destination write. If either write fails, the page reports unsaved progress and keeps playing in memory.
+A valid `aiDealJeopardy.v1` record imports once into Default revision 1 when its destination is absent. The legacy record remains unchanged. The separate `aiDealJeopardy.imported.v1` receipt prevents later deletion of the new save from resurrecting legacy progress. The destination write precedes the receipt. If the destination write fails, the page reports unsaved progress and keeps playing in memory. If only the receipt fails, the page reports that progress is saved and retries the receipt on a later save or reopening.
 
 Invalid records and unsupported schemas or revisions remain untouched. Recovery play starts with zero scores and fresh clues. The **Start fresh saved game** button asks before replacing a rejected destination. Cancel leaves the record unchanged. Ordinary scoring and **New game** never approve replacement. A saved game from another revision remains at its original key after recovery.
 
@@ -126,6 +126,38 @@ The browser lanes select FSI through declared localStorage setup, then use actua
 The performance probe measures actual candidate Default and FSI entries against equivalent baseline Default screens. It records 20 cold samples per route and version, interleaves baseline and candidate, and blocks remote fonts. The same 1000 ms, 150 ms delta, and 400 KiB limits apply. Run a separate comparison against the CP2 worktree to retain its Default baseline.
 
 Coming Soon plays remain unavailable. Offering descriptions reflect the supplied compilation on 2026-10-07, not a verified live catalog. Confirm current scope and prerequisites before customer use. The integration task reports a source-reviewed draft with PASS and 2 minor notes, which this change addresses. Parent review of the final committed pack remains open. Public hosting and distribution are not approved by this change.
+
+## Choose content for both activities
+
+1. Open **Settings** from Home.
+2. Choose **Default** or **FSI**.
+3. Select **Save**.
+4. After the success message, select **Return to Home** and launch either activity.
+
+Radio changes remain unsaved until Save succeeds. Cancel and Home discard the draft. Save stays available when an invalid preference needs repair, even if Default is already checked. If another page changes the saved choice, Settings keeps an unsaved draft and explains the change.
+
+Game links open Settings in a separate tab without opener access. The meeting, clue, timer, or Final stage stays on its original pack. **Open selected pack** appears when a different valid choice exists. Role-play asks before leaving an unfinished meeting. Cancel preserves it. Jeopardy warns that only saved board progress persists. An open clue, Final stage, and unsaved changes do not persist. Reset and Replay never switch packs.
+
+Relaunch checks the saved choice again after confirmation. Reload also adopts the saved choice. Home, Settings, and game notices reread selection on storage events, focus, and browser history restoration. Active games never swap their content silently.
+
+Selection and saves belong to one browser profile and one origin, including its port. They do not sync across devices. If storage cannot be read, Settings refuses to overwrite an unknown prior choice. If a write fails, Settings reports failure. If a write succeeds but its readback fails, Settings reports uncertain confirmation rather than claiming the choice stayed unchanged. Allow browser storage and retry, or reopen Settings to check.
+
+### Verify Settings
+
+Run the 10 Settings lanes and the performance probe:
+
+```sh
+CP4_EVIDENCE_DIR=/tmp/cp4-evidence PORT=8184 npx playwright test tests/browser/settings.spec.mjs
+node scripts/measure-training.mjs --settings --baseline ../baseline --candidate . --samples 20 --packs default,fsi
+```
+
+The lanes use real Settings controls to switch both ways. They check one preference write per Save, board separation, canceled relaunch, changed selection during confirmation, keyboard focus, storage failures, desktop sizes, and 200 percent zoom. They retain screenshots and browser errors locally. Run `npx playwright test` for all 40 lanes, including existing content readability checks.
+
+The probe interleaves cold contexts against trunk Home-to-game. It measures Save click to status, then Return to Home click through activity entry. The activity click bypasses Playwright's hover-animation wait, not the browser's click handler. Save feedback must stay within 100 ms at p95. The complete entry must stay within 1000 ms and trunk plus 150 ms. Each document route must use at most 10 first-party requests. The report also records the full journey's request count without deduplicating modules. Page-load, decoded-byte, and storage budgets remain unchanged. Compare against CP3 separately to retain the prior activity baseline.
+
+### Add a future pack
+
+Add one complete `ContentPack` aggregate with both activities. Register it in `shared/training.mjs`, add provenance outside the web root, and extend content and browser tests. Home and Settings derive their choices and previews from `training.listPacks()`. Neither engine needs a new selector or a content-specific branch. Bump the pack revision when existing saved tile positions no longer identify the same content.
 
 ## Supplied material
 

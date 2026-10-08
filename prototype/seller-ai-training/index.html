@@ -47,7 +47,10 @@ h1 .g{background:linear-gradient(90deg,var(--gold),#ff8a3d);-webkit-background-c
 .cta svg{transition:transform .25s}.card:hover .cta svg{transform:translateX(6px)}
 .mini{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
 .mini span{height:24px;border-radius:5px;background:linear-gradient(180deg,#1f45e6,#1430b8);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--gold)}
-.mini span.h{background:#0d1c66;color:#fff;font-size:8.5px;letter-spacing:.6px}
+.mini span.h{background:#0d1c66;color:#fff;font-size:8.5px;letter-spacing:.6px;height:auto;min-height:24px;padding:4px;text-align:center}
+header nav{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header a{color:var(--ink);text-underline-offset:4px}
+header a:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
 .chat{display:flex;flex-direction:column;gap:6px}
 .b{max-width:80%;font-size:13px;padding:8px 12px;border-radius:12px;line-height:1.35}
 .b.c{background:rgba(255,255,255,.09);border-top-left-radius:4px}
@@ -64,7 +67,7 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
 <div class="wrap">
   <header>
     <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg></div><span><span class="brandInline">CDW</span> &middot; AI Seller Academy</span></div>
-    <span class="pill">Trainer Edition &middot; Prototype</span>
+    <nav aria-label="Main"><span class="pill" id="currentPack"></span><a href="settings.html">Settings</a></nav>
   </header>
 
   <section class="hero">
@@ -80,13 +83,11 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
         <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffc843" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
         <h2>AI Deal Jeopardy</h2>
       </div>
-      <p>A team quiz game on signals, use cases, positioning and objection handling, with Daily Doubles and Final Jeopardy.</p>
+      <p id="quizSummary"></p>
       <div class="mini" aria-hidden="true">
-        <span class="h">LISTEN UP</span><span class="h">USE CASE</span><span class="h">POSITION</span><span class="h">OBJECTION</span><span class="h">DECODER</span><span class="h">DISCOVERY</span>
-        <span>$100</span><span>$100</span><span>$100</span><span>$100</span><span>$100</span><span>$100</span>
-        <span>$200</span><span>$200</span><span>$200</span><span>$200</span><span>$200</span><span>$200</span>
+
       </div>
-      <div class="tags"><span class="tag">2&ndash;4 teams</span><span class="tag">30 clues + Final</span><span class="tag">20&ndash;40 min</span><span class="tag">Timer &amp; sound</span></div>
+      <div class="tags"><span class="tag">2&ndash;4 teams</span><span class="tag" id="clueCount"></span><span class="tag">20&ndash;40 min</span><span class="tag">Timer &amp; sound</span></div>
       <span class="cta">Launch game <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
     </a>
 
@@ -96,16 +97,17 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
         <div class="icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
         <h2>Customer Role-Play Simulator</h2>
       </div>
-      <p>Branching customer conversations: choose what to say, get coaching on every reply, and flag hidden buying signals.</p>
+      <p id="roleplaySummary"></p>
       <div class="chat" aria-hidden="true">
-        <div class="b c">My team keys in <mark>9,000 invoices a month</mark> by hand...</div>
-        <div class="b s">What does an exception cost you today?</div>
+        <div class="b c" id="customerPreview"></div>
+        <div class="b s" id="scenarioPreview"></div>
       </div>
-      <div class="tags"><span class="tag">4 personas</span><span class="tag">Group voting mode</span><span class="tag">Signal spotter</span><span class="tag">Debrief scorecard</span></div>
+      <div class="tags"><span class="tag" id="scenarioCount"></span><span class="tag">Group voting mode</span><span class="tag">Signal spotter</span><span class="tag">Debrief scorecard</span></div>
       <span class="cta">Start role-play <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></span>
     </a>
   </section>
 
+  <p id="selectionNotice" role="status"></p>
   <p id="packNotice" style="color:var(--muted);font-size:12px;line-height:1.5;margin-top:20px"></p>
 
   <footer>
@@ -116,8 +118,36 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
 <script type="module">
 import { SELLER_NAME as BRAND_NAME } from "./shared/identity.mjs";
 import { training } from "./shared/training.mjs";
-const { pack } = training.openPage("roleplay");
-document.getElementById("packNotice").textContent = pack.disclaimer;
+const packs = training.listPacks();
+training.observeSelection(selection => {
+  const pack = packs.find(pack => pack.id === selection.packId);
+  const available = pack && selection.status !== 'blocked';
+  document.getElementById('selectionNotice').textContent = selection.message;
+  document.getElementById('currentPack').textContent = available ? `Current pack: ${pack.label}` : 'Content unavailable';
+  document.querySelectorAll('.card').forEach(link => {
+    link.hidden = !available;
+    link.style.display = available ? '' : 'none';
+  });
+  if (!available) { document.getElementById('packNotice').textContent = ''; return; }
+  const scenarios = pack.roleplay.scenarios;
+  const categories = pack.jeopardy.categories;
+  const clueCount = categories.reduce((total, category) => total + category.clues.length, 0);
+  document.getElementById('quizSummary').textContent = `${pack.label} quiz. ${categories.length} categories, with Daily Doubles and Final Jeopardy.`;
+  document.getElementById('roleplaySummary').textContent = scenarios.map(scenario => scenario.persona.industry).join(' · ');
+  document.getElementById('clueCount').textContent = `${clueCount} clues + Final`;
+  document.getElementById('scenarioCount').textContent = `${scenarios.length} personas`;
+  document.getElementById('customerPreview').textContent = scenarios[0].persona.quote;
+  document.getElementById('scenarioPreview').textContent = scenarios[0].title;
+  const preview = document.querySelector('.mini');
+  preview.replaceChildren();
+  for (const category of categories) {
+    const heading = document.createElement('span'); heading.className = 'h'; heading.textContent = category.name; preview.append(heading);
+  }
+  for (const value of [100, 200]) for (const category of categories) {
+    if (category.clues.length >= value / 100) { const tile = document.createElement('span'); tile.textContent = `$${value}`; preview.append(tile); }
+  }
+  document.getElementById('packNotice').textContent = pack.disclaimer;
+});
 document.querySelectorAll('.brandInline').forEach(e => e.textContent = BRAND_NAME);
 document.title = BRAND_NAME + " · AI Seller Academy";
 </script>

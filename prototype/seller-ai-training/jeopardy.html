@@ -175,6 +175,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 input[type=number]{-moz-appearance:textfield;appearance:textfield}
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,204,77,.7)}50%{box-shadow:0 0 0 10px rgba(255,204,77,0)}}
 @media (max-height:820px){.team{padding:8px 12px}.cat{font-size:clamp(12px,1.2vw,20px)}}
+a.ctl{text-decoration:none;color:var(--ink)}
+.packNav{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.packNav:empty{display:none}
+.ctl:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -185,6 +190,8 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
       <div><h1>AI DEAL <span>JEOPARDY!</span></h1><small><span class="brandInline">CDW</span> &middot; Seller Academy</small></div>
     </div>
     <div class="controls">
+      <a class="ctl" href="index.html">Home</a>
+      <a class="ctl" href="settings.html" target="_blank" rel="noopener" title="Settings opens in a new tab">Settings</a>
       <button class="ctl" id="timerBtn" title="Countdown timer on clues (T)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg>
         <span id="timerLbl">Timer off</span>
@@ -200,6 +207,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 
   <p id="packNotice" style="color:var(--muted);font-size:12px;line-height:1.4"></p>
   <p id="selectionNotice" role="status" style="color:var(--muted);font-size:12px;line-height:1.4"></p>
+  <div class="packNav"><button class="ctl openSelected" hidden>Open selected pack</button></div>
   <p id="saveNotice" role="status" style="color:var(--gold);font-size:13px;line-height:1.4"></p>
   <button class="ctl" id="replaceSave" style="display:none">Start fresh saved game</button>
 
@@ -223,6 +231,8 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
         <div class="cluehead">
           <span class="chip" id="clueCat">Category</span>
           <div style="display:flex;align-items:center;gap:12px">
+            <a class="ctl" href="settings.html" target="_blank" rel="noopener" title="Settings opens in a new tab">Settings</a>
+            <button class="ctl openSelected" hidden>Open selected pack</button>
             <span class="timernum" id="timerNum"></span>
             <span class="chip val" id="clueVal">$100</span>
             <button class="closex" id="closeClue" title="Back to board (Esc)">&times;</button>
@@ -284,8 +294,21 @@ let pageState;
 try { pageState = training.openPage("jeopardy"); }
 catch (error) { document.getElementById("saveNotice").textContent = error.message; throw error; }
 const { pack } = pageState;
-training.observeSelection(selection => {
+function updateSelection(selection) {
   document.getElementById("selectionNotice").textContent = pageState.selectionNotice(selection);
+  document.querySelectorAll('.openSelected').forEach(button => {
+    button.hidden = !selection.valid || selection.packId === pack.id;
+  });
+}
+training.observeSelection(updateSelection);
+document.addEventListener('click', event => {
+  if (!event.target.closest('.openSelected')) return;
+  if (!confirm('Only saved board progress persists. Unsaved changes, the open clue, and the Final stage will be lost. Open selected pack?')) return;
+  setTimeout(() => {
+    const selected = training.readSelection();
+    updateSelection(selected);
+    if (selected.valid && selected.packId !== pack.id) location.reload();
+  }, 0);
 });
 document.getElementById("packNotice").textContent = pack.disclaimer;
 const CATEGORIES = pack.jeopardy.categories;
@@ -580,7 +603,8 @@ function renderFinal(){
       podOrder.map(t => { const rank = order.indexOf(t); return `<div class="pod"><div class="nm">${esc(t.name)}</div><div class="sc">${fmt(t.score)}</div><div class="bar" style="height:${heights[rank]}vh;background:${rank === 0 ? "linear-gradient(180deg,#ffe082,#ffb020)" : "linear-gradient(180deg," + TEAM_COLORS[t.i] + ",rgba(255,255,255,.25))"};animation-delay:${.2 + (3 - rank) * .15}s">${rank + 1}</div></div>`; }).join("") +
       `</div><div class="cluefoot"><button class="btn ghost" id="fBack">Back to board</button><button class="btn gold" id="fNew">Play again</button></div>`;
   }
-  f.innerHTML = h;
+  f.innerHTML = `<div class="packNav"><a class="ctl" href="settings.html" target="_blank" rel="noopener" title="Settings opens in a new tab">Settings</a><button class="ctl openSelected" hidden>Open selected pack</button></div>` + h;
+  updateSelection(training.readSelection());
   const nx = $("fNext"), bk = $("fBack"), nw = $("fNew");
   if (nx) nx.onclick = finalNext; if (bk) bk.onclick = closeFinal; if (nw) nw.onclick = () => { closeFinal(); resetGame(true); };
   f.querySelectorAll("input[data-i]").forEach(inp => inp.oninput = () => { F.wagers[+inp.dataset.i] = +inp.value || 0; });
@@ -672,6 +696,7 @@ document.addEventListener("keydown", e => {
     } else if (e.key === "Escape") { t.blur(); if (cur && !t.isContentEditable) closeClue(); else if (F && !t.isContentEditable) closeFinal(); }
     return;
   }
+  if ((e.key === 'Enter' || e.key === ' ') && t.closest('a, .openSelected')) return;
   const k = e.key.toLowerCase();
   const digit = /^(Digit|Numpad)([1-4])$/.exec(e.code);
   if ($("help").classList.contains("show")) { if (k === "escape" || k === "?" || k === "enter") { e.preventDefault(); toggleHelp(false); } return; }

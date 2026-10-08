@@ -75,6 +75,72 @@ async function measure(browser, origin, activity, packId, verifyPack) {
   } finally { await context.close(); }
 }
 
+async function measureSettings(browser, origin, activity, packId, version) {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  try {
+    const page = await context.newPage();
+    await page.route('https://fonts.googleapis.com/**', route => route.abort());
+    await page.route('https://fonts.gstatic.com/**', route => route.abort());
+    await page.addInitScript(({ activity, packId, version }) => {
+      if (location.protocol !== 'http:') return;
+      if (location.pathname === '/settings.html' && localStorage.getItem('aiTraining.selection.v1') === null) {
+        localStorage.setItem('aiTraining.selection.v1', JSON.stringify({ schema: 1, packId: packId === 'fsi' ? 'default' : 'fsi' }));
+      }
+      document.addEventListener('click', event => {
+        const link = event.target.closest('a');
+        if (link && ((version === 'candidate' && link.id === 'returnHome') || (version === 'baseline' && link.getAttribute('href') === `${activity}.html`))) {
+          sessionStorage.setItem('journeyStart', String(performance.timeOrigin + performance.now()));
+        }
+        if (event.target.closest('#saveSelection')) {
+          const start = performance.now();
+          const observer = new MutationObserver(() => {
+            if (document.querySelector('#saveStatus')?.textContent.includes('selected for both activities')) {
+              window.__saveFeedbackMs = performance.now() - start;
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.getElementById('saveStatus'), { childList: true, subtree: true, characterData: true });
+        }
+      }, true);
+      if (location.pathname !== `/${activity}.html`) return;
+      function ready() {
+        const usable = activity === 'jeopardy' ? document.querySelectorAll('#board .tile').length === 30 : document.querySelectorAll('#personas .pcard').length === 4;
+        const pinned = version === 'baseline' || document.querySelector('#selectionNotice')?.textContent.includes(`Current pack: ${packId === 'fsi' ? 'FSI' : 'Default'}.`);
+        if (usable && pinned) window.__journeyMs = performance.timeOrigin + performance.now() - Number(sessionStorage.getItem('journeyStart'));
+        else requestAnimationFrame(ready);
+      }
+      requestAnimationFrame(ready);
+    }, { activity, packId, version });
+    const errors = [];
+    const requests = [];
+    let route = '';
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('requestfailed', request => { if (request.url().startsWith(origin)) errors.push(`${request.url()} ${request.failure()?.errorText}`); });
+    page.on('response', response => { if (response.url().startsWith(origin) && response.status() >= 400) errors.push(`${response.url()} ${response.status()}`); });
+    page.on('request', request => {
+      if (!request.url().startsWith(origin)) return;
+      if (request.isNavigationRequest()) route = new URL(request.url()).pathname;
+      requests.push({ route, path: new URL(request.url()).pathname });
+    });
+    let saveFeedbackMs = null;
+    if (version === 'candidate') {
+      await page.goto(`${origin}/settings.html`);
+      await page.locator(`input[value="${packId}"]`).check();
+      await page.locator('#saveSelection').click();
+      await page.waitForFunction(() => Number.isFinite(window.__saveFeedbackMs));
+      saveFeedbackMs = await page.evaluate(() => window.__saveFeedbackMs);
+      await page.locator('#returnHome').click();
+      await page.waitForFunction(() => document.querySelector('#currentPack')?.textContent.startsWith('Current pack:'));
+    } else { await page.goto(`${origin}/index.html`); }
+    await page.locator(`a[href="${activity}.html"]`).click({ force: true });
+    await page.waitForFunction(() => Number.isFinite(window.__journeyMs));
+    const usableMs = await page.evaluate(() => window.__journeyMs);
+    if (errors.length) throw new Error(JSON.stringify(errors));
+    const requestsPerRoute = Object.fromEntries([...new Set(requests.map(request => request.route))].map(route => [route, requests.filter(request => request.route === route).length]));
+    return { usableMs, saveFeedbackMs, requestsPerRoute, totalJourneyRequests: requests.length, requests };
+  } finally { await context.close(); }
+}
+
 async function measureStorage(browser, origin, version) {
   const context = await browser.newContext();
   try {
@@ -149,6 +215,25 @@ try {
       }
     }
   }
+  const settings = {};
+  if (args.includes('--settings')) {
+    for (const packId of packs) for (const activity of ['jeopardy', 'roleplay']) {
+      const versions = { baseline: [], candidate: [] };
+      for (let sample = 0; sample < samples; sample++) {
+        for (const version of sample % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
+          versions[version].push(await measureSettings(browser, servers[version].origin, activity, packId, version));
+        }
+      }
+      const baselineP95Ms = p95(versions.baseline.map(item => item.usableMs));
+      const candidateP95Ms = p95(versions.candidate.map(item => item.usableMs));
+      const saveFeedbackP95Ms = p95(versions.candidate.map(item => item.saveFeedbackMs));
+      const maxFirstPartyRequestsPerRoute = Math.max(...versions.candidate.flatMap(item => Object.values(item.requestsPerRoute)));
+      settings[`${packId}.${activity}`] = { baselineP95Ms, candidateP95Ms, deltaMs: candidateP95Ms - baselineP95Ms, saveFeedbackP95Ms,
+        maxFirstPartyRequestsPerRoute, maxTotalJourneyRequests: Math.max(...versions.candidate.map(item => item.totalJourneyRequests)),
+        passed: saveFeedbackP95Ms <= 100 && candidateP95Ms <= 1000 && candidateP95Ms - baselineP95Ms <= 150 && maxFirstPartyRequestsPerRoute <= 10,
+        measurements: versions };
+    }
+  }
   const summary = {};
   for (const [activity, versions] of Object.entries(measurements)) {
     const before = p95(versions.baseline.map(item => item.usableMs));
@@ -164,10 +249,11 @@ try {
   const report = { samplesPerRoutePerVersion: samples, packs, baselineComparison: 'Each requested candidate pack uses an actual cold baseline Default entry screen. No synthetic FSI baseline is claimed.', browser: browser.version(), viewport: { width: 1440, height: 900 },
     fontsBlocked: true, coldContexts: true, baseline: { path: resolve(baseline), sha: sha(baseline) },
     candidate: { path: resolve(candidate), sha: sha(candidate), dirty: Boolean(execFileSync('git', ['-C', resolve(candidate), 'status', '--porcelain'], { encoding: 'utf8' }).trim()) },
-    summary, storage, order };
+    settingsComparison: 'Baseline Home activity click to usable game. Candidate Return to Home click in Settings, then activity click to usable game. Save feedback runs from Save click to status mutation. Requests count every first-party request per document route and across the full journey.',
+    summary, storage, settings, order };
   if (option('--output')) await writeFile(resolve(option('--output')), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
-  if (!Object.values(summary).every(item => item.passed) || !Object.values(storage).every(item => item.passed)) process.exitCode = 1;
+  if (!Object.values(summary).every(item => item.passed) || !Object.values(storage).every(item => item.passed) || !Object.values(settings).every(item => item.passed)) process.exitCode = 1;
 } finally {
   if (browser) await browser.close();
   for (const instance of Object.values(servers)) await instance.close();
