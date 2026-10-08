@@ -86,7 +86,7 @@ test('Plain-language checks reject an oversized answer and excessive coaching.',
 
 const answerMeaning = [
   [/redoing document work/, /where it happens/, /what goes wrong/],
-  [/why the trials stopped/, /useful job/, /sponsor/, /owner for live business use/],
+  [/why the trials stopped/, /useful job/, /sponsor/, /someone responsible for running it/],
   [/tools are chosen/, /rarely used/, /access/, /training/, /review work/],
   [/sponsor and budget/, /Security approval/, /owner for approved data/],
   [/repeated questions/, /supported system/, /FirstTouch AI.*Do not promise it can issue refunds/],
@@ -109,7 +109,7 @@ const answerMeaning = [
   [/does not qualify/, /approved existing system/, /existing NVIDIA AI Enterprise subscription/],
   [/NVIDIA GPU Cluster Assessment/, /existing system/, /current service coverage/],
   [/each job/, /data location/, /response speed/, /software choice/, /total cost/],
-  [/NVIDIA design with limited data/, /not the whole archive/, /approval for live business use/],
+  [/NVIDIA design with limited data/, /not the whole archive/, /approval for staff to rely on it/],
   [/before the trial/, /what to measure/, /continuing or stopping/, /Agree with the owner/],
   [/total time including review/, /corrections/, /actual use/, /consent and advisor approval/],
   [/32 percent counts respondents/, /not a financial return/, /customer guarantee/],

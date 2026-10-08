@@ -218,7 +218,8 @@ test('Lane 4. Wealth keeps consent, advisor approval, and useful adoption explic
 
 test('Lane 5. Payments qualifies the platform before FirstTouch AI and rejects payment guarantees.', async ({ page }) => {
   const trace = await meeting(page, 'fsi-payments');
-  expect(trace[0].response).toContain('Which system have you chosen for handling customer calls and messages');
+  expect(trace[0].response).toContain('Which phone system do you use');
+  expect(trace[0].response).toContain('When a call reaches your team, what information can they already see');
   expect(trace[1].response).toContain('Five9');
   expect(trace[2].coaching).toContain('without evidence of widespread use');
   await expect(page.locator('#debrief')).toContainText('Authority to issue refunds stays separate');
