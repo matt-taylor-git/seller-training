@@ -60,7 +60,7 @@ test('The 11 reviewed option lists stay inside complete questions.', () => {
 test('Bank eligibility and risk review retain their specific requirements.', () => {
   const bank = fsi.roleplay.scenarios[0];
   assert.match(bank.nodes.b3.ch[0].t, /security, finance, and your model-risk team/);
-  assert.match(bank.nodes.b3.ch[0].t, /finance checks running costs and model risk checks whether the model gives reliable answers for lending staff/);
+  assert.match(bank.nodes.b3.ch[0].t, /Finance would check running costs while your model-risk team checks whether the software gives reliable answers for lending staff/);
   assert.match(bank.nodes.b3.ch[0].fb, /Security checks data protection, the model-risk team checks model reliability and suitability, and finance checks costs/);
   assert.match(bank.nodes.b5.ch[0].fb, /existing NVIDIA DGX or approved manufacturer system with NVIDIA graphics processing units, plus an existing NVIDIA AI Enterprise subscription/);
   assert.match(bank.nodes.b6.ch[0].t, /That isn't approval for staff to rely on it/);

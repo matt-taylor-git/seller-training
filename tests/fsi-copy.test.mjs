@@ -85,7 +85,7 @@ test('Plain-language checks reject an oversized answer and excessive coaching.',
 });
 
 const answerMeaning = [
-  [/redoing document work/, /where it happens/, /what goes wrong/],
+  [/repetitive document work/, /how long copying takes/, /what goes wrong/],
   [/why the trials stopped/, /useful job/, /sponsor/, /someone responsible for running it/],
   [/tools are chosen/, /rarely used/, /access/, /training/, /review work/],
   [/sponsor and budget/, /Security approval/, /owner for approved data/],
@@ -110,10 +110,10 @@ const answerMeaning = [
   [/NVIDIA GPU Cluster Assessment/, /existing system/, /current service coverage/],
   [/each job/, /data location/, /response speed/, /software choice/, /total cost/],
   [/NVIDIA design with limited data/, /not the whole archive/, /approval for staff to rely on it/],
-  [/before the trial/, /what to measure/, /continuing or stopping/, /Agree with the owner/],
+  [/before the test/, /what to measure/, /continue or stop/, /Agree with the claims lead/],
   [/total time including review/, /corrections/, /actual use/, /consent and advisor approval/],
   [/32 percent counts respondents/, /not a financial return/, /customer guarantee/],
-  [/AI Value Assurance is not available yet/, /starting measures/, /current assessments or Accelerator results/],
+  [/AI Value Assurance isn't available yet/, /starting measures/, /suitable assessment or test results/],
   [/Stop or change/, /quality and cost limits/, /Do not remove review/],
   [/Sort incoming documents with human review/, /Delays and conflicting numbers/, /AI Readiness Data Quality Assessment/, /compliance, security, and finance owners/, /guarantees neither approval nor savings/]
 ];

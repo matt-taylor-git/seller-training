@@ -43,4 +43,24 @@ test('Measure-before-test clue names the staff, copying task, source, and destin
   assert.match(clue.a, /before the (?:test|trial)/);
   assert.match(clue.why, /copying/);
   assert.doesNotMatch(clue.why, /queue/);
+  assert.match(clue.a, /claims lead/);
+});
+
+test('Insurance plans measurements for next month rather than requesting results that do not exist.', () => {
+  assert.match(spoken(insurance.nodes.i6.c), /start measuring.*next month/);
+  assert.match(insurance.nodes.i7.ch[0].t, /agree what to measure next month/);
+  assert.doesNotMatch(insurance.nodes.i7.ch[0].t, /today.s measurements/);
+});
+
+test('The copying clue distinguishes repetitive work from confirmed rework.', () => {
+  const clue = fsi.jeopardy.categories[0].clues[0];
+  assert.match(clue.a, /repetitive document work/);
+  assert.doesNotMatch(`${clue.a} ${clue.why}`, /redoing|staff repeat work/);
+});
+
+test('Cost evidence names a suitable assessment or technical test rather than unexplained Accelerator results.', () => {
+  const clue = fsi.jeopardy.categories[5].clues[3];
+  assert.match(clue.a, /suitable assessment or test results/);
+  assert.match(clue.why, /AI Factory Accelerator.s technical test/);
+  assert.match(clue.why, /not guarantee savings/);
 });
