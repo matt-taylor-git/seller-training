@@ -14,6 +14,12 @@ Read [DESIGN.md](DESIGN.md) for the customer role-playing page and Settings scre
 
 ## Try the prototypes
 
+Open [the hosted training app](https://matt-taylor-git.github.io/seller-training/) to use it without a local server. Choose **FSI v2** in **Settings** and save your choice to use the supplied financial-services curriculum.
+
+GitHub Pages publishes `prototype/seller-ai-training` through `.github/workflows/pages.yml` when `main` changes. Repository documentation, tests, and authoring evidence are outside the deployed site. Settings and progress stay in each browser. The hosted site has separate browser storage from the local server.
+
+To run the app locally:
+
 From the repository root, run:
 
 ```sh
