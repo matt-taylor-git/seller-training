@@ -1,0 +1,1375 @@
+import { deepFreeze } from '../shared/pack-contract.mjs';
+import { SELLER_NAME } from '../shared/identity.mjs';
+
+/** @type {import('../shared/pack-contract.mjs').ContentPack} */
+const defaultPack = {
+  "id": "default",
+  "revision": 1,
+  "label": "Default",
+  "description": "Practice discovery and qualification with the original fictional customers.",
+  "disclaimer": "Fictional training scenarios. Default's illustrative offers are not a verified CDW catalog.",
+  "roleplay": {
+    "scenarios": [
+      {
+        "id": "cfo",
+        "full": true,
+        "difficulty": 3,
+        "turns": 7,
+        "title": "The Skeptical CFO",
+        "persona": {
+          "name": "Diane Mercer",
+          "initials": "DM",
+          "role": "Chief Financial Officer",
+          "company": "Brightline Components",
+          "industry": "Manufacturing",
+          "size": "$420M revenue · 3 plants · 1,800 employees",
+          "quote": "Every vendor says AI will transform us. Show me the numbers.",
+          "goals": [
+            "Protect margins while material costs are up 11%",
+            "Shorten the 9-day month-end close",
+            "Avoid another failed technology project"
+          ],
+          "personality": [
+            "Numbers-first",
+            "Skeptical",
+            "Short on time",
+            "Respects candor"
+          ],
+          "pains": [
+            "AP team keys in ~9,000 invoices a month; three-way-match exceptions eat half their week",
+            "Late fees and missed early-pay discounts cost ~$580K a year",
+            "Last year's $250K analytics pilot never reached production",
+            "Vendor master data is messy; finance and IT disagree on who owns it"
+          ]
+        },
+        "mission": "Win the CFO's trust, find a use case she can quantify, and leave with a concrete, low-risk next step.",
+        "start": "c1",
+        "nodes": {
+          "c1": {
+            "c": "I've got twenty minutes. Honestly, every vendor that walks in here says AI will transform us. [[Last year we spent $250K on an analytics pilot that never made it out of IT.|red|Failed prior initiative: skepticism and pilot-purgatory risk]] So convince me why this is different.",
+            "ch": [
+              {
+                "t": "That's fair. Honestly, I'd rather not pitch you yet. Can I ask what happened with that pilot, and what you'd need to see to call an AI investment a success?",
+                "q": "best",
+                "s": {
+                  "d": 12,
+                  "l": 12,
+                  "t": 12
+                },
+                "next": "c2",
+                "fb": "You named the skepticism and turned it into discovery. Asking about the failed pilot shows you were listening, and it gets you the success criteria you'll need later."
+              },
+              {
+                "t": "We're different because we partner with all the major hyperscalers and model vendors, so we can bring the best technology.",
+                "q": "meh",
+                "s": {
+                  "p": 2,
+                  "t": -5,
+                  "l": -5
+                },
+                "next": "c1b",
+                "fb": "Partnerships matter later, but leading with credentials ignores her concern. A skeptical CFO hears \"more tech\", not \"less risk\"."
+              },
+              {
+                "t": "AI has come a long way since last year. Generative AI changes everything! Let me show you a quick demo.",
+                "q": "bad",
+                "s": {
+                  "t": -12,
+                  "l": -10,
+                  "d": -8
+                },
+                "next": "c1b",
+                "fb": "Hype plus a demo is exactly what she's tired of. You brushed past her experience and skipped discovery entirely."
+              },
+              {
+                "t": "Totally understand. We focus on outcomes. What are your top financial priorities this year?",
+                "q": "good",
+                "s": {
+                  "d": 8,
+                  "l": 2,
+                  "t": 4
+                },
+                "next": "c2",
+                "fb": "Pivoting to her priorities is good, but you skipped the failed pilot. That was a chance to learn what went wrong and show you heard her."
+              }
+            ]
+          },
+          "c1b": {
+            "c": "Hm. [[That's exactly what the last firm told us.|red|Trust is slipping: you sound like the vendor who failed her]] Look, my priority is margins. Material costs are up 11% and I can't add headcount.",
+            "ch": [
+              {
+                "t": "That's helpful, and I'll drop the pitch. With costs up and no new headcount, where is your team spending the most time on manual work right now?",
+                "q": "best",
+                "s": {
+                  "d": 10,
+                  "l": 8,
+                  "t": 8
+                },
+                "next": "c2",
+                "fb": "Good recovery. You admitted the misstep and asked an open discovery question tied to the constraint she just gave you."
+              },
+              {
+                "t": "AI can definitely help with margins. Most of our clients see 30% cost savings.",
+                "q": "bad",
+                "s": {
+                  "t": -10,
+                  "p": -4
+                },
+                "next": "c2",
+                "fb": "An unsupported statistic to a CFO who is already skeptical? She'll ask for proof you can't give yet. Earn the right to quote numbers."
+              },
+              {
+                "t": "Understood. Would it help if I shared how a similar manufacturer cut costs with AI?",
+                "q": "good",
+                "s": {
+                  "p": 4,
+                  "t": 2
+                },
+                "next": "c2",
+                "fb": "References are powerful, but this one is premature. You don't know her pain yet, so you can't choose the right story."
+              }
+            ]
+          },
+          "c2": {
+            "c": "Fine. Where it hurts? [[Accounts payable. We process about 9,000 supplier invoices a month and my team keys most of them in by hand.|pain|Manual, high-volume document work: a classic document-processing use case]] [[Three-way-match exceptions eat up half their week.|pain|Quantifiable pain: the cost of exception handling]] And month-end close takes nine days.",
+            "ch": [
+              {
+                "t": "Nine thousand a month with manual keying and match exceptions. That's real cost. What does an exception cost you today in hours or late-payment penalties, and are you missing early-pay discounts?",
+                "q": "best",
+                "s": {
+                  "d": 12,
+                  "l": 12,
+                  "u": 8
+                },
+                "next": "c3",
+                "fb": "You played back her numbers (listening) and dug in to quantify the pain. That's the ROI case a CFO needs to say yes."
+              },
+              {
+                "t": "That sounds like a perfect fit for intelligent document processing. We've done that for lots of manufacturers.",
+                "q": "good",
+                "s": {
+                  "u": 12,
+                  "d": -2,
+                  "p": 4
+                },
+                "next": "c3",
+                "fb": "You spotted the right use case! But jumping to the solution before quantifying the pain leaves you with no business case."
+              },
+              {
+                "t": "Have you thought about outsourcing AP to a shared-services provider?",
+                "q": "meh",
+                "s": {
+                  "u": -6,
+                  "p": -6
+                },
+                "next": "c3",
+                "fb": "That's off track. It isn't our offer, and it ignores an AI opportunity that's sitting right in front of you."
+              },
+              {
+                "t": "We could build a gen AI chatbot that answers supplier questions about invoice status.",
+                "q": "bad",
+                "s": {
+                  "u": -8,
+                  "l": -8
+                },
+                "next": "c3",
+                "fb": "A chatbot doesn't touch the keying or match exceptions, which is the real pain. That's solution-first selling."
+              }
+            ]
+          },
+          "c3": {
+            "c": "Late fees run maybe $180K a year, and [[we miss most early-payment discounts. That's another $400K on the table.|buy|Quantified value: a business case a CFO can take to the CEO]] Invoices come in every format: PDFs, scans, even faxes. [[Our ERP is SAP, but half the vendor master data is a mess.|ready|Data readiness cue: poor vendor master data quality]]",
+            "ch": [
+              {
+                "t": "So that's roughly $580K in hard savings before we even count staff time. The messy vendor master data matters, because extraction accuracy depends on it. Who owns that data today, and would cleaning it up be in scope?",
+                "q": "best",
+                "s": {
+                  "l": 12,
+                  "u": 8,
+                  "d": 8,
+                  "p": 6
+                },
+                "next": "c4",
+                "fb": "You summarized the value AND caught the data-readiness cue. That positions data foundation work naturally instead of hiding the risk."
+              },
+              {
+                "t": "Modern document AI handles PDFs, scans and faxes, and we'd integrate it right into SAP.",
+                "q": "good",
+                "s": {
+                  "u": 6,
+                  "p": 6,
+                  "l": -2
+                },
+                "next": "c4",
+                "fb": "Reassuring and true, but you skipped right past her warning about data quality. That risk will come back later."
+              },
+              {
+                "t": "Great. So we can promise you $580K in savings in the first year.",
+                "q": "bad",
+                "s": {
+                  "t": -12,
+                  "p": -6
+                },
+                "next": "c4",
+                "fb": "Over-promising to a skeptic is the fastest way to lose her. Use her numbers to build a case together, not to make guarantees."
+              }
+            ]
+          },
+          "c4": {
+            "c": "IT owns SAP and finance owns the vendor data, which is part of the problem. [[My CIO, Tom, is cautious. He'll want to know about security and where our data goes.|red|Stakeholder risk: CIO and security approval needed]] [[If I bring this to our CEO, I need numbers that hold up.|buy|Path to an executive sponsor: the CEO needs a defensible case]]",
+            "ch": [
+              {
+                "t": "Then let's bring Tom in early rather than surprise him. We deploy inside your own cloud tenant with access controls and an AI governance framework. What if we built the business case together, with numbers both Tom and your CEO can sign off on?",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "t": 12,
+                  "l": 8
+                },
+                "next": "c5",
+                "fb": "You pulled a potential blocker in early, answered security directly, and offered to co-create the business case. That's textbook multi-threading."
+              },
+              {
+                "t": "Security is built into all of our hyperscaler partners' platforms. Tom won't have any concerns.",
+                "q": "meh",
+                "s": {
+                  "p": 4,
+                  "t": -4
+                },
+                "next": "c5",
+                "fb": "Partner security is real, but waving off the CIO's concerns sounds naive. Governance is about more than the platform."
+              },
+              {
+                "t": "Maybe we start without IT and show results first?",
+                "q": "bad",
+                "s": {
+                  "t": -10,
+                  "p": -8
+                },
+                "next": "c5",
+                "fb": "A shadow project with finance data and an SAP integration is a big red flag. Going around the CIO kills deals later, and it kills trust now."
+              }
+            ]
+          },
+          "c5": {
+            "c": "Okay. So what are you actually proposing? [[I won't sign a seven-figure transformation program.|red|Budget constraint: avoid big-bang proposals]] [[But if you can show me something real in a quarter, I have discretionary budget.|buy|Budget and timeline: discretionary funds for fast, proven value]]",
+            "ch": [
+              {
+                "t": "Here's what I'd suggest: a two-week AI value assessment focused on AP. We validate the $580K case, check data readiness, and design a 90-day pilot on your top three invoice types, with success metrics agreed up front and a clear path to production. Not another lab experiment.",
+                "q": "best",
+                "s": {
+                  "p": 15,
+                  "u": 8,
+                  "t": 8
+                },
+                "next": "c6",
+                "fb": "Right-sized and low-risk, it deals with her pilot-purgatory scar directly and ties to her metric and timeline."
+              },
+              {
+                "t": "We'd start with a pilot on invoice processing and see how it goes.",
+                "q": "good",
+                "s": {
+                  "p": 5,
+                  "u": 4
+                },
+                "next": "c6",
+                "fb": "Right direction, but too vague. \"See how it goes\" is what killed her last pilot. Define success criteria and the path to production."
+              },
+              {
+                "t": "Our full AI transformation program covers strategy, data, platform and 12 use cases. It's the best way to get value at scale.",
+                "q": "bad",
+                "s": {
+                  "l": -12,
+                  "p": -8,
+                  "t": -6
+                },
+                "next": "c6",
+                "fb": "She just told you she won't sign a big program. This shows you weren't listening."
+              },
+              {
+                "t": "We could do a free proof of concept so there's no risk to you.",
+                "q": "meh",
+                "s": {
+                  "p": -2,
+                  "t": 2
+                },
+                "next": "c6",
+                "fb": "Free POCs rarely get executive attention or reach production, which is exactly what happened last time. A small, paid, outcome-scoped engagement beats free."
+              }
+            ]
+          },
+          "c6": {
+            "c": "Hm. And when this goes live, who maintains it? [[I don't want to hire data scientists.|pain|Skills gap: no in-house ML talent, so position managed services]] [[And my AP team is nervous they'll be replaced.|red|Adoption risk: people fear job loss, so plan change management]]",
+            "ch": [
+              {
+                "t": "Two parts. We can run it as a managed service: monitoring accuracy, retraining models and handling SAP updates, so you don't need a data science team. And for your AP team, we include change management. They become exception handlers and supplier-relationship owners instead of keyers. Teams usually welcome losing the tedious work.",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "t": 10,
+                  "l": 6
+                },
+                "next": "c7",
+                "fb": "You covered both concerns: managed services for the skills gap and change management for the people. That's how pilots become production."
+              },
+              {
+                "t": "We'll train your IT team to maintain it.",
+                "q": "good",
+                "s": {
+                  "p": 4,
+                  "l": -2
+                },
+                "next": "c7",
+                "fb": "Enablement is valuable, but she just said she doesn't want data scientists, and you ignored the AP team's anxiety."
+              },
+              {
+                "t": "Honestly, with AI you'll be able to cut AP headcount in half.",
+                "q": "bad",
+                "s": {
+                  "t": -12,
+                  "l": -8
+                },
+                "next": "c7",
+                "fb": "She raised her team's fear and you confirmed it. That sinks adoption and her trust in you."
+              }
+            ]
+          },
+          "c7": {
+            "c": "Alright. [[You've been more practical than most.|buy|Trust earned: she's open to a next step]] What's the next step?",
+            "ch": [
+              {
+                "t": "Let's set up 60 minutes next week with you, Tom and your AP manager to scope the assessment. I'll bring a draft business case using the numbers you shared, plus a one-page overview of our security and governance approach for Tom.",
+                "q": "best",
+                "s": {
+                  "p": 10,
+                  "t": 8,
+                  "d": 4
+                },
+                "next": "end",
+                "fb": "A specific next step with the right stakeholders, and each asset is matched to a concern she raised. Strong close."
+              },
+              {
+                "t": "I'll send you a proposal by Friday.",
+                "q": "good",
+                "s": {
+                  "p": 4
+                },
+                "next": "end",
+                "fb": "Fine, but it's single-threaded. A proposal without Tom and the AP manager aligned will stall."
+              },
+              {
+                "t": "Can we get a signature on a full pilot SOW this week?",
+                "q": "bad",
+                "s": {
+                  "t": -10,
+                  "p": -4
+                },
+                "next": "end",
+                "fb": "That pushes too hard, too soon, for a skeptical buyer who still needs her CIO and CEO on board."
+              }
+            ]
+          }
+        },
+        "outcomes": {
+          "great": {
+            "title": "Deal advanced: scoping session booked",
+            "text": "Diane books the session, loops in Tom and her AP manager, and asks for the business case template. You're on track for a paid assessment."
+          },
+          "ok": {
+            "title": "Interested but cautious",
+            "text": "Diane asks for a proposal but hasn't committed stakeholders. The deal could stall without stronger discovery and multi-threading."
+          },
+          "poor": {
+            "title": "Polite exit",
+            "text": "Diane thanks you for your time and says she'll \"reach out if anything changes.\" You sounded like the last vendor."
+          }
+        },
+        "useCases": [
+          "Intelligent document processing for accounts payable (invoice extraction, three-way-match exception handling, SAP integration)",
+          "Later phase: cash and working-capital forecasting to capture early-pay discounts"
+        ],
+        "offering": {
+          "headline": "AI Value Assessment → 90-day pilot-to-production → Managed AI service",
+          "steps": [
+            "2-week assessment: validate the ~$580K business case and data readiness",
+            "Data foundation: vendor master clean-up and ownership model",
+            "IDP pilot on the top 3 invoice types with agreed KPIs and a production plan",
+            "Governance and security pack for the CIO, plus change management for the AP team",
+            "Managed service: monitoring, retraining, SAP updates"
+          ]
+        },
+        "takeaways": [
+          "Skeptics respond to curiosity, not credentials. Ask about the failed pilot first.",
+          "Quantify the pain in the customer's own numbers before naming a solution.",
+          "Treat data-quality comments as positioning opportunities, not obstacles.",
+          "Bring the CIO and security in early, because blockers become allies when included.",
+          "Right-size the first step: a short, paid, metric-driven engagement with a path to production."
+        ]
+      },
+      {
+        "id": "cio",
+        "full": true,
+        "difficulty": 2,
+        "turns": 7,
+        "title": "The Excited-but-Unfocused CIO",
+        "persona": {
+          "name": "Raj Patel",
+          "initials": "RP",
+          "role": "Chief Information Officer",
+          "company": "Harborview Community Bank",
+          "industry": "Regional Banking",
+          "size": "$9B assets · 60 branches · 2 recent acquisitions",
+          "quote": "We want to do AI. Like, everywhere. I've got a list of 23 ideas!",
+          "goals": [
+            "Show the board a credible AI strategy within 90 days",
+            "Keep up with a competitor's new AI app",
+            "Modernize without upsetting regulators"
+          ],
+          "personality": [
+            "Enthusiastic",
+            "Buzzword-heavy",
+            "Unfocused",
+            "Wants quick wins"
+          ],
+          "pains": [
+            "Contact center wait times hit 11 minutes and NPS is dropping",
+            "New agents take four months to ramp on a 600-page policy manual",
+            "Customer data is split across three CRMs after acquisitions",
+            "The Chief Risk Officer shut down a ChatGPT experiment after a data leak",
+            "Card fraud losses are up 30%"
+          ]
+        },
+        "mission": "Channel the CIO's enthusiasm into one prioritized, governed use case and a roadmap the board will believe.",
+        "start": "b1",
+        "nodes": {
+          "b1": {
+            "c": "Thanks for coming! So, we want to do AI. Like, everywhere. [[Our board asked me last month what our AI strategy is,|buy|Board-level pressure: urgency and likely executive sponsorship]] and honestly, [[our competitor across town just launched an AI assistant in their app.|buy|Competitive pressure: creates urgency]] I've got a list of 23 ideas!",
+            "ch": [
+              {
+                "t": "Love the energy. 23 ideas is a great problem to have. Before we dig into the list, what did the board actually ask for? Growth, efficiency, risk reduction, or just proof that you have a plan?",
+                "q": "best",
+                "s": {
+                  "d": 12,
+                  "l": 10,
+                  "t": 6
+                },
+                "next": "b2",
+                "fb": "You channeled his enthusiasm into outcome discovery. What the board asked for defines success and lets you prioritize later."
+              },
+              {
+                "t": "Great! Let's walk through all 23 and see which ones we can help with.",
+                "q": "good",
+                "s": {
+                  "d": 4,
+                  "u": 2
+                },
+                "next": "b2",
+                "fb": "Collaborative, but you'll drown in the list. You need prioritization criteria first, and those come from business outcomes."
+              },
+              {
+                "t": "Perfect. We can build you an assistant that's even better than your competitor's in eight weeks.",
+                "q": "bad",
+                "s": {
+                  "t": -8,
+                  "p": -8,
+                  "d": -6
+                },
+                "next": "b2",
+                "fb": "Copying a competitor's feature isn't a strategy, and promising eight weeks at a regulated bank without discovery is reckless."
+              },
+              {
+                "t": "What's your budget for AI this year?",
+                "q": "meh",
+                "s": {
+                  "d": 2,
+                  "t": -4
+                },
+                "next": "b2",
+                "fb": "Budget matters, but asking it first feels transactional this early. Earn it with value discovery first."
+              }
+            ]
+          },
+          "b2": {
+            "c": "The board wants efficiency and a better customer experience. [[Our contact center wait times hit 11 minutes last quarter|pain|Quantified customer-experience pain: points to a contact-center use case]] and NPS dropped. Oh, and I want gen AI for code, for marketing, for loan underwriting, for... everything.",
+            "ch": [
+              {
+                "t": "Eleven-minute waits with an NPS drop is something the board will feel. When calls run long, what slows your agents down: finding answers, jumping between systems, compliance checks?",
+                "q": "best",
+                "s": {
+                  "l": 12,
+                  "d": 10,
+                  "u": 8
+                },
+                "next": "b3",
+                "fb": "You zeroed in on the quantified pain tied to the board's goals and let the rest of the wish list wait."
+              },
+              {
+                "t": "Let's prioritize. We have a framework that scores use cases by value and feasibility.",
+                "q": "good",
+                "s": {
+                  "p": 8,
+                  "u": 4
+                },
+                "next": "b3",
+                "fb": "Right instinct, wrong moment. Prioritization works best after you understand the pain. Keep it for the next turn."
+              },
+              {
+                "t": "Loan underwriting with gen AI is really exciting. Let's start there.",
+                "q": "meh",
+                "s": {
+                  "u": -8,
+                  "p": -4
+                },
+                "next": "b3",
+                "fb": "Underwriting is a high-risk, heavily regulated use case (fair lending, explainability). It's a poor first step for a bank with no AI governance yet."
+              },
+              {
+                "t": "We can do all of those. We have accelerators for every one.",
+                "q": "bad",
+                "s": {
+                  "t": -6,
+                  "d": -8,
+                  "u": -6
+                },
+                "next": "b3",
+                "fb": "Feeding the lack of focus hurts your credibility. Saying yes to everything means you're not helping him choose."
+              }
+            ]
+          },
+          "b3": {
+            "c": "Agents juggle the core system, three CRMs and a 600-page policy manual on SharePoint. [[New hires take four months to get fully up to speed.|pain|Knowledge and onboarding pain: a fit for knowledge search or an agent copilot]] [[Customer data is spread across those CRMs after two acquisitions, and nobody's sure which one is right.|ready|Data readiness cue: fragmented customer data]]",
+            "ch": [
+              {
+                "t": "So there are two problems: agents can't find policy answers fast, and customer data is fragmented. An agent-assist copilot that searches your policy content and cites its sources could cut handle time and ramp-up quickly, and it doesn't need the CRM data fixed first. Does that match what you're seeing?",
+                "q": "best",
+                "s": {
+                  "u": 15,
+                  "l": 8,
+                  "p": 6
+                },
+                "next": "b4",
+                "fb": "You named a specific use case (RAG-based agent assist), separated it from the data-readiness problem, and checked your understanding."
+              },
+              {
+                "t": "Sounds like you need a data platform modernization before doing any AI.",
+                "q": "good",
+                "s": {
+                  "u": 2,
+                  "p": 4,
+                  "d": 2
+                },
+                "next": "b4",
+                "fb": "Data matters, but this stalls the quick win. Knowledge assist can start on documents while the data work runs in parallel."
+              },
+              {
+                "t": "A customer-facing chatbot would solve this, since customers wouldn't need agents at all.",
+                "q": "bad",
+                "s": {
+                  "u": -8,
+                  "t": -4
+                },
+                "next": "b4",
+                "fb": "Jumping to customer-facing gen AI at a bank with fragmented data and no governance is high-risk, and it misses the agents' pain."
+              }
+            ]
+          },
+          "b4": {
+            "c": "Yes! Exactly. But here's the thing: [[our Chief Risk Officer basically shut down a ChatGPT experiment last spring.|red|Governance blocker: risk and compliance must be engaged]] Someone pasted customer info into it.",
+            "ch": [
+              {
+                "t": "Honestly, she made the right call. The answer isn't to avoid AI, it's to govern it. We'd want her at the table early: private model deployment in your tenant, no customer data used for training, access controls, and a responsible-AI framework with human review. Would she be open to co-designing the guardrails?",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "t": 12,
+                  "l": 6
+                },
+                "next": "b5",
+                "fb": "You agreed with the risk, turned a blocker into a potential ally, and positioned governance as part of the solution."
+              },
+              {
+                "t": "Our partner's enterprise models don't train on your data, so that's not an issue anymore.",
+                "q": "meh",
+                "s": {
+                  "p": 2,
+                  "t": -4
+                },
+                "next": "b5",
+                "fb": "Mostly true, but dismissive. Governance is more than a vendor policy, and the CRO still needs to be engaged directly."
+              },
+              {
+                "t": "Maybe we keep the CRO out of it until we have a working demo?",
+                "q": "bad",
+                "s": {
+                  "t": -14,
+                  "p": -8
+                },
+                "next": "b5",
+                "fb": "At a regulated bank, going around risk will kill the deal and your credibility."
+              }
+            ]
+          },
+          "b5": {
+            "c": "She'd probably appreciate that, actually. [[I can get the COO to sponsor this if it moves call-center numbers.|buy|Potential executive sponsor (COO) tied to a measurable KPI]] What else should we look at? [[Card fraud losses are up 30%,|pain|Secondary use case: fraud detection]] too.",
+            "ch": [
+              {
+                "t": "Fraud is worth a look; it's a proven ML use case. I'd put both into a short AI strategy and prioritization workshop: we score your 23 ideas on value, feasibility and risk with your COO and CRO in the room. My bet is agent assist comes out as the quick win and fraud as a strong second wave.",
+                "q": "best",
+                "s": {
+                  "p": 14,
+                  "u": 8,
+                  "d": 4
+                },
+                "next": "b6",
+                "fb": "A workshop tames the 23 ideas, brings in the sponsor and the blocker together, and produces a roadmap that leads to the next deal."
+              },
+              {
+                "t": "Let's do fraud detection too. We can run both pilots in parallel.",
+                "q": "good",
+                "s": {
+                  "u": 6,
+                  "p": -2
+                },
+                "next": "b6",
+                "fb": "Ambitious, but parallel pilots will stretch a team that's just starting out. Sequence them on a roadmap."
+              },
+              {
+                "t": "We need to stay focused, so fraud is out of scope.",
+                "q": "meh",
+                "s": {
+                  "u": -4,
+                  "l": -4
+                },
+                "next": "b6",
+                "fb": "Focus is good, but dismissing a quantified pain throws away value. Park it on the roadmap instead."
+              }
+            ]
+          },
+          "b6": {
+            "c": "Love it. [[Can we have something live by end of quarter? I'm presenting to the board in 90 days.|buy|Hard deadline with board visibility: strong urgency]]",
+            "ch": [
+              {
+                "t": "Here's a realistic plan: the workshop in weeks 1–2, then an agent-assist pilot with one contact-center team by week 10, measured on handle time and ramp-up. You'd show the board a roadmap, real pilot results, and a governance model the CRO co-signed. Production rollout follows with MLOps monitoring.",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "t": 8,
+                  "u": 4
+                },
+                "next": "b7",
+                "fb": "Realistic, it hits his board date, and it builds in the path from pilot to production. That's a story he can tell."
+              },
+              {
+                "t": "Absolutely. We'll have the full solution in production in 90 days.",
+                "q": "bad",
+                "s": {
+                  "t": -10,
+                  "p": -4
+                },
+                "next": "b7",
+                "fb": "Over-promising. Governance reviews, integration and change management at a bank won't all fit in 90 days."
+              },
+              {
+                "t": "Ninety days is tight. Let's see after the workshop.",
+                "q": "good",
+                "s": {
+                  "t": 4,
+                  "p": -2
+                },
+                "next": "b7",
+                "fb": "Honest, but there's no plan. He needs a story for the board, so give him one with realistic milestones."
+              }
+            ]
+          },
+          "b7": {
+            "c": "This is way more focused than I expected. [[Who else do you need from my side?|buy|Asking about stakeholders and next steps: a strong buying signal]]",
+            "ch": [
+              {
+                "t": "Ideally your COO as sponsor, the CRO or her delegate, your contact-center leader and whoever owns the policy content. I'll send a workshop agenda and a one-page governance overview for the CRO before we meet. Can we pencil in a date before Friday?",
+                "q": "best",
+                "s": {
+                  "p": 10,
+                  "d": 4,
+                  "t": 6
+                },
+                "next": "end",
+                "fb": "Multi-threaded, with a sponsor, a blocker turned ally, a process owner and a content owner. Each one gets something useful. Great close."
+              },
+              {
+                "t": "Just you for now. We can loop others in later.",
+                "q": "good",
+                "s": {
+                  "p": -2,
+                  "d": -2
+                },
+                "next": "end",
+                "fb": "Single-threaded deals with an enthusiastic CIO often die in the CRO's or COO's office."
+              },
+              {
+                "t": "Just procurement, so we can get the paperwork moving.",
+                "q": "bad",
+                "s": {
+                  "t": -6,
+                  "p": -4
+                },
+                "next": "end",
+                "fb": "Too early. You haven't aligned the sponsor or risk yet, and procurement can't buy what nobody has agreed to."
+              }
+            ]
+          }
+        },
+        "outcomes": {
+          "great": {
+            "title": "Workshop booked with COO & CRO",
+            "text": "Raj books the strategy workshop with his COO and CRO. You've gone from 23 ideas to a governed quick win and a roadmap."
+          },
+          "ok": {
+            "title": "Enthusiastic, still unfocused",
+            "text": "Raj loves the conversation but there's no clear priority or sponsor. Expect another meeting with a new list of ideas."
+          },
+          "poor": {
+            "title": "Stalled by risk",
+            "text": "The CRO hears about the conversation and puts AI on hold. Your credibility with the bank's leadership takes a hit."
+          }
+        },
+        "useCases": [
+          "Contact-center agent-assist copilot: RAG search over policy content with citations",
+          "Second wave: real-time card fraud detection",
+          "Foundation: customer data unification across the three CRMs"
+        ],
+        "offering": {
+          "headline": "AI Strategy & Prioritization Workshop → Governed agent-assist pilot → Roadmap",
+          "steps": [
+            "2-week workshop: score the 23 ideas with the COO and CRO",
+            "Responsible-AI and governance framework co-designed with risk",
+            "Agent-assist pilot with one team, measured on handle time and ramp-up",
+            "MLOps and production rollout; fraud detection as wave 2",
+            "Data foundation: CRM consolidation running in parallel"
+          ]
+        },
+        "takeaways": [
+          "Enthusiasm isn't focus. Anchor on what the board actually asked for.",
+          "Lead with a quantified pain (11-minute waits), not the wish list.",
+          "Internal-facing copilots are the safest first gen AI win in regulated industries.",
+          "Make the risk officer a co-designer of guardrails, never someone you route around.",
+          "Use a prioritization workshop to turn many ideas into a sequenced roadmap."
+        ]
+      },
+      {
+        "id": "health",
+        "full": false,
+        "difficulty": 2,
+        "turns": 4,
+        "title": "Drowning in Paperwork",
+        "persona": {
+          "name": "Maria Alvarez",
+          "initials": "MA",
+          "role": "VP of Operations",
+          "company": "Cedar Valley Health",
+          "industry": "Healthcare Provider",
+          "size": "4 hospitals · 38 clinics · 9,000 staff",
+          "quote": "We're drowning in faxes. My team is burning out.",
+          "goals": [
+            "Cut claim denials",
+            "Reduce staff burnout and turnover",
+            "Show measurable impact to fund further work"
+          ],
+          "personality": [
+            "Warm",
+            "Overloaded",
+            "People-first",
+            "Pragmatic"
+          ],
+          "pains": [
+            "4,000 referral faxes and prior-auth forms a week, retyped into Epic",
+            "Denials up 18% due to missing information",
+            "Lost six intake staff to burnout this year",
+            "IT is consumed by an EHR upgrade"
+          ]
+        },
+        "mission": "Uncover where the paperwork breaks, address HIPAA early, and propose a plan that's light on her IT team.",
+        "start": "h1",
+        "nodes": {
+          "h1": {
+            "c": "We're drowning. [[My intake team handles about 4,000 referral faxes and prior-auth forms a week.|pain|High-volume document work: document processing for intake and prior auth]] [[Denials are up 18% because of missing information.|pain|Quantified revenue impact: claim denials]]",
+            "ch": [
+              {
+                "t": "That's a lot of paper landing on a lot of people. Where does the missing information usually slip through: at intake, during data entry, or when the prior auth is submitted?",
+                "q": "best",
+                "s": {
+                  "d": 12,
+                  "l": 10
+                },
+                "next": "h2",
+                "fb": "Great diagnostic question. You're finding where in the process AI would have the most impact."
+              },
+              {
+                "t": "Document AI can read those faxes and auto-fill your EHR.",
+                "q": "good",
+                "s": {
+                  "u": 10,
+                  "d": -2
+                },
+                "next": "h2",
+                "fb": "Right use case! But diagnose before you prescribe; you don't know where it breaks yet."
+              },
+              {
+                "t": "Have you considered a patient-facing chatbot?",
+                "q": "bad",
+                "s": {
+                  "u": -8,
+                  "l": -8
+                },
+                "next": "h2",
+                "fb": "That isn't the problem she described. Listen for the pain, not the trend."
+              }
+            ]
+          },
+          "h2": {
+            "c": "Mostly at data entry. Staff are retyping everything into Epic, and they're exhausted. [[We lost six people to burnout this year.|pain|Staff burnout and attrition: lead with people and change management]] [[Compliance will need to approve anything touching PHI.|red|HIPAA/PHI governance gate: engage compliance early]]",
+            "ch": [
+              {
+                "t": "Losing six people tells me this is urgent for your team, not just the numbers. Anything we build has to be HIPAA-compliant from day one: PHI stays in your environment, with audit trails and human review on low-confidence extractions. Could we bring your compliance lead in early?",
+                "q": "best",
+                "s": {
+                  "l": 10,
+                  "p": 10,
+                  "t": 10
+                },
+                "next": "h3",
+                "fb": "You were empathetic, addressed compliance directly, and multi-threaded early. That's the trifecta."
+              },
+              {
+                "t": "AI will let you do the same work with fewer staff.",
+                "q": "bad",
+                "s": {
+                  "t": -12,
+                  "l": -8
+                },
+                "next": "h3",
+                "fb": "She's trying to keep her people, not cut them. Wrong value message."
+              },
+              {
+                "t": "We're HIPAA-compliant, so that won't be a problem.",
+                "q": "meh",
+                "s": {
+                  "p": 4,
+                  "t": -2
+                },
+                "next": "h3",
+                "fb": "A claim isn't a plan. Show how you handle PHI, and invite compliance in."
+              }
+            ]
+          },
+          "h3": {
+            "c": "That would help. [[We have budget from a CMS grant if we can show impact by spring.|buy|Funding source plus a deadline]] But [[our IT team is stretched thin with an EHR upgrade.|red|Capacity constraint: limited IT bandwidth]]",
+            "ch": [
+              {
+                "t": "Then let's keep it light on your IT team: a two-week assessment of the intake workflow, then a pilot on your top three referral types that we deliver, integrate with Epic and run as a managed service. We'd set denial-rate and turnaround metrics so you can show impact to the grant committee by spring.",
+                "q": "best",
+                "s": {
+                  "p": 14,
+                  "u": 8
+                },
+                "next": "h4",
+                "fb": "You designed around her constraint (IT bandwidth), tied it to the funding deadline, and set clear metrics."
+              },
+              {
+                "t": "We can wait until the EHR upgrade is done.",
+                "q": "meh",
+                "s": {
+                  "t": 2,
+                  "p": -4
+                },
+                "next": "h4",
+                "fb": "Waiting puts the grant deadline at risk. Find a delivery model that works around IT capacity."
+              },
+              {
+                "t": "Your IT team will just need to free up two engineers for six months.",
+                "q": "bad",
+                "s": {
+                  "l": -8,
+                  "p": -8
+                },
+                "next": "h4",
+                "fb": "She just told you IT is maxed out. This shows you didn't listen."
+              }
+            ]
+          },
+          "h4": {
+            "c": "I like that. [[What do you need from me to get started?|buy|Clear buying signal: she's asking for next steps]]",
+            "ch": [
+              {
+                "t": "An intro to your compliance lead and intake manager, a sample of anonymized referral documents, and 60 minutes next week to map the workflow. I'll bring a draft success scorecard.",
+                "q": "best",
+                "s": {
+                  "p": 8,
+                  "d": 4,
+                  "t": 4
+                },
+                "next": "end",
+                "fb": "Concrete, multi-stakeholder, and it shows momentum."
+              },
+              {
+                "t": "Just a signed SOW and we'll take it from there.",
+                "q": "meh",
+                "s": {
+                  "p": -2
+                },
+                "next": "end",
+                "fb": "Skipping workflow mapping and compliance alignment creates risk."
+              },
+              {
+                "t": "Let's start with a big AI strategy across the whole health system first.",
+                "q": "bad",
+                "s": {
+                  "l": -6,
+                  "p": -4
+                },
+                "next": "end",
+                "fb": "She has a burning, specific problem and a deadline. A broad strategy now would slow her down."
+              }
+            ]
+          }
+        },
+        "outcomes": {
+          "great": {
+            "title": "Workflow mapping session booked",
+            "text": "Maria introduces you to compliance and her intake manager. The grant-funded pilot is within reach."
+          },
+          "ok": {
+            "title": "Promising, needs work",
+            "text": "Maria is interested, but compliance and IT concerns are unresolved."
+          },
+          "poor": {
+            "title": "Trust lost",
+            "text": "Maria worries you'll create more work for her team. She'll keep looking."
+          }
+        },
+        "useCases": [
+          "Intelligent document processing for referral and prior-auth intake into Epic",
+          "Denial prevention: completeness checks before submission"
+        ],
+        "offering": {
+          "headline": "Intake Assessment → HIPAA-compliant IDP pilot → Managed service",
+          "steps": [
+            "2-week workflow assessment",
+            "IDP pilot on the top 3 referral types, integrated with Epic",
+            "Governance: PHI handling, audit trails, human-in-the-loop",
+            "Change management for intake staff",
+            "Managed service to protect IT capacity"
+          ]
+        },
+        "takeaways": [
+          "Diagnose where the process breaks before prescribing AI.",
+          "In healthcare, lead with people and compliance.",
+          "Design around the customer's constraints, like IT capacity.",
+          "Tie the plan to the funding deadline with clear metrics."
+        ]
+      },
+      {
+        "id": "cmo",
+        "full": false,
+        "difficulty": 1,
+        "turns": 4,
+        "title": "\"ChatGPT for Everything\"",
+        "persona": {
+          "name": "Jordan Blake",
+          "initials": "JB",
+          "role": "Chief Marketing Officer",
+          "company": "Northpeak Outfitters",
+          "industry": "Retail / E-commerce",
+          "size": "$1.1B revenue · 140 stores · strong e-commerce",
+          "quote": "I want ChatGPT for everything. Copy, emails, social, service... the works!",
+          "goals": [
+            "Launch products faster",
+            "Personalize marketing at scale",
+            "Impress the CEO with visible AI wins"
+          ],
+          "personality": [
+            "Visionary",
+            "Impatient",
+            "Brand-protective",
+            "Big ideas"
+          ],
+          "pains": [
+            "3,000 new SKUs a season; copywriters are 6 weeks behind",
+            "Legal is nervous after a competitor's AI made up a product claim",
+            "No clear owner for AI across marketing"
+          ]
+        },
+        "mission": "Narrow the CMO's \"everything\" into one high-value gen AI use case with brand guardrails, and a roadmap for the rest.",
+        "start": "r1",
+        "nodes": {
+          "r1": {
+            "c": "I want ChatGPT for everything! [[Our CEO saw a demo at a conference and asked why we're not doing this.|buy|Executive interest: a top-down push]] Product copy, emails, social, customer service, the works.",
+            "ch": [
+              {
+                "t": "I love that your CEO is pushing; that helps. If you could fix only one thing in the next 90 days, which marketing task slows your team down the most?",
+                "q": "best",
+                "s": {
+                  "d": 12,
+                  "l": 8
+                },
+                "next": "r2",
+                "fb": "You kept the excitement but forced a priority. That's the key move with a \"do everything\" buyer."
+              },
+              {
+                "t": "We can deploy ChatGPT across your whole company next month.",
+                "q": "bad",
+                "s": {
+                  "t": -8,
+                  "p": -8,
+                  "u": -6
+                },
+                "next": "r2",
+                "fb": "No use case, no guardrails, no data plan. That's a recipe for a public failure."
+              },
+              {
+                "t": "Gen AI is great for content. Let me show you a demo of product description generation.",
+                "q": "good",
+                "s": {
+                  "u": 6,
+                  "d": -2
+                },
+                "next": "r2",
+                "fb": "Good guess at a use case, but confirm the pain before you demo."
+              }
+            ]
+          },
+          "r2": {
+            "c": "Product descriptions, honestly. [[We launch 3,000 new SKUs a season and our copywriters are six weeks behind.|pain|Quantified content bottleneck: a gen AI content use case]] [[Our product data in the PIM is pretty clean, actually.|ready|Positive data readiness: clean product data in the PIM]]",
+            "ch": [
+              {
+                "t": "Clean PIM data is a great head start. That's exactly what keeps AI-generated descriptions accurate. A pilot that drafts descriptions from PIM attributes in your brand voice, with copywriters as editors, could clear that backlog fast.",
+                "q": "best",
+                "s": {
+                  "u": 14,
+                  "l": 10,
+                  "p": 6
+                },
+                "next": "r3",
+                "fb": "You caught the readiness cue and turned it into a grounded, human-in-the-loop use case."
+              },
+              {
+                "t": "We can generate all 3,000 descriptions automatically.",
+                "q": "meh",
+                "s": {
+                  "u": 8,
+                  "t": -4
+                },
+                "next": "r3",
+                "fb": "Right use case, but \"fully automatic\" alarms brand and legal teams. Keep humans in the loop."
+              },
+              {
+                "t": "Let's start with a customer service chatbot instead. It's a bigger ROI.",
+                "q": "bad",
+                "s": {
+                  "l": -8,
+                  "u": -4
+                },
+                "next": "r3",
+                "fb": "She just told you her biggest pain. Don't override it."
+              }
+            ]
+          },
+          "r3": {
+            "c": "Love that. But [[Legal freaked out about a competitor whose AI made up a product claim.|red|Brand and legal risk: fear of hallucination]] Can we trust it?",
+            "ch": [
+              {
+                "t": "Legal is right to ask. We'd build guardrails in: grounding only on PIM data, banned-claim filters, a brand-voice checker, and human approval before anything publishes. We'll build an evaluation set with Legal so they can see accuracy before go-live.",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "t": 12
+                },
+                "next": "r4",
+                "fb": "Specific guardrails plus a way to prove accuracy to Legal. That's responsible-AI positioning done right."
+              },
+              {
+                "t": "The newest models don't really hallucinate anymore.",
+                "q": "bad",
+                "s": {
+                  "t": -12,
+                  "p": -6
+                },
+                "next": "r4",
+                "fb": "That's false, and it destroys credibility with Legal."
+              },
+              {
+                "t": "Your copywriters will review everything, so it's fine.",
+                "q": "good",
+                "s": {
+                  "p": 4,
+                  "t": 2
+                },
+                "next": "r4",
+                "fb": "Human review helps, but Legal will want systematic guardrails and evidence."
+              }
+            ]
+          },
+          "r4": {
+            "c": "Okay, [[if this works for descriptions, I want it for email and social next.|buy|Expansion potential: a roadmap beyond the pilot]]",
+            "ch": [
+              {
+                "t": "That's the right sequence: prove it on descriptions with a six-week pilot measured on time-to-publish and conversion, then extend to email and social on the same governed platform. We can run it as a managed service so new channels plug in easily.",
+                "q": "best",
+                "s": {
+                  "p": 12,
+                  "u": 6
+                },
+                "next": "end",
+                "fb": "A land-and-expand path on a governed platform, with metrics. Excellent."
+              },
+              {
+                "t": "Let's do all three channels at once to move faster.",
+                "q": "meh",
+                "s": {
+                  "p": -2,
+                  "u": 2
+                },
+                "next": "end",
+                "fb": "Spreading thin raises risk. Prove value first, then scale."
+              },
+              {
+                "t": "Email and social are a different project. We'll quote them separately.",
+                "q": "meh",
+                "s": {
+                  "t": -4,
+                  "p": -2
+                },
+                "next": "end",
+                "fb": "That's a missed chance to show a platform roadmap, and it sounds transactional."
+              }
+            ]
+          }
+        },
+        "outcomes": {
+          "great": {
+            "title": "Pilot greenlit with Legal on board",
+            "text": "Jordan sponsors a six-week description pilot with Legal as co-designer, and a roadmap for email and social."
+          },
+          "ok": {
+            "title": "Excited, still risky",
+            "text": "Jordan wants to move, but Legal's concerns aren't resolved. Expect delays."
+          },
+          "poor": {
+            "title": "Shiny-object stall",
+            "text": "Without focus or guardrails, Legal blocks the initiative."
+          }
+        },
+        "useCases": [
+          "Gen AI product-description generation grounded in PIM data",
+          "Later: personalized email and social content on the same platform"
+        ],
+        "offering": {
+          "headline": "Gen AI Content Pilot with Responsible-AI guardrails → Managed platform",
+          "steps": [
+            "6-week pilot: descriptions from PIM data in the brand voice",
+            "Guardrails: grounding, banned-claim filters, human approval",
+            "Evaluation set co-built with Legal",
+            "Expand to email and social on a managed platform"
+          ]
+        },
+        "takeaways": [
+          "\"Everything\" isn't a use case. Force a 90-day priority.",
+          "Clean data is a buying signal, so call it out.",
+          "Answer hallucination fears with specific guardrails and evidence.",
+          "Land with one use case, then expand on a shared platform."
+        ]
+      }
+    ]
+  },
+  "jeopardy": {
+    "categories": [
+      {
+        "name": "Listen Up",
+        "clues": [
+          {
+            "q": "A customer says: \"My team spends hours every week copying invoice data into SAP.\" What kind of signal is this?",
+            "a": "A pain point & buying signal for intelligent document processing",
+            "why": "Manual, repetitive, high-volume document work is one of the clearest early AI use cases. Next, ask about volume, cost and error rates."
+          },
+          {
+            "q": "\"Our board asked the CEO what our AI strategy is.\" This tells you there is ___.",
+            "a": "Executive pressure: urgency from the top, and probably an exec sponsor",
+            "why": "Top-down mandates create budget and urgency. Ask who owns the answer to the board and how they'll measure success."
+          },
+          {
+            "q": "\"Our data is spread across 14 systems and nobody trusts the reports.\" Name the cue AND the opportunity.",
+            "a": "A data-readiness red flag, and an opening to sell data foundation work",
+            "why": "AI is only as good as its data. Position data modernization before or alongside the AI use case instead of ignoring the risk."
+          },
+          {
+            "q": "\"We tried a chatbot last year and it flopped.\" Name the cue and your next move.",
+            "a": "Skepticism after a failed attempt. Ask what went wrong before pitching anything",
+            "why": "Learn whether it failed on scope, data, adoption or production. That tells you to position pilot-to-production rigor and change management."
+          },
+          {
+            "q": "\"There's budget set aside for Q3, but Legal must approve anything that touches customer data.\" Identify BOTH signals.",
+            "a": "A buying signal (budget + timeline) and a governance gate (Legal / compliance)",
+            "why": "Celebrate the budget, then bring Legal in early with a responsible-AI and data-governance story so they don't block the deal late."
+          }
+        ]
+      },
+      {
+        "name": "Use Case Match",
+        "clues": [
+          {
+            "q": "An insurer's claims team reads thousands of PDFs, emails and photos every week to start each claim.",
+            "a": "Intelligent document processing (document AI extraction & classification)",
+            "why": "Look for high volume, unstructured inputs, and manual re-keying."
+          },
+          {
+            "q": "Contact center agents put customers on hold to search five different knowledge bases.",
+            "a": "Agent-assist copilot with knowledge search (RAG)",
+            "why": "It's internal-facing, lower risk, and easy to measure on handle time, first-contact resolution and ramp-up time."
+          },
+          {
+            "q": "A plant manager says: \"We find out a motor is failing when the production line stops.\"",
+            "a": "Predictive maintenance (IoT sensor data + anomaly detection)",
+            "why": "Listen for words like unplanned downtime, sensors, maintenance logs, and the cost of an hour of downtime."
+          },
+          {
+            "q": "A retailer keeps over-stocking winter coats while running out of its best sellers.",
+            "a": "Demand forecasting / inventory optimization",
+            "why": "Signals: forecasts built in spreadsheets, markdowns, stock-outs, and a lot of working capital tied up in inventory."
+          },
+          {
+            "q": "A bank sees rising card-not-present losses and takes two days to flag suspicious transactions.",
+            "a": "Real-time fraud detection (ML anomaly scoring on streaming transactions)",
+            "why": "A proven ML use case with a clear ROI: losses avoided, fewer false positives, and faster detection."
+          }
+        ]
+      },
+      {
+        "name": "Position It",
+        "clues": [
+          {
+            "q": "This low-risk, fixed-scope engagement helps a customer rank AI use cases by value and feasibility.",
+            "a": "An AI assessment / strategy (use-case discovery) workshop",
+            "why": "It's the best door-opener for unfocused or skeptical buyers, and it produces a roadmap that leads to the next deal."
+          },
+          {
+            "q": "When the customer's data isn't ready for AI, lead with this offering.",
+            "a": "Data foundation / data modernization (platform, quality, governance)",
+            "why": "Fixing the data unlocks many AI use cases, and it's often the larger and stickier engagement."
+          },
+          {
+            "q": "A customer has six proofs of concept and zero in production. Name the problem AND the offer.",
+            "a": "\"Pilot purgatory\". Position pilot-to-production plus MLOps",
+            "why": "Industrialize it: clear success metrics, integration, monitoring, security reviews and a scaling plan."
+          },
+          {
+            "q": `Give two reasons a customer would choose an SI like ${SELLER_NAME} over buying directly from a hyperscaler or model vendor.`,
+            "a": "Any two: vendor-neutral multi-partner expertise, integration with existing systems, end-to-end accountability, change management, proven accelerators, lower risk",
+            "why": `Partners provide the platform. ${SELLER_NAME} brings it together with the customer's processes, data and people, which gets them to value faster with less risk.`
+          },
+          {
+            "q": "The customer worries about who will monitor, retrain and keep models compliant after go-live.",
+            "a": "Managed AI services (MLOps / AIOps plus governance)",
+            "why": "Recurring revenue for us and peace of mind for them: drift monitoring, retraining, updates and compliance reporting."
+          }
+        ]
+      },
+      {
+        "name": "Objection Busters",
+        "clues": [
+          {
+            "q": "\"AI is just hype.\"",
+            "a": "Anchor on one measurable business problem, share a relevant outcome, and propose a small pilot scoped to value",
+            "why": "Don't argue about AI in general. Make it about their KPI and a low-risk way to prove it."
+          },
+          {
+            "q": "\"We'll just build it ourselves with our IT team.\"",
+            "a": "Respect it, then position co-delivery & enablement: accelerators, lessons learned, and upskilling their team",
+            "why": `Frame ${SELLER_NAME} as the way to get there faster and avoid known pitfalls, not as a replacement for their team.`
+          },
+          {
+            "q": "\"Our data isn't secure enough to use AI.\"",
+            "a": "Agree it matters, then explain private deployment in their tenant, access controls, and a governance framework. Start with a low-sensitivity use case",
+            "why": "Security concerns are buying criteria, not deal-breakers. Turn the security team into co-designers."
+          },
+          {
+            "q": "\"It's too expensive.\"",
+            "a": "Reframe to ROI and the cost of doing nothing. Quantify the pain, then phase the investment",
+            "why": "Start with an assessment or a pilot that has agreed success metrics, so each phase pays for the next."
+          },
+          {
+            "q": "\"What if the AI gives our customers wrong answers?\"",
+            "a": "Acknowledge hallucination risk, then cover guardrails: grounding (RAG), human-in-the-loop, evaluation & monitoring. Start internal-facing",
+            "why": "An agent copilot proves accuracy safely before anything faces the customer."
+          }
+        ]
+      },
+      {
+        "name": "AI Buzzword Decoder",
+        "clues": [
+          {
+            "q": "LLM",
+            "a": "Large Language Model",
+            "why": "AI trained on huge amounts of text to understand and generate language. It's the engine behind ChatGPT-style assistants."
+          },
+          {
+            "q": "RAG",
+            "a": "Retrieval-Augmented Generation",
+            "why": "The model looks up the company's own trusted content before it answers, so responses are more accurate, current and citable."
+          },
+          {
+            "q": "When a generative AI model confidently makes up facts.",
+            "a": "Hallucination",
+            "why": "Reduce it with grounding (RAG), guardrails, evaluation, and human review for high-stakes outputs."
+          },
+          {
+            "q": "The practices and tooling to deploy, monitor, retrain and govern models in production. Think \"DevOps for ML.\"",
+            "a": "MLOps",
+            "why": `This is how pilots survive in the real world, and it's a core ${SELLER_NAME} offering.`
+          },
+          {
+            "q": "AI that can plan and take multi-step actions with tools and systems (like looking up an order and issuing a refund) to reach a goal.",
+            "a": "Agentic AI (AI agents)",
+            "why": "Powerful, but it needs strong guardrails, permissions, and human approval checkpoints."
+          }
+        ]
+      },
+      {
+        "name": "Discovery Questions",
+        "clues": [
+          {
+            "q": "Ask this open-ended question to uncover where AI could save time.",
+            "a": "\"Where does your team spend the most time on repetitive, manual work today?\"",
+            "why": "Open questions about pain beat \"Do you want AI?\" every time."
+          },
+          {
+            "q": "The question that finds out if there's an executive sponsor.",
+            "a": "\"Who's championing this at the leadership level, and how will they measure success?\"",
+            "why": "No sponsor usually means no budget and no decision."
+          },
+          {
+            "q": "The question that checks data readiness.",
+            "a": "\"Where does the data for this process live, and how much do you trust it?\"",
+            "why": "Data quality and access decide both feasibility and timeline."
+          },
+          {
+            "q": "Turn \"We want to do something with AI\" into a real use case.",
+            "a": "\"What business outcome would make this a win in 12 months, and which KPI moves?\"",
+            "why": "Start from the outcome and work back to the use case, not from the technology."
+          },
+          {
+            "q": "The question that uncovers the buying process and hidden blockers.",
+            "a": "\"Who else needs to weigh in on a project like this: security, legal, procurement?\"",
+            "why": "Multi-thread early. The stakeholders you don't know about are the ones who stall deals."
+          }
+        ]
+      }
+    ],
+    "final": {
+      "category": "The Full Deal",
+      "q": `A COO says: "Our claims backlog is six weeks, the board is on my case, and our last AI pilot never left the lab." Name the USE CASE, the key SIGNAL, and the ${SELLER_NAME} OFFER you'd lead with.`,
+      "a": "Use case: intelligent document processing for claims. Signals: quantified pain + board pressure (exec sponsor) + a pilot-purgatory red flag. Lead with: a short assessment and a pilot-to-production plan with success metrics, governance and change management.",
+      "why": "Listen, identify, position: the whole job in one answer."
+    }
+  }
+};
+
+export default deepFreeze(defaultPack);

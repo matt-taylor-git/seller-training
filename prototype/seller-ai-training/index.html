@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-/* ==================== CONFIG ==================== */
-/* Change your company name here; it updates everywhere on the page. */
-const BRAND_NAME = "Your Company";
-/* ================================================ */
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Seller Academy</title>
+<title>CDW · AI Seller Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
@@ -69,14 +63,14 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
 <div class="bgfx"></div><div class="grid"></div>
 <div class="wrap">
   <header>
-    <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg></div><span><span class="brandInline">Your Company</span> &middot; AI Seller Academy</span></div>
+    <div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4z"/></svg></div><span><span class="brandInline">CDW</span> &middot; AI Seller Academy</span></div>
     <span class="pill">Trainer Edition &middot; Prototype</span>
   </header>
 
   <section class="hero">
     <div class="eyebrow">Sales enablement</div>
     <h1>Learn to sell AI by <span class="g">playing the deal.</span></h1>
-    <p class="lede">Two games for presenters that teach sellers what to listen for, how to spot real AI use cases, and how to position <span class="brandInline">Your Company</span>'s services. Use them in the training room or over screen share.</p>
+    <p class="lede">Two games for presenters that teach sellers what to listen for, how to spot real AI use cases, and how to position <span class="brandInline">CDW</span>'s services. Use them in the training room or over screen share.</p>
   </section>
 
   <section class="cards">
@@ -112,12 +106,18 @@ kbd{font-family:inherit;font-size:12px;border:1px solid var(--line);border-botto
     </a>
   </section>
 
+  <p id="packNotice" style="color:var(--muted);font-size:12px;line-height:1.5;margin-top:20px"></p>
+
   <footer>
     <span>Tip: press <kbd>F11</kbd> for full screen when projecting. Both games work over screen share.</span>
-    <span>&copy; <span class="brandInline">Your Company</span> &middot; Internal training prototype</span>
+    <span>&copy; <span class="brandInline">CDW</span> &middot; Internal training prototype</span>
   </footer>
 </div>
-<script>
+<script type="module">
+import { SELLER_NAME as BRAND_NAME } from "./shared/identity.mjs";
+import { training } from "./shared/training.mjs";
+const { pack } = training.openPage("roleplay");
+document.getElementById("packNotice").textContent = pack.disclaimer;
 document.querySelectorAll('.brandInline').forEach(e => e.textContent = BRAND_NAME);
 document.title = BRAND_NAME + " · AI Seller Academy";
 </script>

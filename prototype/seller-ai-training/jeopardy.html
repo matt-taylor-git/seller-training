@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>
-/* ==================== CONFIG ==================== */
-/* Change your company name here; it updates everywhere in the game. */
-const BRAND_NAME = "Your Company";
-/* ================================================ */
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Deal Jeopardy</title>
+<title>AI Deal Jeopardy · CDW</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -188,7 +182,7 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
   <div class="topbar">
     <div class="title">
       <div class="mark">J!</div>
-      <div><h1>AI DEAL <span>JEOPARDY!</span></h1><small><span class="brandInline">Your Company</span> &middot; Seller Academy</small></div>
+      <div><h1>AI DEAL <span>JEOPARDY!</span></h1><small><span class="brandInline">CDW</span> &middot; Seller Academy</small></div>
     </div>
     <div class="controls">
       <button class="ctl" id="timerBtn" title="Countdown timer on clues (T)">
@@ -203,6 +197,8 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
       <button class="ctl final" id="finalBtn" title="Final Jeopardy (F)">Final Jeopardy</button>
     </div>
   </div>
+
+  <p id="packNotice" style="color:var(--muted);font-size:12px;line-height:1.4"></p>
 
   <div class="board" id="board" role="grid" aria-label="Jeopardy board"></div>
 
@@ -278,124 +274,16 @@ input[type=number]{-moz-appearance:textfield;appearance:textfield}
 </div>
 <canvas id="confetti"></canvas>
 <div class="toast" id="toast"></div>
-<script>
-/* =============== GAME CONTENT =============== */
-const B = BRAND_NAME;
-const CATEGORIES = [
- { name: "Listen Up", clues: [
-  { q: "A customer says: \"My team spends hours every week copying invoice data into SAP.\" What kind of signal is this?",
-    a: "A pain point & buying signal for intelligent document processing",
-    why: "Manual, repetitive, high-volume document work is one of the clearest early AI use cases. Next, ask about volume, cost and error rates." },
-  { q: "\"Our board asked the CEO what our AI strategy is.\" This tells you there is ___.",
-    a: "Executive pressure: urgency from the top, and probably an exec sponsor",
-    why: "Top-down mandates create budget and urgency. Ask who owns the answer to the board and how they'll measure success." },
-  { q: "\"Our data is spread across 14 systems and nobody trusts the reports.\" Name the cue AND the opportunity.",
-    a: "A data-readiness red flag, and an opening to sell data foundation work",
-    why: "AI is only as good as its data. Position data modernization before or alongside the AI use case instead of ignoring the risk." },
-  { q: "\"We tried a chatbot last year and it flopped.\" Name the cue and your next move.",
-    a: "Skepticism after a failed attempt. Ask what went wrong before pitching anything",
-    why: "Learn whether it failed on scope, data, adoption or production. That tells you to position pilot-to-production rigor and change management." },
-  { q: "\"There's budget set aside for Q3, but Legal must approve anything that touches customer data.\" Identify BOTH signals.",
-    a: "A buying signal (budget + timeline) and a governance gate (Legal / compliance)",
-    why: "Celebrate the budget, then bring Legal in early with a responsible-AI and data-governance story so they don't block the deal late." }
- ]},
- { name: "Use Case Match", clues: [
-  { q: "An insurer's claims team reads thousands of PDFs, emails and photos every week to start each claim.",
-    a: "Intelligent document processing (document AI extraction & classification)",
-    why: "Look for high volume, unstructured inputs, and manual re-keying." },
-  { q: "Contact center agents put customers on hold to search five different knowledge bases.",
-    a: "Agent-assist copilot with knowledge search (RAG)",
-    why: "It's internal-facing, lower risk, and easy to measure on handle time, first-contact resolution and ramp-up time." },
-  { q: "A plant manager says: \"We find out a motor is failing when the production line stops.\"",
-    a: "Predictive maintenance (IoT sensor data + anomaly detection)",
-    why: "Listen for words like unplanned downtime, sensors, maintenance logs, and the cost of an hour of downtime." },
-  { q: "A retailer keeps over-stocking winter coats while running out of its best sellers.",
-    a: "Demand forecasting / inventory optimization",
-    why: "Signals: forecasts built in spreadsheets, markdowns, stock-outs, and a lot of working capital tied up in inventory." },
-  { q: "A bank sees rising card-not-present losses and takes two days to flag suspicious transactions.",
-    a: "Real-time fraud detection (ML anomaly scoring on streaming transactions)",
-    why: "A proven ML use case with a clear ROI: losses avoided, fewer false positives, and faster detection." }
- ]},
- { name: "Position It", clues: [
-  { q: "This low-risk, fixed-scope engagement helps a customer rank AI use cases by value and feasibility.",
-    a: "An AI assessment / strategy (use-case discovery) workshop",
-    why: "It's the best door-opener for unfocused or skeptical buyers, and it produces a roadmap that leads to the next deal." },
-  { q: "When the customer's data isn't ready for AI, lead with this offering.",
-    a: "Data foundation / data modernization (platform, quality, governance)",
-    why: "Fixing the data unlocks many AI use cases, and it's often the larger and stickier engagement." },
-  { q: "A customer has six proofs of concept and zero in production. Name the problem AND the offer.",
-    a: "\"Pilot purgatory\". Position pilot-to-production plus MLOps",
-    why: "Industrialize it: clear success metrics, integration, monitoring, security reviews and a scaling plan." },
-  { q: "Give two reasons a customer would choose an SI like " + B + " over buying directly from a hyperscaler or model vendor.",
-    a: "Any two: vendor-neutral multi-partner expertise, integration with existing systems, end-to-end accountability, change management, proven accelerators, lower risk",
-    why: "Partners provide the platform. " + B + " brings it together with the customer's processes, data and people, which gets them to value faster with less risk." },
-  { q: "The customer worries about who will monitor, retrain and keep models compliant after go-live.",
-    a: "Managed AI services (MLOps / AIOps plus governance)",
-    why: "Recurring revenue for us and peace of mind for them: drift monitoring, retraining, updates and compliance reporting." }
- ]},
- { name: "Objection Busters", clues: [
-  { q: "\"AI is just hype.\"",
-    a: "Anchor on one measurable business problem, share a relevant outcome, and propose a small pilot scoped to value",
-    why: "Don't argue about AI in general. Make it about their KPI and a low-risk way to prove it." },
-  { q: "\"We'll just build it ourselves with our IT team.\"",
-    a: "Respect it, then position co-delivery & enablement: accelerators, lessons learned, and upskilling their team",
-    why: "Frame " + B + " as the way to get there faster and avoid known pitfalls, not as a replacement for their team." },
-  { q: "\"Our data isn't secure enough to use AI.\"",
-    a: "Agree it matters, then explain private deployment in their tenant, access controls, and a governance framework. Start with a low-sensitivity use case",
-    why: "Security concerns are buying criteria, not deal-breakers. Turn the security team into co-designers." },
-  { q: "\"It's too expensive.\"",
-    a: "Reframe to ROI and the cost of doing nothing. Quantify the pain, then phase the investment",
-    why: "Start with an assessment or a pilot that has agreed success metrics, so each phase pays for the next." },
-  { q: "\"What if the AI gives our customers wrong answers?\"",
-    a: "Acknowledge hallucination risk, then cover guardrails: grounding (RAG), human-in-the-loop, evaluation & monitoring. Start internal-facing",
-    why: "An agent copilot proves accuracy safely before anything faces the customer." }
- ]},
- { name: "AI Buzzword Decoder", clues: [
-  { q: "LLM",
-    a: "Large Language Model",
-    why: "AI trained on huge amounts of text to understand and generate language. It's the engine behind ChatGPT-style assistants." },
-  { q: "RAG",
-    a: "Retrieval-Augmented Generation",
-    why: "The model looks up the company's own trusted content before it answers, so responses are more accurate, current and citable." },
-  { q: "When a generative AI model confidently makes up facts.",
-    a: "Hallucination",
-    why: "Reduce it with grounding (RAG), guardrails, evaluation, and human review for high-stakes outputs." },
-  { q: "The practices and tooling to deploy, monitor, retrain and govern models in production. Think \"DevOps for ML.\"",
-    a: "MLOps",
-    why: "This is how pilots survive in the real world, and it's a core " + B + " offering." },
-  { q: "AI that can plan and take multi-step actions with tools and systems (like looking up an order and issuing a refund) to reach a goal.",
-    a: "Agentic AI (AI agents)",
-    why: "Powerful, but it needs strong guardrails, permissions, and human approval checkpoints." }
- ]},
- { name: "Discovery Questions", clues: [
-  { q: "Ask this open-ended question to uncover where AI could save time.",
-    a: "\"Where does your team spend the most time on repetitive, manual work today?\"",
-    why: "Open questions about pain beat \"Do you want AI?\" every time." },
-  { q: "The question that finds out if there's an executive sponsor.",
-    a: "\"Who's championing this at the leadership level, and how will they measure success?\"",
-    why: "No sponsor usually means no budget and no decision." },
-  { q: "The question that checks data readiness.",
-    a: "\"Where does the data for this process live, and how much do you trust it?\"",
-    why: "Data quality and access decide both feasibility and timeline." },
-  { q: "Turn \"We want to do something with AI\" into a real use case.",
-    a: "\"What business outcome would make this a win in 12 months, and which KPI moves?\"",
-    why: "Start from the outcome and work back to the use case, not from the technology." },
-  { q: "The question that uncovers the buying process and hidden blockers.",
-    a: "\"Who else needs to weigh in on a project like this: security, legal, procurement?\"",
-    why: "Multi-thread early. The stakeholders you don't know about are the ones who stall deals." }
- ]}
-];
-const FINAL = {
-  category: "The Full Deal",
-  q: "A COO says: \"Our claims backlog is six weeks, the board is on my case, and our last AI pilot never left the lab.\" Name the USE CASE, the key SIGNAL, and the " + B + " OFFER you'd lead with.",
-  a: "Use case: intelligent document processing for claims. Signals: quantified pain + board pressure (exec sponsor) + a pilot-purgatory red flag. Lead with: a short assessment and a pilot-to-production plan with success metrics, governance and change management.",
-  why: "Listen, identify, position: the whole job in one answer."
-};
+<script type="module">
+import { SELLER_NAME as BRAND_NAME } from "./shared/identity.mjs";
+import { training } from "./shared/training.mjs";
+const { pack } = training.openPage("jeopardy");
+document.getElementById("packNotice").textContent = pack.disclaimer;
+const CATEGORIES = pack.jeopardy.categories;
+const FINAL = pack.jeopardy.final;
 const VALUES = [100,200,300,400,500];
 const TEAM_COLORS = ["#38bdf8","#f472b6","#a3e635","#fb923c"];
-</script>
-<script>
-/* =============== GAME ENGINE =============== */
+const CLUE_TOTAL = CATEGORIES.reduce((total, category) => total + category.clues.length, 0);
 const $ = id => document.getElementById(id);
 const STORE = "aiDealJeopardy.v1";
 const fmt = n => (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString();
@@ -462,7 +350,7 @@ function renderBoard(){
     if (used) t.tabIndex = -1; else t.addEventListener("click", () => openClue(ci, r, t));
     b.appendChild(t);
   }));
-  $("finalBtn").style.animation = S.used.length >= 30 ? "pulse 1.2s ease-in-out infinite" : "";
+  $("finalBtn").style.animation = S.used.length >= CLUE_TOTAL ? "pulse 1.2s ease-in-out infinite" : "";
 }
 
 /* ---------- Teams ---------- */
@@ -573,7 +461,7 @@ function closeClue(){
   }, 320);
   setTimeout(() => {
     ov.classList.remove("show"); cur = null; closing = false; renderBoard(); stopConfetti();
-    if (S.used.length >= 30) toast("Board cleared! Press F for Final Jeopardy");
+    if (S.used.length >= CLUE_TOTAL) toast("Board cleared! Press F for Final Jeopardy");
   }, 900);
 }
 function reveal(){
