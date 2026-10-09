@@ -300,6 +300,11 @@ body.group{--fs:1.06}
     </div>
   </div>
 
+  <div style="padding:4px 24px;color:var(--muted);font-size:12px;line-height:1.5">
+    <p id="selectionNotice" role="status"></p>
+    <p id="saveNotice" role="status"></p>
+  </div>
+
   <!-- Scenario picker -->
   <section class="screen show" id="sPick">
     <div class="pick"><div class="inner">
@@ -369,7 +374,13 @@ body.group{--fs:1.06}
 <script type="module">
 import { SELLER_NAME as BRAND_NAME } from "./shared/identity.mjs";
 import { training } from "./shared/training.mjs";
-const { pack } = training.openPage("roleplay");
+let pageState;
+try { pageState = training.openPage("roleplay"); }
+catch (error) { document.getElementById("saveNotice").textContent = error.message; throw error; }
+const { pack } = pageState;
+training.observeSelection(selection => {
+  document.getElementById("selectionNotice").textContent = pageState.selectionNotice(selection);
+});
 document.getElementById("packNotice").textContent = pack.disclaimer;
 const SCENARIOS = pack.roleplay.scenarios;
 const $ = id => document.getElementById(id);
@@ -378,9 +389,9 @@ const DIMS = [["d", "Discovery", "var(--data)"], ["l", "Listening", "var(--data)
 const SIG = { buy: { label: "Buying signal", col: "var(--green)" }, pain: { label: "Pain point", col: "var(--amber)" }, ready: { label: "AI readiness cue", col: "var(--sky)" }, red: { label: "Red flag", col: "var(--red)" } };
 const Q = { best: { label: "Ideal move", col: "var(--green)", pts: 100, icon: "" }, good: { label: "Solid", col: "var(--sky)", pts: 60, icon: "" }, meh: { label: "Missed opportunity", col: "var(--amber)", pts: 20, icon: "" }, bad: { label: "Risky move", col: "var(--red)", pts: 0, icon: "" } };
 const LET = ["A", "B", "C", "D"];
-const PREFS_KEY = "aiRoleplay.prefs.v1";
-let prefs = { group: false, spot: true, ideal: false };
-try { Object.assign(prefs, JSON.parse(localStorage.getItem(PREFS_KEY)) || {}); } catch (e) {}
+const restoredPreferences = pageState.readPreferences();
+let prefs = restoredPreferences.prefs;
+$("saveNotice").textContent = restoredPreferences.message;
 let R = null;
 
 document.querySelectorAll(".brandInline").forEach(e => e.textContent = BRAND_NAME);
@@ -648,9 +659,12 @@ function debrief(){
 function applyPrefs(){
   document.body.classList.toggle("group", prefs.group); document.body.classList.toggle("spot", prefs.spot); document.body.classList.toggle("showideal", prefs.ideal);
   $("tGroup").classList.toggle("on", prefs.group); $("tSpot").classList.toggle("on", prefs.spot); $("tIdeal").classList.toggle("on", prefs.ideal);
-  try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch (e) {}
 }
-function toggle(k, label){ prefs[k] = !prefs[k]; applyPrefs(); toast(label + (prefs[k] ? " on" : " off")); }
+function toggle(k, label){
+  prefs[k] = !prefs[k]; applyPrefs();
+  $("saveNotice").textContent = pageState.savePreferences(prefs).message;
+  toast(label + (prefs[k] ? " on" : " off"));
+}
 $("tGroup").onclick = () => { toggle("group", "Group mode"); if (R && R.phase === "choose") fitThread(); };
 $("tSpot").onclick = () => toggle("spot", "Signal spotter");
 $("tIdeal").onclick = () => toggle("ideal", "Ideal path");

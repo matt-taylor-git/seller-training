@@ -104,7 +104,7 @@ async function closeTile(page) {
 }
 
 async function storedBoard(page) {
-  return page.evaluate(() => JSON.parse(localStorage.getItem('aiDealJeopardy.v1')));
+  return page.evaluate(() => JSON.parse(localStorage.getItem('aiDealJeopardy.v2.default.1')).state);
 }
 
 const score = (page, index) => page.locator(`#team${index} .score`);

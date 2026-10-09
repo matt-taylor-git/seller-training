@@ -69,6 +69,51 @@ async function measure(browser, origin, activity) {
   } finally { await context.close(); }
 }
 
+async function measureStorage(browser, origin, version) {
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    await page.route('https://fonts.googleapis.com/**', route => route.abort());
+    await page.route('https://fonts.gstatic.com/**', route => route.abort());
+    await page.goto(`${origin}/jeopardy.html`);
+    return await page.evaluate(async ({ version, samples }) => {
+      const candidate = version === 'candidate';
+      const training = candidate ? (await import('/shared/training.mjs')).training : null;
+      const key = candidate ? 'aiDealJeopardy.v2.default.1' : 'aiDealJeopardy.v1';
+      const state = { teams: Array.from({ length: 4 }, (_, i) => ({ name: String(i).repeat(28), score: Number.MAX_SAFE_INTEGER - i })),
+        used: Array.from({ length: 30 }, (_, i) => `${Math.floor(i / 5)}-${i % 5}`), dd: ['0-1', '1-4'], timerOn: true, muted: true, timerSecs: 60 };
+      const serialized = () => JSON.stringify(candidate ? { schema: 2, packId: 'default', packRevision: 1, state } : state);
+      localStorage.setItem(key, serialized());
+      const operations = { absentSelection: [], selectedResolution: [], checkpointRead: [], checkpointWrite: [] };
+      const timed = operation => { const start = performance.now(); operation(); return performance.now() - start; };
+      for (let sample = 0; sample < samples; sample++) {
+        localStorage.removeItem('aiTraining.selection.v1');
+        operations.absentSelection.push(timed(() => candidate ? training.readSelection() : localStorage.getItem('aiTraining.selection.v1')));
+        if (candidate) {
+          localStorage.setItem('aiTraining.selection.v1', '{"schema":1,"packId":"default"}');
+          operations.selectedResolution.push(timed(() => training.readSelection()));
+        }
+        operations.checkpointRead.push(timed(() => {
+          const restored = candidate ? training.openPage('jeopardy').readCheckpoint().state : JSON.parse(localStorage.getItem(key));
+          if (restored.used.length !== 30 || restored.teams.length !== 4) throw new Error('Maximal board did not restore.');
+        }));
+        state.teams[0].score -= 1;
+        const handle = candidate ? training.openPage('jeopardy') : null;
+        if (handle) handle.readCheckpoint();
+        operations.checkpointWrite.push(timed(() => {
+          if (candidate) { if (!handle.saveCheckpoint(state).ok) throw new Error('Checkpoint write failed.'); }
+          else localStorage.setItem(key, JSON.stringify(state));
+        }));
+        const written = JSON.parse(localStorage.getItem(key));
+        if ((candidate ? written.state : written).teams[0].score !== state.teams[0].score) throw new Error('Checkpoint write was not durable.');
+      }
+      return { operations, serializedBytes: new TextEncoder().encode(serialized()).length,
+        absentSelectionMeaning: candidate ? 'Resolve absent preference to Default' : 'Raw absent-key read; trunk has no selection feature',
+        selectedResolutionAvailable: candidate, maximalTeams: 4, maximalUsedTiles: 30 };
+    }, { version, samples });
+  } finally { await context.close(); }
+}
+
 const p95 = values => [...values].sort((a, b) => a - b)[Math.ceil(values.length * 0.95) - 1];
 const servers = {};
 let browser;
@@ -76,6 +121,14 @@ try {
   servers.baseline = await server(baseline);
   servers.candidate = await server(candidate);
   browser = await chromium.launch();
+  const storage = {};
+  if (args.includes('--storage')) {
+    for (const version of ['baseline', 'candidate']) {
+      const result = await measureStorage(browser, servers[version].origin, version);
+      const p95Ms = Object.fromEntries(Object.entries(result.operations).map(([name, values]) => [name, values.length ? p95(values) : null]));
+      storage[version] = { ...result, p95Ms, passed: Object.values(p95Ms).every(value => value === null || value <= 10) && result.serializedBytes <= 16 * 1024 };
+    }
+  }
   const measurements = { jeopardy: { baseline: [], candidate: [] }, roleplay: { baseline: [], candidate: [] } };
   const order = [];
   for (let sample = 0; sample < samples; sample++) {
@@ -102,10 +155,10 @@ try {
   const report = { samplesPerRoutePerVersion: samples, browser: browser.version(), viewport: { width: 1440, height: 900 },
     fontsBlocked: true, coldContexts: true, baseline: { path: resolve(baseline), sha: sha(baseline) },
     candidate: { path: resolve(candidate), sha: sha(candidate), dirty: Boolean(execFileSync('git', ['-C', resolve(candidate), 'status', '--porcelain'], { encoding: 'utf8' }).trim()) },
-    summary, order };
+    summary, storage, order };
   if (option('--output')) await writeFile(resolve(option('--output')), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
-  if (!Object.values(summary).every(item => item.passed)) process.exitCode = 1;
+  if (!Object.values(summary).every(item => item.passed) || !Object.values(storage).every(item => item.passed)) process.exitCode = 1;
 } finally {
   if (browser) await browser.close();
   for (const instance of Object.values(servers)) await instance.close();
