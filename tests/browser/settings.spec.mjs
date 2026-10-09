@@ -44,7 +44,7 @@ const stored = (page, key = selectionKey) => page.evaluate(key => localStorage.g
 async function choose(page, id) {
   await radio(page, id).check();
   await page.getByRole('button', { name: 'Save', exact: true }).click();
-  await expect(page.locator('#saveStatus')).toContainText(`${id === 'fsi' ? 'FSI' : 'Default'} selected for both activities.`);
+  await expect(page.locator('#saveStatus')).toContainText(`${id === 'fsi' ? 'Financial services' : 'Default'} selected for both activities.`);
   await expect(page.locator('#saveSelection')).toBeDisabled();
 }
 async function settingsFromGame(page, selector = 'a[href="settings.html"]') {
@@ -102,19 +102,19 @@ test('Lane 2. One FSI save drives both game entries and Home previews.', async (
   await radio(page, 'fsi').check();
   expect(await stored(page)).toBeNull();
   await page.locator('#saveSelection').click();
-  await expect(page.locator('#saveStatus')).toHaveText('FSI selected for both activities. Open games keep their current pack.');
+  await expect(page.locator('#saveStatus')).toHaveText('Financial services selected for both activities. Open games keep their current pack.');
   expect(await page.evaluate(() => window.__preferenceWrites)).toEqual(['{"schema":1,"packId":"fsi"}']);
   await page.getByRole('link', { name: 'Return to Home' }).click();
   await homePack(page, fsiPack);
   await expect(page.locator('body')).not.toContainText('9,000 invoices');
   await page.locator('a[href="roleplay.html"]').click();
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('.pcard')).toHaveCount(fsiPack.roleplay.scenarios.length);
   for (const scenario of fsiPack.roleplay.scenarios) await expect(page.locator(`#personas .pcard[data-id="${scenario.id}"]`)).toContainText(scenario.persona.name);
   await capture(page, 'fsi-roleplay.png');
   await page.locator('.brand').click();
   await page.locator('a[href="jeopardy.html"]').click();
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('.cat')).toHaveText(fsiPack.jeopardy.categories.map(category => category.name));
   await capture(page, 'fsi-both.png');
 });
@@ -125,10 +125,10 @@ test('Lane 3. Switching both ways restores each pack board and no neighboring sc
   const original = await stored(page, 'aiDealJeopardy.v2.default.1');
   const settings = await settingsFromGame(page);
   await choose(settings, 'fsi');
-  await expect(page.locator('#selectionNotice')).toContainText('FSI is selected');
+  await expect(page.locator('#selectionNotice')).toContainText('Financial services is selected');
   page.once('dialog', dialog => dialog.accept());
   await page.locator('.app .openSelected').click();
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('#team0 .score')).toHaveText('$0');
   await scoreClue(page);
   await page.locator('#team0 .adj button').first().click();
@@ -183,7 +183,7 @@ test('Lane 5. Settings preserves typing and feedback; canceled relaunch keeps th
   await page.locator('#briefGo').click();
   await expect(page.locator('.typing')).toBeVisible();
   await choose(settings, 'fsi');
-  await expect(page.locator('#selectionNotice')).toContainText('FSI is selected');
+  await expect(page.locator('#selectionNotice')).toContainText('Financial services is selected');
   await expect(page.locator('.choice')).toHaveCount(3);
   await expect(page.locator('.msg.cust')).toHaveCount(1);
   const thread = await page.locator('#thread').innerHTML();
@@ -217,7 +217,7 @@ test('Lane 5. Settings preserves typing and feedback; canceled relaunch keeps th
   await choose(settings, 'fsi');
   page.once('dialog', dialog => dialog.accept());
   await page.locator('#openSelected').click();
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('#sPick')).toHaveClass(/show/);
 });
 
@@ -261,7 +261,7 @@ test('Lane 6. Clue and Final survive Settings; relaunch warns about stages and u
   await choose(settings, 'fsi');
   page.once('dialog', dialog => dialog.accept());
   await page.locator('#final .openSelected').click();
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('#final')).not.toHaveClass(/show/);
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new DOMException('Full', 'QuotaExceededError'); }; });
   await page.locator('#team0 .adj button').first().click();
@@ -293,11 +293,11 @@ test('Lane 7. Two tabs, focus, and history reconcile previews without discarding
   await page.goBack();
   await homePack(page, fsiPack);
   await page.goForward();
-  await expect(page.locator('#selectionStatus')).toHaveText('Current pack: FSI.');
+  await expect(page.locator('#selectionStatus')).toHaveText('Current pack: Financial services.');
   await page.getByRole('link', { name: 'Home', exact: true }).click();
   await page.locator('a[href="roleplay.html"]').click();
   await choose(settings, 'default');
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI.');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services.');
   await expect(page.locator('#selectionNotice')).toContainText('Default is selected');
   await capture(page, 'settings-history.png');
   await page.locator('.brand').click();
@@ -327,7 +327,7 @@ test('Lane 8. Native keyboard controls show focus and game navigation never cons
   expect(await page.locator('#saveSelection').evaluate(node => getComputedStyle(node).outlineStyle)).toBe('solid');
   await capture(page, 'settings-keyboard.png');
   await page.keyboard.press('Enter');
-  await expect(page.locator('#saveStatus')).toContainText('FSI selected');
+  await expect(page.locator('#saveStatus')).toContainText('Financial services selected');
   await page.keyboard.press('Shift+Tab');
   await expect(radio(page, 'fsi')).toBeFocused();
   await page.keyboard.press('ArrowUp');
@@ -380,7 +380,7 @@ test('Lane 8. Native keyboard controls show focus and game navigation never cons
   await page.keyboard.press('Space');
   await expect(page).toHaveURL(/jeopardy\.html$/);
   await page.keyboard.press('Enter');
-  await expect(page.locator('#currentPack')).toHaveText('Current pack: FSI');
+  await expect(page.locator('#currentPack')).toHaveText('Current pack: Financial services');
   await page.locator('a[href="jeopardy.html"]').click();
   await expect(page.locator('.tile')).toHaveCount(30);
   await page.locator('.app a[href="settings.html"]').focus();
@@ -398,7 +398,7 @@ test('Lane 8. Native keyboard controls show focus and game navigation never cons
   await page.locator('.app .openSelected').focus();
   page.once('dialog', dialog => dialog.dismiss());
   await page.keyboard.press('Space');
-  await expect(page.locator('#selectionNotice')).toContainText('Current pack: FSI');
+  await expect(page.locator('#selectionNotice')).toContainText('Current pack: Financial services');
   await page.locator('.tile[data-key="0-0"]').click();
   await expect(page.locator('#flipper')).toHaveClass(/flipped/);
   const clue = await page.locator('#clueText').textContent();
@@ -482,7 +482,7 @@ test('Lane 9. Blocked reads, failed writes, uncertain confirmation, and invalid 
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
   await expect(radio(page, 'fsi')).toBeChecked();
   await page.locator('#saveSelection').click();
-  await expect(page.locator('#saveStatus')).toContainText('FSI selected for both activities');
+  await expect(page.locator('#saveStatus')).toContainText('Financial services selected for both activities');
 });
 
 test('Lane 10. Settings stays readable at both desktop sizes, 200 percent CSS zoom, and reduced motion.', async ({ page }) => {
@@ -509,7 +509,7 @@ test('Lane 10. Settings stays readable at both desktop sizes, 200 percent CSS zo
     }
     await page.locator('#saveSelection').scrollIntoViewIfNeeded();
     await page.locator('#saveSelection').click();
-    await expect(page.locator('#saveStatus')).toContainText('FSI selected');
+    await expect(page.locator('#saveStatus')).toContainText('Financial services selected');
     await choose(page, 'default');
   }
   await page.evaluate(() => { document.documentElement.style.zoom = ''; });

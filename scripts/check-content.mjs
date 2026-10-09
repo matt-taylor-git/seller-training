@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import fsiPack from '../prototype/seller-ai-training/packs/fsi.mjs';
 import { validatePack } from '../prototype/seller-ai-training/shared/pack-contract.mjs';
 
-export const categoryNames = ['Listen for the signal', 'Match the workflow', 'Choose the CDW play', 'Data and risk', 'Qualify the workload', 'Prove the value'];
+export const categoryNames = ['Listen for what the customer needs.', 'Match the tool to the job.', 'Choose the CDW service that fits.', 'Check the data and the risks.', 'Check whether the customer qualifies.', 'Check whether the results are worth it.'];
 const expansions = { AI: 'artificial intelligence', GPU: 'graphics processing unit', LLM: 'large language model', M365: 'Microsoft 365', AWS: 'Amazon Web Services', FinOps: 'financial operations' };
 const unavailable = ['FinOps for AI', 'AI Value Assurance', 'Agents & Workflow Automation', 'Security from AI', 'Hyperscaler AI Foundation', 'AI-Accelerated Engineering', 'Modern Data Ecosystem Design Workshop'];
 const digest = value => createHash('sha256').update(value).digest('hex');
@@ -17,7 +17,7 @@ export function checkContent(pack, provenance, source) {
   validatePack(pack);
   assert.equal(pack.id, 'fsi');
   assert.equal(pack.revision, 1);
-  assert.equal(pack.label, 'FSI');
+  assert.equal(pack.label, 'Financial services');
   assert.equal(pack.roleplay.scenarios.length, 4);
   assert.deepEqual(pack.jeopardy.categories.map(category => category.name), categoryNames);
   assert.match(pack.disclaimer, /fictional training scenarios/i);
