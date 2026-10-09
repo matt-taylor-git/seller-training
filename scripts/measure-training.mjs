@@ -11,6 +11,8 @@ const option = name => {
 const samples = Number(option('--samples') || 20);
 const baseline = option('--baseline');
 const candidate = option('--candidate');
+const packs = (option('--packs') || 'default').split(',');
+if (new Set(packs).size !== packs.length || packs.some(pack => !['default', 'fsi'].includes(pack))) throw new Error('--packs accepts default,fsi without duplicates.');
 if (!baseline || !candidate || !Number.isInteger(samples) || samples < 20) throw new Error('Provide --baseline, --candidate, and at least 20 --samples.');
 
 async function server(directory) {
@@ -36,22 +38,26 @@ async function server(directory) {
   } catch (error) { child.kill('SIGTERM'); await exited; throw error; }
 }
 
-async function measure(browser, origin, activity) {
+async function measure(browser, origin, activity, packId, verifyPack) {
   const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   try {
     const page = await context.newPage();
     await page.route('https://fonts.googleapis.com/**', route => route.abort());
     await page.route('https://fonts.gstatic.com/**', route => route.abort());
-    await page.addInitScript(activityName => {
+    await page.addInitScript(({ activityName, packId, verifyPack }) => {
+      if (location.protocol !== 'http:') return;
+      localStorage.setItem('aiTraining.selection.v1', JSON.stringify({ schema: 1, packId }));
       function ready() {
         const usable = activityName === 'jeopardy'
           ? document.querySelectorAll('#board .tile').length === 30 && document.querySelectorAll('#teams .team').length >= 2
           : document.querySelectorAll('#personas .pcard').length === 4;
-        if (usable) window.__trainingUsable = performance.now();
+        const label = packId === 'fsi' ? 'FSI' : 'Default';
+        const pinned = !verifyPack || document.querySelector('#selectionNotice')?.textContent.includes(`Current pack: ${label}.`);
+        if (usable && pinned) window.__trainingUsable = performance.now();
         else requestAnimationFrame(ready);
       }
       requestAnimationFrame(ready);
-    }, activity);
+    }, { activityName: activity, packId, verifyPack });
     const bodies = [];
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -65,7 +71,7 @@ async function measure(browser, origin, activity) {
     const usableMs = await page.evaluate(() => window.__trainingUsable);
     const responses = await Promise.all(bodies);
     if (errors.length || responses.some(item => item.status !== 200)) throw new Error(JSON.stringify({ errors, responses }));
-    return { usableMs, decodedBytes: responses.reduce((sum, item) => sum + item.bytes, 0), responses };
+    return { usableMs, decodedBytes: responses.reduce((sum, item) => sum + item.bytes, 0), responses, effectivePack: packId };
   } finally { await context.close(); }
 }
 
@@ -129,14 +135,17 @@ try {
       storage[version] = { ...result, p95Ms, passed: Object.values(p95Ms).every(value => value === null || value <= 10) && result.serializedBytes <= 16 * 1024 };
     }
   }
-  const measurements = { jeopardy: { baseline: [], candidate: [] }, roleplay: { baseline: [], candidate: [] } };
+  const measurements = Object.fromEntries(packs.flatMap(pack => ['jeopardy', 'roleplay'].map(activity => [pack === 'default' ? activity : `${pack}.${activity}`, { baseline: [], candidate: [] }])));
   const order = [];
   for (let sample = 0; sample < samples; sample++) {
-    for (const activity of ['jeopardy', 'roleplay']) {
-      for (const version of sample % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
-        const result = await measure(browser, servers[version].origin, activity);
-        measurements[activity][version].push(result);
-        order.push({ sample: sample + 1, activity, version, ...result });
+    for (const pack of sample % 2 ? [...packs].reverse() : packs) {
+      for (const activity of ['jeopardy', 'roleplay']) {
+        for (const version of sample % 2 ? ['candidate', 'baseline'] : ['baseline', 'candidate']) {
+          const effectivePack = version === 'baseline' ? 'default' : pack;
+          const result = await measure(browser, servers[version].origin, activity, effectivePack, version === 'candidate');
+          measurements[pack === 'default' ? activity : `${pack}.${activity}`][version].push(result);
+          order.push({ sample: sample + 1, pack, activity, version, ...result });
+        }
       }
     }
   }
@@ -152,7 +161,7 @@ try {
     };
   }
   const sha = directory => execFileSync('git', ['-C', resolve(directory), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-  const report = { samplesPerRoutePerVersion: samples, browser: browser.version(), viewport: { width: 1440, height: 900 },
+  const report = { samplesPerRoutePerVersion: samples, packs, baselineComparison: 'Each requested candidate pack uses an actual cold baseline Default entry screen. No synthetic FSI baseline is claimed.', browser: browser.version(), viewport: { width: 1440, height: 900 },
     fontsBlocked: true, coldContexts: true, baseline: { path: resolve(baseline), sha: sha(baseline) },
     candidate: { path: resolve(candidate), sha: sha(candidate), dirty: Boolean(execFileSync('git', ['-C', resolve(candidate), 'status', '--porcelain'], { encoding: 'utf8' }).trim()) },
     summary, storage, order };

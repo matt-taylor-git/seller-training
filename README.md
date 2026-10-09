@@ -66,11 +66,11 @@ The probe starts Python servers and interleaves cold browser contexts with fonts
 
 ## Content and saves
 
-`packs/default.mjs` contains one complete aggregate for both activities. `shared/identity.mjs` owns the seller name. `shared/training.mjs` validates and deeply freezes registered packs. Each engine calls `training.openPage(activity)` once and retains that pack. The game engines remain inline module scripts in their own pages.
+`packs/default.mjs` and `packs/fsi.mjs` each contain one complete aggregate for both activities. `shared/identity.mjs` owns the seller name. `shared/training.mjs` validates and deeply freezes registered packs. Each engine calls `training.openPage(activity)` once and retains that pack. The game engines remain inline module scripts in their own pages.
 
 Each page pins its pack when it opens. Reset, Replay, timers, and Final keep that pack. Selection changes update a notice, never an active game. Reopening an activity adopts the saved selection. Storage events, focus, and browser history restoration refresh the notice.
 
-Selection uses `aiTraining.selection.v1` with `{schema: 1, packId}`. A missing selection uses Default. An invalid or unknown selection also uses Default, but retains an invalid status until an explicit save repairs it. A known pack that fails content checks blocks entry instead of showing another pack under its name. This change adds no Settings screen or alternate production pack.
+Selection uses `aiTraining.selection.v1` with `{schema: 1, packId}`. A missing selection uses Default. An invalid or unknown selection also uses Default, but retains an invalid status until an explicit save repairs it. A known pack that fails content checks blocks entry instead of showing another pack under its name. The registry contains Default and FSI. No Settings screen exists yet. Browser test setup selects FSI until the later Settings change.
 
 Jeopardy uses durable `localStorage` under `aiDealJeopardy.v2.<packId>.<revision>`. Each record contains `{schema: 2, packId, packRevision, state}`. The state contains teams, scores, used tiles, Daily Doubles, timer settings, and sound settings. It does not contain an open clue, Final stage, or undo history. Different packs and revisions never share a board.
 
@@ -103,6 +103,29 @@ node scripts/measure-training.mjs --storage --baseline ../baseline --candidate .
 The browser lanes cover migration, rejected records, isolated packs, pinned play, history, storage failures, durable saves, and same-pack writes. `PORT` gives independent browser runs separate servers. The alternate fixture stays under `tests/fixtures`, outside the served application. Test-only route replacement registers it without a production URL override.
 
 The storage probe times real browser reads and writes with a maximal valid board. Every operation must stay within 10 ms at p95. Checkpoint JSON must stay below 16 KiB. The probe also retains the page-load limits above. Trunk has no selection feature, so its absent-key read appears separately from candidate selection resolution.
+
+## Verify FSI
+
+FSI adds fictional bank, insurance, wealth, and payments conversations. It teaches data ownership, human review, platform qualification, workload-specific hosting, and measured value. Its board contains 6 categories, 30 clues, and 1 Final. Both activities share one pack.
+
+The pack contains 23 nodes, 69 choices, 12 outcomes, and 5 takeaways per scenario. Bank and insurance each take 7 choices. Insurance recovery uses an alternate second node without changing the engine. Wealth and payments each take 4 choices.
+
+Read [the FSI authoring record](content-authoring/README.md) for source dates, claim coverage, review status, and distribution limits. All 35 items have evidence records with 56 claim entries. The source compilation is not copied into the repository. Provenance stays outside the web root.
+
+Run the content and 10 browser lanes:
+
+```sh
+node scripts/check-content.mjs
+node --test tests/fsi-content.test.mjs
+CP3_EVIDENCE_DIR=/tmp/cp3-evidence PORT=8183 npx playwright test tests/browser/fsi.spec.mjs
+node scripts/measure-training.mjs --baseline ../baseline --candidate . --samples 20 --packs default,fsi
+```
+
+The browser lanes select FSI through declared localStorage setup, then use actual clicks and keys. They cover ideal play, risky bank play, insurance recovery, all 31 quiz answers, both Daily Doubles, Final scoring, Default return, and group-mode density. Readability checks run at 1440 by 900 and 1920 by 1080 pixels. They count rendered lines, record text and element heights, and pin existing font sizes. Regular answers allow 3 lines, Final answers allow 4, and supporting notes allow 3. Authored word ceilings also prevent oversized copy before browser testing. `CP3_EVIDENCE_DIR` retains screenshots, answer records, and browser error logs. Playwright saves videos and traces under `test-results`.
+
+The performance probe measures actual candidate Default and FSI entries against equivalent baseline Default screens. It records 20 cold samples per route and version, interleaves baseline and candidate, and blocks remote fonts. The same 1000 ms, 150 ms delta, and 400 KiB limits apply. Run a separate comparison against the CP2 worktree to retain its Default baseline.
+
+Coming Soon plays remain unavailable. Offering descriptions reflect the supplied compilation on 2026-10-07, not a verified live catalog. Confirm current scope and prerequisites before customer use. The integration task reports a source-reviewed draft with PASS and 2 minor notes, which this change addresses. Parent review of the final committed pack remains open. Public hosting and distribution are not approved by this change.
 
 ## Supplied material
 
