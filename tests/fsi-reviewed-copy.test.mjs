@@ -1,77 +1,51 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import fsi from '../prototype/seller-ai-training/packs/fsi.mjs';
 
-const reviewedOrder = [
-  {
-    steps: [/^Agree what Private AI Launch Workshop/, /^Use AI Readiness Data Quality Assessment/, /^Consider AI Risk Assessment.*model-risk team/, /^For AI Factory Accelerator.*NVIDIA DGX.*NVIDIA graphics processing units.*existing NVIDIA AI Enterprise subscription/, /^If existing graphics processing units use Kubernetes/, /^Use a small working test.*separate decision about letting staff rely on policy search/],
-    takeaways: [/^Ask why a trial stopped/, /^Name the person who owns the policy documents separately from the person responsible for running policy search/, /^Bring security and finance/, /^Choose where each job runs/, /^An AI Factory Accelerator test provides evidence, not approval for staff to rely on policy search/]
-  },
-  {
-    steps: [/^Provide scores showing readiness.*business case summary.*plan in priority order.*briefing for decision makers/, /^If access, data history, or ownership needs work/, /^Consider Data Quality and Remediation.*Modern Data Platform for AI only after/, /^Check whether AI Risk Assessment fits/, /^For software that generates answers for customers/, /^Plan any later trial separately/],
-    takeaways: [/^Help with incoming documents does not mean/, /^Test the difficult documents/, /^State who reviews results/, /^Correct a claim you cannot support/, /^A risk assessment reviews risks/]
-  },
-  {
-    steps: [/^Confirm the chosen tools/, /^Consider M365 Copilot Deployment Accelerator.*up to 50 users/, /^Consider Copilot Adoption and Change Management/, /^Plan any connection that collects meeting information separately/, /^Keep client consent and advisor approval/],
-    takeaways: [/^If few people use a tool/, /^Client consent and advisor approval are separate/, /^A company's public example/, /^Measure total time including review/, /^Do not sell services that are not available yet\. Do not promise investment advice without advisor approval\.$/]
-  },
-  {
-    steps: [/^Confirm the chosen system\./, /^Confirm what FirstTouch AI currently covers/, /^Agree on identity checks/, /^Use Contact Center Strategic Consulting/, /^Before expanding, measure/],
-    takeaways: [/^Serving an industry does not prove/, /^FirstTouch AI covers first contact/, /^Payments by artificial intelligence agents are emerging\..*agents can take actions for someone/, /^Measure identity checks/, /^A successful trial of one job does not approve/]
-  }
-];
+const map = readFileSync(new URL('../content-authoring/fsi-lesson-map.md', import.meta.url), 'utf8');
+const provenance = JSON.parse(readFileSync(new URL('../content-authoring/fsi-provenance.json', import.meta.url), 'utf8'));
 
-for (const [index, expected] of reviewedOrder.entries()) {
-  const scenario = fsi.roleplay.scenarios[index];
-  for (const [name, patterns] of Object.entries(expected)) {
-    const entries = name === 'steps' ? scenario.offering.steps : scenario.takeaways;
-    const check = copy => {
-      assert.equal(copy.length, patterns.length);
-      for (const [position, pattern] of patterns.entries()) assert.match(copy[position], pattern);
-    };
-    test(`${scenario.id} keeps the reviewed ${name} in order and rejects every pair swap.`, () => {
-      check(entries);
-      for (let left = 0; left < entries.length; left++) {
-        for (let right = left + 1; right < entries.length; right++) {
-          const swapped = [...entries];
-          [swapped[left], swapped[right]] = [swapped[right], swapped[left]];
-          assert.throws(() => check(swapped), `${name} swap ${left} and ${right} must fail.`);
-        }
-      }
-    });
-  }
-}
-
-test('Reviewed copy spells out percentages and leaves M365 only in the official offering name.', () => {
-  const copy = JSON.stringify(fsi).replaceAll('M365 Copilot Deployment Accelerator', '');
-  assert(!/%|\bM365\b/.test(copy));
-  assert(!/daily use|time after review|automatic payments are emerging|software-driven payments/i.test(copy));
+test('The authoring map covers every node and standalone quiz premise.', () => {
+  for (const scenario of fsi.roleplay.scenarios) for (const nodeId of Object.keys(scenario.nodes)) assert(map.includes(`| ${nodeId} |`), nodeId);
+  for (let category = 0; category < 6; category++) for (let row = 0; row < 5; row++) assert(map.includes(`| ${category}-${row} |`));
+  assert(map.includes('| Final |'));
+  assert.match(map, /Already visible.*Customer reveals now.*Seller decision/);
 });
 
-test('The 11 reviewed option lists stay inside complete questions.', () => {
-  const locations = [[0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2], [2, 3], [3, 0], [5, 0]];
-  for (const [category, row] of locations) {
-    const question = fsi.jeopardy.categories[category].clues[row].q;
-    assert.match(question, /(?:Should you|Does the published Morgan Stanley Debrief example).*\?$/);
-    assert.equal((question.match(/\?/g) || []).length, 1);
+test('Evidence distinguishes fiction, authored plans, and source claims without inheriting an approval.', () => {
+  assert.equal(provenance.packRevision, 2);
+  assert.match(provenance.reviewStatus, /No earlier PASS status carries forward/);
+  assert.match(provenance.reviewStatus, /independent parent review/);
+  const kinds = new Set(provenance.items.flatMap(item => item.claims.map(claim => claim.kind)));
+  assert.deepEqual(kinds, new Set(['fictional-fact', 'authored-recommendation', 'source-claim']));
+});
+
+test('The new curriculum omits catalog prerequisites, availability trivia, and survey recall.', () => {
+  const copy = JSON.stringify(fsi);
+  assert.doesNotMatch(copy, /NVIDIA|GPU|Kubernetes|Factory Accelerator|FinOps|AI Value Assurance|Coming Soon|percent of respondents/);
+  const names = ['Private AI Launch Workshop', 'AI Readiness Data Quality Assessment', 'AI Risk Assessment', 'Copilot Adoption and Change Management', 'FirstTouch AI'];
+  for (const name of names) assert(copy.includes(name));
+});
+
+test('Score-selected outcomes assess the approach rather than asserting a customer commitment.', () => {
+  for (const scenario of fsi.roleplay.scenarios) {
+    assert.match(scenario.outcomes.great.text, /still need|still require/);
+    for (const result of Object.values(scenario.outcomes)) {
+      assert.match(result.text, /your approach/i);
+      assert.doesNotMatch(result.text, /booked|signed|greenlit|approved the|agreed to buy|introduces you/);
+    }
   }
 });
 
-test('Bank eligibility and risk review retain their specific requirements.', () => {
+test('Official offering limits remain next to the claims that need them.', () => {
   const bank = fsi.roleplay.scenarios[0];
-  assert.match(bank.nodes.b3.ch[0].t, /security, finance, and your model-risk team/);
-  assert.match(bank.nodes.b3.ch[0].t, /Finance would check running costs while your model-risk team checks whether the software gives reliable answers for lending staff/);
-  assert.match(bank.nodes.b3.ch[0].fb, /Security checks data protection, the model-risk team checks model reliability and suitability, and finance checks costs/);
-  assert.match(bank.nodes.b5.ch[0].fb, /existing NVIDIA DGX or approved manufacturer system with NVIDIA graphics processing units, plus an existing NVIDIA AI Enterprise subscription/);
-  assert.match(bank.nodes.b6.ch[0].t, /That isn't approval for staff to rely on it/);
-  assert.match(bank.outcomes.great.text, /does not approve staff relying on policy search or imply regulatory approval/);
-});
-
-test('Payments coaching limits the refund claim to FirstTouch AI and keeps agent payments distinct.', () => {
+  assert.match(bank.offering.steps[2], /If document problems.*AI Readiness Data Quality Assessment.*confirm its current scope/);
+  const wealth = fsi.roleplay.scenarios[2];
+  assert.match(wealth.offering.steps[3], /integration separately/);
   const payments = fsi.roleplay.scenarios[3];
-  assert.match(payments.nodes.p3.c, /Agents are software that can take actions for someone/);
-  assert.match(payments.nodes.p3.ch[0].t, /Payments by agents still raise questions about consent, who covers losses, fraud, and proving which agent is acting/);
-  assert.match(payments.nodes.p3.ch[0].t, /can't promise FirstTouch AI can issue refunds without a person/);
-  assert.match(payments.nodes.p3.ch[0].fb, /payments by artificial intelligence agents/);
-  assert.match(payments.nodes.p3.ch[0].fb, /emerging without evidence of widespread use.*source does not show refunds without people for FirstTouch AI/);
+  assert.match(payments.nodes.transfer.ch[0].fb, /does not guarantee.*handoff or integration/);
+  assert.match(payments.nodes.authority.ch[0].fb, /does not prove it can decide or issue refunds/);
+  const risk = fsi.jeopardy.categories[3].clues[3];
+  assert.match(risk.a, /does not grant approval/);
 });

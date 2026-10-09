@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "packId": "fsi",
-  "packRevision": 1,
-  "reviewStatus": "The task reports an independent source review of the draft with PASS and 2 minor notes. CP3 spells out United Kingdom and keeps insurance recovery at the second-node depth. The integrator compared claims with the complete supplied compilation. The readability revision narrows Final to intake, 2 signals, one qualified assessment, owners, and a rejected hosting promise. It removes speculative future services from Final rather than relocating them into coaching. Parent review of the final committed pack remains required.",
+  "packRevision": 2,
+  "reviewStatus": "Fresh revision-2 author evidence mapping. No earlier PASS status carries forward. Author checks do not replace independent parent review. Linked source pages and current service availability were not independently verified.",
   "source": {
     "id": "supplied-fsi-playbook",
     "title": "AI in Financial Services: Research Summary & CDW Seller Playbook",
@@ -13,188 +13,929 @@
     "evidenceRule": "All section citations refer to the supplied compilation, not independent retrieval of its linked source documents. Dates on offering claims identify the compilation date, not a verified publication date for a live offering page."
   },
   "authoringPolicy": {
-    "fiction": "All 4 customers, personas, dialogue, customer volumes, times, rates, staffing, assets, budgets, and outcomes are invented. Clue-specific customer examples and Final are also fictional. No quoted customer statement is a real customer testimonial.",
-    "measurement": "Customer metrics are discovery inputs and proposed evaluation measures, not returns, service commitments, or audited customer results.",
-    "misconceptions": "Nonideal choices and clue questions deliberately contain false or premature claims for learners to reject. Their coaching or explanations correct those claims. They are not assertions of product capability or recommended commitments.",
-    "proposedControls": "Scoping meetings, non-recording alternatives, stop rules, reviewer scorecards, sample approvals, and evaluation cohorts are authored training recommendations. They are not guaranteed service deliverables or claims about an existing customer's controls.",
-    "exclusions": ["Service prices", "Personal contacts", "Case-routing instructions", "Campaign tags", "SharePoint URLs", "Source text reproduced wholesale"],
-    "availability": "Confirm current scope and prerequisites before positioning any offering. FinOps for AI, AI Value Assurance, and Agents & Workflow Automation are Coming Soon in the source. Security from AI is under construction. None is positioned as currently available in this pack.",
-    "distribution": "Local drafting does not authorize publication. The CP3 owner must retain provenance outside the web root and obtain a separate approved audience and hosting decision."
+    "fiction": "All customers, companies, figures, dialogue, scenarios, quiz situations, and outcomes are fictional training examples. The selected Microsoft 365 Copilot and Five9 products are fictional customer choices, not testimonials or entitlement claims.",
+    "measurement": "Customer measures are fictional inputs or authored evaluation proposals. They are not audited results, promised returns, or service commitments.",
+    "misconceptions": "Nonideal choices contain premature or false claims only with immediate corrective coaching. They are not recommended product claims.",
+    "proposedControls": "Working meetings, consent rules, non-recording alternatives, approved samples, test measures, and escalation paths are authored recommendations. They are not extra named-service deliverables.",
+    "exclusions": [
+      "Service prices",
+      "Personal contacts",
+      "Case-routing instructions",
+      "Campaign tags",
+      "SharePoint URLs",
+      "Source text reproduced wholesale"
+    ],
+    "availability": "Confirm current scope and availability. FinOps for AI, AI Value Assurance, Agents & Workflow Automation, Hyperscaler AI Foundation, AI-Accelerated Engineering, and Modern Data Ecosystem Design Workshop are Coming Soon. Security from AI is under construction. None appears in this curriculum.",
+    "distribution": "Keep evidence outside the web root. Local authoring does not authorize publication. Audience and hosting approval remain separate."
   },
   "items": [
     {
-      "itemId": "scenario:fsi-bank", "activity": "roleplay", "locator": "roleplay.scenarios[id=fsi-bank]", "fictionalCustomer": true,
+      "itemId": "scenario:branch-answers",
+      "activity": "roleplay",
+      "locator": "roleplay.scenarios[id=branch-answers]",
+      "fictionalCustomer": true,
+      "contentSha256": "e46f0477f2fed5ade85b44e23ee16c4660d6dc1554c7a342dc95924b81ff6d6b",
       "claims": [
-        {"claim": "Stalled pilots and uncertain strategy can support Private AI Launch Workshop discovery.", "section": "6.A; 7", "date": "2026-10-07", "locations": ["nodes.b1", "nodes.b5", "nodes.b7", "offering"], "caveat": "A workshop is not a production commitment. The authored scoping meeting is not a promised workshop deliverable."},
-        {"claim": "Conflicting policy versions and missing ownership are data-readiness concerns. Internal knowledge work is a plausible banking workflow.", "section": "3, Banking; 4; 5.2; 6.C", "date": "2026-10-07", "locations": ["nodes.b2", "useCases", "offering.steps"], "caveat": "The lending procedure example, baseline, and evaluation design are fictional. Source references do not guarantee accurate answers."},
-        {"claim": "Security and finance belong early. AI Risk Assessment informs risk decisions but cannot grant regulatory approval.", "section": "6.D; 7", "date": "2026-10-07", "locations": ["nodes.b3", "nodes.b7", "outcomes", "offering"], "caveat": "The customer's own approval process remains necessary. No assessment guarantees compliance or security."},
-        {"claim": "Hosting must be chosen per workload using residency, latency, cost, and model choice.", "section": "2.4; 5.3; 7", "date": "2026-10-07", "locations": ["nodes.b4", "takeaways"], "caveat": "Hybrid is not required. Private hosting is not inherently cheaper or more secure. Cost components in coaching are proposed comparison inputs."},
-        {"claim": "AI Factory Accelerator requires an existing NVIDIA DGX or approved original equipment manufacturer NVIDIA GPU system and an existing NVIDIA AI Enterprise subscription. It produces a scoped proof of concept, metrics report, runbook, and executive readout.", "section": "6.B; 7", "date": "2026-10-07", "locations": ["nodes.b5", "nodes.b6", "offering"], "caveat": "The source describes a small dataset of 1 to 2 GB or up to about 5,000 documents. This is not a full archive, production deployment, or approval service. System and subscription status in the scenario are fictional and unconfirmed."},
-        {"claim": "NVIDIA GPU Cluster Assessment targets existing GPU clusters running Kubernetes and reports utilization and capacity findings.", "section": "6.B", "date": "2026-10-07", "locations": ["nodes.b5.ch[2]", "offering.steps"], "caveat": "A utilization assessment does not resolve use-case ownership or automatically justify new equipment."}
+        {
+          "kind": "fictional-fact",
+          "claim": "The named customer, work practices, dialogue, and possible outcomes are invented training examples.",
+          "section": "3",
+          "date": "2026-10-07",
+          "caveat": "Sector context is informed by the compilation. No customer testimony, measured result, or promised commitment is claimed.",
+          "locations": [
+            "persona",
+            "nodes",
+            "outcomes"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Discover document authority and updates before testing internal procedure search. Compare correct answers, checking time, access, and escalation.",
+          "section": "3, Banking; 4; 5.2; 5.6",
+          "date": "2026-10-07",
+          "caveat": "The branch procedure story, source-link proposal, sample meeting, and test design are authored recommendations. No search accuracy or ready-made integration is promised.",
+          "locations": [
+            "mission",
+            "nodes",
+            "useCases",
+            "offering.steps[0]",
+            "offering.steps[1]",
+            "offering.steps[3]",
+            "takeaways"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "AI Readiness Data Quality Assessment is a source-described response to fragmented or untrusted data and document-search needs.",
+          "offering": "AI Readiness Data Quality Assessment",
+          "section": "6.C",
+          "date": "2026-10-07",
+          "caveat": "Positioned only if structured investigation is needed. Confirm current scope and availability. No named deliverables beyond the supplied scope are claimed.",
+          "locations": [
+            "offering.steps[2]"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "Private hosting does not by itself establish security or approval.",
+          "section": "2.4; 5.3; 7",
+          "date": "2026-10-07",
+          "caveat": "The nonideal seller reply deliberately overstates hosting. Its immediate coaching rejects that inference. Bank approval remains a separate decision.",
+          "locations": [
+            "nodes.boundaries.ch[1]"
+          ]
+        }
       ]
     },
     {
-      "itemId": "scenario:fsi-insurance", "activity": "roleplay", "locator": "roleplay.scenarios[id=fsi-insurance]", "fictionalCustomer": true,
+      "itemId": "scenario:claim-handoff",
+      "activity": "roleplay",
+      "locator": "roleplay.scenarios[id=claim-handoff]",
+      "fictionalCustomer": true,
+      "contentSha256": "b4178491f2dee3e5d14b8919091e44d50bc4b115f4af146a02257b76f18f5503",
       "claims": [
-        {"claim": "Insurance intake classification, extraction, and draft summaries are plausible generative workflows. High-stakes claims need human review.", "section": "3, Insurance; 4; 5.1", "date": "2026-10-07", "locations": ["nodes.i1", "nodes.ir", "nodes.i4", "useCases", "outcomes"], "caveat": "Insurance examples are often proof of concept. No autonomous settlement capability or service outcome is promised. The hallucination, backlog, and volumes are fictional."},
-        {"claim": "AI Readiness Data Quality Assessment delivers a maturity scorecard, business case summary, prioritized action plan, and stakeholder readout.", "section": "6.C", "date": "2026-10-07", "locations": ["nodes.i2", "nodes.ir", "nodes.i3", "nodes.i7", "offering"], "caveat": "Readiness findings do not guarantee extraction accuracy. Sample approval and trial design are authored recommendations, not additional named deliverables."},
-        {"claim": "Data Governance for AI starts with a design workshop before implementation. Modern Data Platform for AI is not a fit before data quality assessment.", "section": "6.C", "date": "2026-10-07", "locations": ["nodes.i3", "offering.steps"], "caveat": "Data Quality and Remediation and platform work require separate scope qualification. A platform does not repair every record automatically."},
-        {"claim": "AI Risk Assessment and AI LLM Penetration Testing address different risk questions. Testing covers prompt injection, leakage, and insecure integrations and includes a letter of attestation.", "section": "6.D; 7", "date": "2026-10-07", "locations": ["nodes.i5", "offering.steps"], "caveat": "Neither guarantees security or regulatory approval. Testing is positioned before a separately qualified customer-facing launch, not as evidence the fictional trial is safe."},
-        {"claim": "Security from AI is under construction in the source.", "section": "6.D; 10", "date": "2026-10-07", "locations": ["nodes.i5.ch[1]"], "caveat": "The nonideal choice deliberately proposes an unavailable play. Coaching rejects that proposal. It is not in the recommended offering steps."},
-        {"claim": "Value measurement includes baseline cycle time, error rate, adoption, and net cost after human review and infrastructure.", "section": "5.6; 7", "date": "2026-10-07", "locations": ["nodes.i6", "nodes.i7", "takeaways"], "caveat": "The source's measures are recommendations. Stop rules and sample controls are authored trial-design suggestions. No reduction of the fictional backlog is guaranteed."}
+        {
+          "kind": "fictional-fact",
+          "claim": "The named customer, work practices, dialogue, and possible outcomes are invented training examples.",
+          "section": "3",
+          "date": "2026-10-07",
+          "caveat": "Sector context is informed by the compilation. No customer testimony, measured result, or promised commitment is claimed.",
+          "locations": [
+            "persona",
+            "nodes",
+            "outcomes"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Investigate the coordinator-to-adjuster handoff and test document completeness before assignment. Measure checking, corrections, and waiting separately.",
+          "section": "3, Insurance; 4; 5.6",
+          "date": "2026-10-07",
+          "caveat": "Claims extraction and intake are source-supported directions, often not mature deployments. This exact checklist, handoff, test, and working session are authored proposals, not a packaged service.",
+          "locations": [
+            "mission",
+            "nodes",
+            "useCases",
+            "offering",
+            "takeaways"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "The source does not establish a ready-made autonomous settlement service for this customer or authority to substitute invented facts.",
+          "section": "3, Insurance; 4; 5.1; 7",
+          "date": "2026-10-07",
+          "caveat": "High-stakes claims require human review in the source. Nonideal replies propose settlement or substituting estimated facts and receive immediate corrective coaching.",
+          "locations": [
+            "nodes.backlog.ch[2]",
+            "nodes.pushback.ch[2]",
+            "nodes.missing.ch[2]"
+          ]
+        }
       ]
     },
     {
-      "itemId": "scenario:fsi-wealth", "activity": "roleplay", "locator": "roleplay.scenarios[id=fsi-wealth]", "fictionalCustomer": true,
+      "itemId": "scenario:advisor-notes",
+      "activity": "roleplay",
+      "locator": "roleplay.scenarios[id=advisor-notes]",
+      "fictionalCustomer": true,
+      "contentSha256": "83dcbb8d503b576e3e9912910b22459d3f2f9225e87c36d41e2b5728e99c4b80",
       "claims": [
-        {"claim": "The Morgan Stanley Debrief disclosure describes notes, action items, and a draft email with client consent and advisor review.", "section": "3, Wealth management; 9, Company disclosures; 10", "date": "2024-06-26", "locations": ["nodes.w2", "nodes.w3", "useCases"], "caveat": "Company disclosure is not audited return evidence. It does not establish a CDW implementation offering or autonomous advice. A non-recording route is an authored policy recommendation, not a claim about Debrief."},
-        {"claim": "AI Assistants includes M365 Copilot Deployment Accelerator for an initial group of up to 50 users and Copilot Adoption and Change Management.", "section": "6.E", "date": "2026-10-07", "locations": ["nodes.w1", "nodes.w3", "offering"], "caveat": "Platform choice must be settled. The fictional Microsoft choice and 12-advisor cohort are discovery inputs. No turnkey wealth recording or notes integration is promised."},
-        {"claim": "Agents & Workflow Automation is marked Coming Soon on the hub.", "section": "6.E; 10", "date": "2026-10-07", "locations": ["nodes.w3.ch[1]", "takeaways"], "caveat": "A nonideal choice proposes automation and receives explicit corrective coaching. Page examples do not override the hub status. Fully autonomous investment advice is not evidenced."},
-        {"claim": "Net time after review and active adoption are useful measures for a bounded productivity trial.", "section": "5.5; 5.6; 7", "date": "2026-10-07", "locations": ["nodes.w4", "takeaways"], "caveat": "Consent compliance, factual corrections, and stop decisions are authored evaluation controls. The baseline time and adoption rate are fictional, not service outcomes."}
+        {
+          "kind": "fictional-fact",
+          "claim": "The named customer, work practices, dialogue, and possible outcomes are invented training examples.",
+          "section": "3",
+          "date": "2026-10-07",
+          "caveat": "Sector context is informed by the compilation. No customer testimony, measured result, or promised commitment is claimed.",
+          "locations": [
+            "persona",
+            "nodes",
+            "outcomes"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore advisor-reviewed notes and follow-up, client consent, a non-recording route, corrections, and total work rather than login counts.",
+          "section": "3, Wealth management; 5.5; 5.6",
+          "date": "2026-10-07",
+          "caveat": "The Morgan Stanley example supports this general direction, not a Microsoft feature claim or CDW turnkey integration. Consent rules, the alternative route, and trial measures are authored proposals.",
+          "locations": [
+            "mission",
+            "nodes",
+            "useCases",
+            "offering.steps[0]",
+            "offering.steps[1]",
+            "offering.steps[3]",
+            "takeaways"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "Copilot Adoption and Change Management appears under AI Assistants for customers on a chosen platform with adoption needs.",
+          "offering": "Copilot Adoption and Change Management",
+          "section": "6.E",
+          "date": "2026-10-07",
+          "caveat": "The fictional firm chose Microsoft 365 Copilot. Current scope and availability require confirmation. No notes integration, recording entitlement, or guaranteed savings are asserted.",
+          "locations": [
+            "nodes.habits.ch[2].t",
+            "nodes.habits.ch[2].fb",
+            "offering.steps[2]"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "The compilation does not establish fully autonomous advice or approval-free client follow-up.",
+          "section": "3, Wealth management; 10",
+          "date": "2026-10-07",
+          "caveat": "This is an evidence limit, not a claim about all possible market capabilities. The nonideal reply receives immediate correction.",
+          "locations": [
+            "nodes.usefulness.ch[2]"
+          ]
+        }
       ]
     },
     {
-      "itemId": "scenario:fsi-payments", "activity": "roleplay", "locator": "roleplay.scenarios[id=fsi-payments]", "fictionalCustomer": true,
+      "itemId": "scenario:dispute-transfer",
+      "activity": "roleplay",
+      "locator": "roleplay.scenarios[id=dispute-transfer]",
+      "fictionalCustomer": true,
+      "contentSha256": "5b0d04da8516824bd5f048187753211b4da2c4e41c342552bc60f034606c96e1",
       "claims": [
-        {"claim": "FirstTouch AI automates the first minute of customer contact on CDW-supported platforms. No platform decision is a poor fit.", "section": "6.F", "date": "2026-10-07", "locations": ["nodes.p1", "nodes.p2", "offering"], "caveat": "Listed platforms are AWS, Cisco, Dialpad, Five9, Google, NiCE, RingCentral, and Zoom. Confirm current scope and integration. Support does not imply dispute adjudication or payment execution. Five9 selection and call volume are fictional."},
-        {"claim": "Contact Center Strategic Consulting can follow a broader customer-experience discovery need.", "section": "6.F", "date": "2026-10-07", "locations": ["nodes.p2.ch[2]", "offering.steps"], "caveat": "This is an expansion option, not a promise that a broader engagement is required for FirstTouch AI."},
-        {"claim": "Agentic payments are emerging with unresolved consent, liability, fraud, and agent identity questions.", "section": "2.6; 3, Payments; 9, HM Treasury; 10", "date": "2026-07-14", "locations": ["nodes.p3", "outcomes", "takeaways"], "caveat": "HM Treasury's plan contains proposals, not enacted rules. The source establishes no deployment at scale or autonomous refund guarantee."},
-        {"claim": "Payments-specific generative document-work evidence is thin and dispute document work is an inference.", "section": "3, Payments; 10", "date": "2026-10-07", "locations": ["useCases[1]"], "caveat": "Do not present this inferred discovery topic as a proven payments deployment or CDW packaged integration."},
-        {"claim": "Baseline and net-cost measures belong in value discovery.", "section": "5.6; 7", "date": "2026-10-07", "locations": ["nodes.p4", "offering.steps", "takeaways"], "caveat": "Verification failures, handoffs, stop rules, and repeated-detail rates are authored workload-specific measures. They are not FirstTouch AI service guarantees."}
+        {
+          "kind": "fictional-fact",
+          "claim": "The named customer, work practices, dialogue, and possible outcomes are invented training examples.",
+          "section": "3",
+          "date": "2026-10-07",
+          "caveat": "Sector context is informed by the compilation. No customer testimony, measured result, or promised commitment is claimed.",
+          "locations": [
+            "persona",
+            "nodes",
+            "outcomes"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "FirstTouch AI covers the first minute of contact on supported platforms, including Five9. Platform support alone does not establish a particular transfer integration.",
+          "offering": "FirstTouch AI",
+          "section": "6.F",
+          "date": "2026-10-07",
+          "caveat": "The source describes scope as of compilation, not verified current availability. Trace this fictional handoff before recommending a service. No dispute decision or refund authority follows.",
+          "locations": [
+            "nodes.transfer.ch[0].t",
+            "nodes.transfer.ch[0].fb",
+            "nodes.transfer.ch[1].t",
+            "nodes.transfer.ch[1].fb",
+            "offering.headline",
+            "offering.steps[1]"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Trace what callers provide and staff receive, then compare repeated questions, missing details, and staff checking time.",
+          "section": "5.6; 6.F; 7",
+          "date": "2026-10-07",
+          "caveat": "The payment-dispute handoff and evaluation are authored hypotheses. Payments-specific generative evidence is thin and does not prove a ready-made dispute integration.",
+          "locations": [
+            "mission",
+            "nodes",
+            "useCases",
+            "offering.steps[0]",
+            "offering.steps[2]",
+            "offering.steps[3]",
+            "takeaways"
+          ]
+        },
+        {
+          "kind": "source-claim",
+          "claim": "The source does not demonstrate that FirstTouch AI decides or issues refunds. Consequential actions need separately bounded authority.",
+          "offering": "FirstTouch AI",
+          "section": "3, Payments; 5.1; 6.F; 10",
+          "date": "2026-10-07",
+          "caveat": "The compilation describes agent-initiated payments as emerging. This lesson separates first contact from refund authority without asserting that ordinary payment automation is new.",
+          "locations": [
+            "nodes.authority.c",
+            "nodes.authority.ch[0].t",
+            "nodes.authority.ch[0].fb",
+            "nodes.authority.ch[1].t",
+            "nodes.authority.ch[1].fb",
+            "nodes.authority.ch[2].t",
+            "nodes.authority.ch[2].fb",
+            "takeaways[2]"
+          ]
+        }
       ]
     },
     {
-      "itemId": "clue:listen-for-the-signal:1", "activity": "jeopardy", "locator": "jeopardy.categories[0].clues[0]",
-      "claims": [{"claim": "Manual claim-document intake supports bounded document-work discovery, not autonomous settlement readiness.", "section": "3, Insurance; 5.1; 6.C", "date": "2026-10-07", "caveat": "Fictional customer statement. Workflow fit does not prove quality or confer decision authority."}]
-    },
-    {
-      "itemId": "clue:listen-for-the-signal:2", "activity": "jeopardy", "locator": "jeopardy.categories[0].clues[1]",
-      "claims": [{"claim": "Stalled pilots support Private AI Launch Workshop discovery and examination of ownership and production barriers.", "section": "4; 6.A; 7", "date": "2026-10-07", "caveat": "Fictional pilot count. GPUs do not by themselves resolve governance, integration, or operating ownership."}]
-    },
-    {
-      "itemId": "clue:listen-for-the-signal:3", "activity": "jeopardy", "locator": "jeopardy.categories[0].clues[2]",
-      "claims": [{"claim": "Low useful adoption on a chosen platform supports qualification of Copilot Adoption and Change Management.", "section": "6.E; 5.5", "date": "2026-10-07", "caveat": "Fictional firm. Chosen Microsoft platform is not proof that deployment, licensing, permissions, or integration are already correct."}]
-    },
-    {
-      "itemId": "clue:listen-for-the-signal:4", "activity": "jeopardy", "locator": "jeopardy.categories[0].clues[3]",
-      "claims": [{"claim": "Security concerns and unknown data ownership remain gates even with a sponsor. Risk and data assessments address different needs.", "section": "6.C; 6.D; 7", "date": "2026-10-07", "caveat": "Fictional budget and sponsorship. Assessments inform decisions but do not supply regulatory approval."}]
-    },
-    {
-      "itemId": "clue:listen-for-the-signal:5", "activity": "jeopardy", "locator": "jeopardy.categories[0].clues[4]",
-      "claims": [{"claim": "FirstTouch AI requires platform qualification. Agentic payments do not establish autonomous refund readiness.", "section": "6.F; 3, Payments; 10", "date": "2026-10-07", "caveat": "Fictional processor. Payment authority, consent, liability, fraud, and identity need separate evidence."}]
-    },
-    {
-      "itemId": "clue:match-the-workflow:1", "activity": "jeopardy", "locator": "jeopardy.categories[1].clues[0]",
-      "claims": [{"claim": "Insurance classification and extraction are plausible intake tasks with human review.", "section": "3, Insurance; 4; 5.1", "date": "2026-10-07", "caveat": "Fictional workflow. A task match is not proof of a packaged implementation, guaranteed accuracy, or autonomous settlement."}]
-    },
-    {
-      "itemId": "clue:match-the-workflow:2", "activity": "jeopardy", "locator": "jeopardy.categories[1].clues[1]",
-      "claims": [{"claim": "Knowledge-search evaluation needs authoritative data, ownership, access, and retrieval quality.", "section": "3, Banking; 4; 5.2; 6.C", "date": "2026-10-07", "caveat": "Fictional policy library. Citations and human review do not eliminate errors."}]
-    },
-    {
-      "itemId": "clue:match-the-workflow:3", "activity": "jeopardy", "locator": "jeopardy.categories[1].clues[2]",
-      "claims": [{"claim": "Morgan Stanley Debrief describes consent and advisor-reviewed meeting outputs.", "section": "3, Wealth management; 9, Company disclosures", "date": "2024-06-26", "caveat": "A company disclosure demonstrates its own workflow, not audited returns or a CDW turnkey product. Autonomous advice is not evidenced."}]
-    },
-    {
-      "itemId": "clue:match-the-workflow:4", "activity": "jeopardy", "locator": "jeopardy.categories[1].clues[3]",
+      "itemId": "clue:1-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[0].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "8d32264cdaae6413306f5a0d0923b9b4c85c9f941126c1bb83368598392ec3e9",
       "claims": [
-        {"claim": "Payments document-work evidence is thin and dispute work is an inference.", "section": "3, Payments; 10", "date": "2026-10-07", "caveat": "Do not convert another segment's examples into proven payments deployments."},
-        {"claim": "HM Treasury describes emerging agentic payment opportunities and unresolved consent, liability, fraud, and agent identity.", "section": "2.6; 9, HM Treasury", "date": "2026-07-14", "caveat": "The plan contains proposals, not enacted rules. It does not prove deployments at scale."}
+        {
+          "kind": "authored-recommendation",
+          "claim": "Copying is repetitive work, not confirmed rework. Ask about time and corrections.",
+          "section": "5.6; 6.E",
+          "date": "2026-10-07",
+          "caveat": "Rework is not established by the fictional question.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
       ]
     },
     {
-      "itemId": "clue:match-the-workflow:5", "activity": "jeopardy", "locator": "jeopardy.categories[1].clues[4]",
-      "claims": [{"claim": "Predictive, generative, and agentic workloads differ in maturity and authority needs. Agents need bounded permissions, approval points, logs, and shutdown.", "section": "1; 3; 5.1; 7", "date": "2026-10-07", "caveat": "These controls are recommendations, not evidence of a safe autonomous bank workflow. Shared hosting does not remove differences in consequence."}]
-    },
-    {
-      "itemId": "clue:choose-the-cdw-play:1", "activity": "jeopardy", "locator": "jeopardy.categories[2].clues[0]",
-      "claims": [{"claim": "Private AI Launch Workshop is a 2-day workshop for strategy, governance, private designs, or stalled pilots.", "section": "6.A; 7", "date": "2026-10-07", "caveat": "Confirm current scope. Duration is source-described, not a commitment to this fictional customer. No production or approval guarantee."}]
-    },
-    {
-      "itemId": "clue:choose-the-cdw-play:2", "activity": "jeopardy", "locator": "jeopardy.categories[2].clues[1]",
-      "claims": [{"claim": "AI Readiness Data Quality Assessment has 4 named deliverables and precedes Modern Data Platform for AI fit.", "section": "6.C", "date": "2026-10-07", "caveat": "A platform purchase alone does not establish clean data. Deliverables are assessment findings, not a guaranteed remediation result."}]
-    },
-    {
-      "itemId": "clue:choose-the-cdw-play:3", "activity": "jeopardy", "locator": "jeopardy.categories[2].clues[2]",
-      "claims": [{"claim": "AI Risk Assessment differs from AI LLM Penetration Testing. Testing covers injection, leakage, and insecure integrations and includes a letter of attestation.", "section": "6.D; 7", "date": "2026-10-07", "caveat": "Testing belongs before a qualified customer-facing launch. Neither service guarantees security or approval."}]
-    },
-    {
-      "itemId": "clue:choose-the-cdw-play:4", "activity": "jeopardy", "locator": "jeopardy.categories[2].clues[3]",
-      "claims": [{"claim": "M365 Copilot Deployment Accelerator starts with up to 50 users. Copilot Adoption and Change Management addresses a distinct adoption need.", "section": "6.E", "date": "2026-10-07", "caveat": "Confirm current scope on the chosen platform. No unlimited rollout or arbitrary industry integration is promised."}]
-    },
-    {
-      "itemId": "clue:choose-the-cdw-play:5", "activity": "jeopardy", "locator": "jeopardy.categories[2].clues[4]",
+      "itemId": "clue:1-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[0].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "d8d489ee99ef2167d00f824c8f8fbbef4918eb97f25dc600a3ef2b66b3d49309",
       "claims": [
-        {"claim": "FinOps for AI, AI Value Assurance, and Agents & Workflow Automation are Coming Soon.", "section": "6.E; 6, AI Economics gap; 10", "date": "2026-10-07", "caveat": "Listed page examples do not override hub availability. Current assessment evidence does not guarantee a return."},
-        {"claim": "The listed enterprise application implementation offering is ServiceNow, with no implementation offering outside ServiceNow.", "section": "6.F", "date": "2026-10-07", "caveat": "This statement reflects the supplied catalog snapshot, not an independently verified company-wide capability claim."}
+        {
+          "kind": "authored-recommendation",
+          "claim": "Follow the staff procedure search to learn where it slows down.",
+          "section": "3, Banking; 5.2; 6.C",
+          "date": "2026-10-07",
+          "caveat": "The question does not diagnose the cause of the search delay.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
       ]
     },
     {
-      "itemId": "clue:data-and-risk:1", "activity": "jeopardy", "locator": "jeopardy.categories[3].clues[0]",
-      "claims": [{"claim": "Hallucinations require evidence checks, review, and escalation. Grounding and citations do not eliminate them.", "section": "4; 5.4; 3, Insurance", "date": "2026-10-07", "caveat": "The invented coverage detail is fictional. Proposed checks do not guarantee correctness."}]
-    },
-    {
-      "itemId": "clue:data-and-risk:2", "activity": "jeopardy", "locator": "jeopardy.categories[3].clues[1]",
-      "claims": [{"claim": "The disclosed Debrief workflow uses client consent and advisor review as separate boundaries.", "section": "3, Wealth management; 9, Company disclosures", "date": "2024-06-26", "caveat": "The fictional firm needs its own policy decisions. Tool access is not consent, and consent is not approval of generated advice."}]
-    },
-    {
-      "itemId": "clue:data-and-risk:3", "activity": "jeopardy", "locator": "jeopardy.categories[3].clues[2]",
-      "claims": [{"claim": "Data Governance for AI requires a design workshop before implementation.", "section": "6.C", "date": "2026-10-07", "caveat": "Ownership, access, lineage, and authority need customer agreement. Model capability does not determine these responsibilities."}]
-    },
-    {
-      "itemId": "clue:data-and-risk:4", "activity": "jeopardy", "locator": "jeopardy.categories[3].clues[3]",
-      "claims": [{"claim": "Private hosting is not inherently secure or compliant. AI LLM Penetration Testing provides scoped evidence and a letter of attestation, not approval.", "section": "2.4; 6.D; 7", "date": "2026-10-07", "caveat": "The regulator claim in the question is deliberately false. Ongoing customer controls and approval remain necessary."}]
-    },
-    {
-      "itemId": "clue:data-and-risk:5", "activity": "jeopardy", "locator": "jeopardy.categories[3].clues[4]",
-      "claims": [{"claim": "In the United Kingdom 2024 survey, 55% of use cases had some automated decision-making and 2% were fully autonomous.", "section": "2.1; 2.2, UK; 9, Bank of England and FCA; 10", "date": "2024-11-21", "caveat": "118 responding United Kingdom-regulated firms. Unit is use cases, not firms. Not a global rate or safety standard. United Kingdom 2026 results were pending at the compilation date of 2026-10-07."}]
-    },
-    {
-      "itemId": "clue:qualify-the-workload:1", "activity": "jeopardy", "locator": "jeopardy.categories[4].clues[0]",
-      "claims": [{"claim": "FirstTouch AI runs on the listed CDW-supported contact center platforms and is not a fit without a platform decision.", "section": "6.F", "date": "2026-10-07", "caveat": "Confirm current integration and task scope. The supported list is not a guarantee for every platform feature or deployment."}]
-    },
-    {
-      "itemId": "clue:qualify-the-workload:2", "activity": "jeopardy", "locator": "jeopardy.categories[4].clues[1]",
-      "claims": [{"claim": "AI Factory Accelerator needs an existing NVIDIA DGX or approved original equipment manufacturer NVIDIA GPU system and an existing NVIDIA AI Enterprise subscription.", "section": "6.B", "date": "2026-10-07", "caveat": "Hardware alone does not satisfy eligibility. Approval of the system and subscription must be verified against current scope."}]
-    },
-    {
-      "itemId": "clue:qualify-the-workload:3", "activity": "jeopardy", "locator": "jeopardy.categories[4].clues[2]",
-      "claims": [{"claim": "NVIDIA GPU Cluster Assessment targets existing GPU clusters running Kubernetes and delivers utilization and capacity findings.", "section": "6.B", "date": "2026-10-07", "caveat": "Unused capacity does not automatically establish a hardware purchase need. Confirm current qualification criteria."}]
-    },
-    {
-      "itemId": "clue:qualify-the-workload:4", "activity": "jeopardy", "locator": "jeopardy.categories[4].clues[3]",
-      "claims": [{"claim": "Hosting should be evaluated per workload. Small usage may favor hosted services; private and hybrid hosting are not universal requirements.", "section": "2.4; 5.3; 6.B, Not a fit; 7", "date": "2026-10-07", "caveat": "No hosting choice guarantees lower cost or better security. Listed cost components are authored comparison factors."}]
-    },
-    {
-      "itemId": "clue:qualify-the-workload:5", "activity": "jeopardy", "locator": "jeopardy.categories[4].clues[4]",
-      "claims": [{"claim": "AI Factory Accelerator validates a scoped NVIDIA blueprint using 1 to 2 GB or up to about 5,000 documents and supplies a proof of concept, metrics report, runbook, and executive readout with roadmap.", "section": "6.B; 7", "date": "2026-10-07", "caveat": "The 3-million-document archive is fictional. A small validation does not authorize production or prove full-archive performance."}]
-    },
-    {
-      "itemId": "clue:prove-the-value:1", "activity": "jeopardy", "locator": "jeopardy.categories[5].clues[0]",
-      "claims": [{"claim": "Baseline before the pilot and production measurement are recommended. Cycle time and errors belong together.", "section": "5.6; 7", "date": "2026-10-07", "caveat": "Fictional intake trial. Thresholds are authored evaluation recommendations, not prescribed service outcomes."}]
-    },
-    {
-      "itemId": "clue:prove-the-value:2", "activity": "jeopardy", "locator": "jeopardy.categories[5].clues[1]",
-      "claims": [{"claim": "Productivity value should account for human review and active adoption, not only generation speed.", "section": "5.6; 3, Wealth management; 7", "date": "2026-10-07", "caveat": "The 1-minute draft and 25-minute review are fictional. No audited customer productivity gain is claimed."}]
-    },
-    {
-      "itemId": "clue:prove-the-value:3", "activity": "jeopardy", "locator": "jeopardy.categories[5].clues[2]",
-      "claims": [{"claim": "32% named document processing among highest-return use cases in the NVIDIA survey. This is not a 32% financial return.", "section": "2.1; 2.3; 9, NVIDIA; 10", "date": "2026-01", "caveat": "839 global respondents. Fieldwork 2025-08 through 2025-09 via NVIDIA channels. Self-selected, self-reported vendor survey. No audited causal evidence or promised return."}]
-    },
-    {
-      "itemId": "clue:prove-the-value:4", "activity": "jeopardy", "locator": "jeopardy.categories[5].clues[3]",
-      "claims": [{"claim": "AI Value Assurance and FinOps for AI are Coming Soon. Current assessment findings and Accelerator metrics can inform a business case.", "section": "6, AI Economics gap; 5.6; 10", "date": "2026-10-07", "caveat": "Do not present unavailable plays as deliverable. Metrics inform decisions but do not guarantee savings. Net costs include human review and infrastructure."}]
-    },
-    {
-      "itemId": "clue:prove-the-value:5", "activity": "jeopardy", "locator": "jeopardy.categories[5].clues[4]",
-      "claims": [{"claim": "Value decisions should consider cycle time, errors, active adoption, human effort, and net costs. Survey reports do not establish audited returns.", "section": "1; 2.3; 5.6; 7; 10", "date": "2026-10-07", "caveat": "The trial result and stop decision are fictional authored examples. Removing review to improve throughput would change the authority and risk assumptions."}]
-    },
-    {
-      "itemId": "final", "activity": "jeopardy", "locator": "jeopardy.final",
+      "itemId": "clue:1-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[0].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "388470f40f997c27679649942a913eac7219c3a7bf7ecb1ca244b06b9448436c",
       "claims": [
-        {"claim": "A claims intake backlog with untrusted identifiers supports bounded document-work discovery and AI Readiness Data Quality Assessment.", "section": "3, Insurance; 4; 6.C", "date": "2026-10-07", "caveat": "The backlog, failed pilot, sponsor, and data problem are fictional. The assessment does not guarantee remediation or claims outcomes."},
-        {"claim": "The intake and data owners should qualify assessment scope with compliance, security, and finance before commitment.", "section": "5.2; 6.C; 7", "date": "2026-10-07", "caveat": "This stakeholder discussion is an authored discovery recommendation, not an additional assessment deliverable. The primary next engagement addresses the stated data-readiness gap."},
-        {"claim": "Intake assistance keeps settlement authority with people. Evaluation needs an approved sample, baseline errors, cycle time, review effort, and net cost. Private hosting guarantees neither approval nor savings.", "section": "2.4; 3, Insurance; 5; 7", "date": "2026-10-07", "caveat": "Sample approval and the evaluation plan are authored recommendations. They do not guarantee remediation, claims outcomes, approval, or financial returns."}
+        {
+          "kind": "authored-recommendation",
+          "claim": "Investigate the full note workflow before prescribing training for continued evening work.",
+          "section": "5.5; 5.6; 6.E",
+          "date": "2026-10-07",
+          "caveat": "The chosen product and evening work are fictional. Access, habits, and correction effort remain possibilities, not established causes.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:1-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[0].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "ca6858dd6aa47fb6e421383128cb63dd99e7683d1b891bb22cdc585c29f6b729",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "A board request establishes pressure, not a confirmed sponsor or resources.",
+          "section": "6.A; 6.B, Not a fit",
+          "date": "2026-10-07",
+          "caveat": "Sponsorship and resources require discovery. They cannot be inferred from the fictional request.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:1-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[0].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "611cf7a47f6d9df7d41eb1494f7970f6637f3ad7ee7ede4d0b762f11995e3ed2",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Investigate the transfer problem before accepting a proposed phone-menu solution.",
+          "section": "5.6; 6.F",
+          "date": "2026-10-07",
+          "caveat": "This is an authored discovery recommendation. No integration or cause is established.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:2-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[1].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "c758fc3537e9b75bc4d70d5af06cd7ace8e33da19454e1cffedf662e4ce6296a",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore a source-checked claim summary while leaving the claim decision with adjusters.",
+          "section": "3, Insurance; 4; 5.1",
+          "date": "2026-10-07",
+          "caveat": "Task fit does not promise accuracy or autonomous settlement.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:2-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[1].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "1869123cdf4649113b074fe0b67c2c4275c2f911469176c73b24512a53bca29f",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Separate finding approved instructions from authority to change customer records.",
+          "section": "3, Banking; 5.1; 5.2; 6.C",
+          "date": "2026-10-07",
+          "caveat": "The proposed search is an authored bounded task, not an existing implementation.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:2-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[1].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "d382a47d29194361be4c36c9209d5336b09c7ee1a55abcfd5bf57ec6a43d8cd3",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Keep notes and follow-up as drafts for advisor review under consent rules.",
+          "section": "3, Wealth management; 5.1",
+          "date": "2026-10-07",
+          "caveat": "This is an authored task boundary informed by the disclosed wealth workflow, not a CDW product capability claim.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:2-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[1].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "955349c59c9b2d5641a1af99188f858b3c681ece1011870e7693aa3d9c11f75a",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore identifying missing estimates earlier rather than accelerating already-quick summaries.",
+          "section": "3, Insurance; 5.6",
+          "date": "2026-10-07",
+          "caveat": "The proposed completeness check is a hypothesis, not proof it reduces the wait.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:2-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[1].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "05413f7bf120c05d7838f765d692488da544ab72f228cb174cf77be9ed26f150",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Start with the known missing dispute reason rather than unsettled refund authority.",
+          "section": "3, Payments; 5.1; 6.F; 10",
+          "date": "2026-10-07",
+          "caveat": "Payments document-work evidence is thin. The handoff proposal is not proof of deployment or guaranteed fit.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:3-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[2].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "d674c6151cb4754b46ec5388dcf3d085c81c460e13ea4fe48721bc82e7ce1109",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Ask where loss dates come from and inspect document formats before testing extraction.",
+          "section": "3, Insurance; 4; 6.C",
+          "date": "2026-10-07",
+          "caveat": "No input quality or standard format is assumed.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:3-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[2].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "d6110f98000f819b6ef014337186e351b72c8110bc8d03bc516e1171fdde8184",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Establish the approved document and its owner before search uses conflicting procedures.",
+          "section": "5.2; 6.C",
+          "date": "2026-10-07",
+          "caveat": "File dates alone do not establish authority. This is an authored discovery recommendation.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:3-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[2].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "cb39e19ce21dbbd3944e46a2f350fdbf33f6b0effd8a92128ac5647ce03c41de",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Trace an approved example from capture to employee screen before diagnosing a missing handoff.",
+          "section": "5.2; 6.F",
+          "date": "2026-10-07",
+          "caveat": "The recorded reason and missing screen information are fictional. The cause remains unknown.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:3-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[2].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "15eda416aeb4f1a4f143f35e894d37d1c4c3af67f07e37958cf6a91580eedfb9",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Define which work a time measure includes before comparing a new check.",
+          "section": "5.6",
+          "date": "2026-10-07",
+          "caveat": "The 10-minute figure is fictional. Total work and waiting must not be silently excluded.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:3-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[2].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "d445220c45937d4836aa904b9d2311a33309db2cdd95ed4b1ce7c7d24e2db331",
+      "claims": [
+        {
+          "kind": "source-claim",
+          "claim": "FirstTouch AI covers the first minute of customer contact on supported platforms. Qualification requires a platform decision and current service-fit checks.",
+          "offering": "FirstTouch AI",
+          "section": "6.F",
+          "date": "2026-10-07",
+          "caveat": "The source excludes customers without a platform decision. A supported platform does not guarantee a particular task or integration.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:4-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[3].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "933841dc1b1ba36051ea0811e889f8e9d7701cb95212d36b5941a9a27d55332d",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Treat an unsupported date in a generated summary as an error requiring source checking.",
+          "section": "4; 5.4",
+          "date": "2026-10-07",
+          "caveat": "The date error is fictional. Review and escalation are authored controls, not guarantees.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:4-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[3].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "5424f70e2c09568fcb97e6ef8a148410b0b57920e36bcb5603edd94bc97db006",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Resolve client consent before recording. Tool access and advisor approval are distinct.",
+          "section": "3, Wealth management; 5.1",
+          "date": "2026-10-07",
+          "caveat": "The client-consent boundary is informed by the disclosed wealth workflow. The firm must decide its own applicable rules.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:4-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[3].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "0ee3ea59bca9a493c6f8f458036e3d45ecd697f003b23c49047c95ae85d33a9c",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Test access restrictions before expanding internal search.",
+          "section": "5.1; 5.2; 6.D",
+          "date": "2026-10-07",
+          "caveat": "The access failure is fictional. Internal use does not authorize all staff to read all records.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:4-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[3].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "1a71c009679b57bc81faad2fbcf9f8bc3048e1441cd53aecd4724c5cfa7c8758",
+      "claims": [
+        {
+          "kind": "source-claim",
+          "claim": "AI Risk Assessment informs risk decisions and does not grant approval.",
+          "offering": "AI Risk Assessment",
+          "section": "6.D; 7",
+          "date": "2026-10-07",
+          "caveat": "Current scope requires confirmation. The assessment does not replace bank approval or guarantee compliance or security.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:4-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[3].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "bd8f1f0b20e54670538021d500a85e64c018c935d1626d3802dd7305908f2b86",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "A successful information-transfer test does not establish refund authority.",
+          "section": "3, Payments; 5.1; 10",
+          "date": "2026-10-07",
+          "caveat": "The successful test is fictional and deliberately narrow. No autonomous refund capability is asserted.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:5-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[4].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "b2c9270e055a59d0559c225b3e42563ba412ba3ed878c0ac6f30372661c53d40",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Agree approved examples and data protection before accepting customer files.",
+          "section": "4; 5.2; 7",
+          "date": "2026-10-07",
+          "caveat": "The proposed control is authored, not a named service deliverable or universal legal rule.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:5-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[4].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "5f2a961efbd1215014538968fc9223298c74e911fc3f45bf4de188a385cf0326",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Bring coordinator and adjuster leads together around returned and completed files.",
+          "section": "3, Insurance; 5.5; 5.6",
+          "date": "2026-10-07",
+          "caveat": "This is an authored working meeting, not a source-prescribed engagement.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:5-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[4].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "3939577d5249ba21e9cb74516a5d8702df57be3a0e51386b498b8dce6399fcb2",
+      "claims": [
+        {
+          "kind": "source-claim",
+          "claim": "Copilot Adoption and Change Management is a source-described option for support on a chosen platform.",
+          "offering": "Copilot Adoption and Change Management",
+          "section": "6.E",
+          "date": "2026-10-07",
+          "caveat": "The service appears in coaching, not the required answer. Confirm current scope and inspect correction effort before promising a solution.",
+          "locations": [
+            "why"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore work-specific training and support for reviewing meeting notes when generic training omitted that work.",
+          "section": "5.5; 6.E",
+          "date": "2026-10-07",
+          "caveat": "The chosen platform, access, and training gap are fictional. The proposed support follows those premises without requiring service-name recall.",
+          "locations": [
+            "q",
+            "a"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:5-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[4].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "5ab3443ae57052a45987cfd623135838da91335f8109b5fb27b430e7d373b767",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Offer a decision plan for document and risk review without committing to launch by a board date.",
+          "section": "4; 5.2; 6.A; 7",
+          "date": "2026-10-07",
+          "caveat": "The 6-week deadline and proposed review are fictional training details, not service commitments.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:5-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[4].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "5245e4f7d5313d9af2111bb0c477a66672bed8d7ea9d2bcda82c9dd289beb6fd",
+      "claims": [
+        {
+          "kind": "source-claim",
+          "claim": "Private AI Launch Workshop may fit strategy and privacy exploration.",
+          "offering": "Private AI Launch Workshop",
+          "section": "6.A; 7",
+          "date": "2026-10-07",
+          "caveat": "The service appears in coaching. Confirm current workshop scope, and do not imply deployment or a required hosting choice.",
+          "locations": [
+            "why"
+          ]
+        },
+        {
+          "kind": "authored-recommendation",
+          "claim": "Agree a useful task, information needs, and decision owners in a first working session.",
+          "section": "6.A; 7",
+          "date": "2026-10-07",
+          "caveat": "The competing ideas and privacy concerns are fictional. The working session is an authored recommendation, not a named-service deliverable.",
+          "locations": [
+            "q",
+            "a"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:6-1",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[5].clues[0]",
+      "fictionalSituation": true,
+      "contentSha256": "180e35bc5acc01c8bf1beaedcd82ee87f8728ed7343cf2c9d8d3c6f63c12ce1d",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Measure current copying and checking time, errors, and corrections before a test.",
+          "section": "5.6; 7",
+          "date": "2026-10-07",
+          "caveat": "These are proposed measures for the fictional task, not proof of savings.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:6-2",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[5].clues[1]",
+      "fictionalSituation": true,
+      "contentSha256": "136a5757c35d345bda9f3ac55f8789b16b0843e9494da82aa38d4ba49b5857bd",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Include checking in total work. A 3-minute draft and 12-minute check exceed a previous 10-minute task.",
+          "section": "5.6",
+          "date": "2026-10-07",
+          "caveat": "All numbers are fictional. This arithmetic illustrates net time, not customer results.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:6-3",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[5].clues[2]",
+      "fictionalSituation": true,
+      "contentSha256": "4285983ef6f26e3720b5136d2b45965b5593b6ce31ecd96de89fe5560f01fade",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Shorter calls alone do not demonstrate less repeated explanation at transfer.",
+          "section": "5.6; 6.F",
+          "date": "2026-10-07",
+          "caveat": "The reported change is fictional and does not prove better handoff information.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:6-4",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[5].clues[3]",
+      "fictionalSituation": true,
+      "contentSha256": "7406268b3d6a7abdc2c36eeb9219a3280d0e86a1d91c8da0e3f7eb5dbc9f0e7f",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Test representative document types and agree how people handle failures before rollout.",
+          "section": "3, Insurance; 4; 5.6",
+          "date": "2026-10-07",
+          "caveat": "The sample design is authored. Good results on clear files do not establish results on handwritten files.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "clue:6-5",
+      "activity": "jeopardy",
+      "locator": "jeopardy.categories[5].clues[4]",
+      "fictionalSituation": true,
+      "contentSha256": "75b74bbfc8bfefa4888b080589268011e910691cd1e605245dcacf920fd2ed1c",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Separate faster intake from unchanged total claim resolution and investigate the remaining wait.",
+          "section": "5.6; 7",
+          "date": "2026-10-07",
+          "caveat": "The local improvement is fictional. It is not audited return evidence or a service guarantee.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
+      ]
+    },
+    {
+      "itemId": "final:useful-first-meeting",
+      "activity": "jeopardy",
+      "locator": "jeopardy.final",
+      "fictionalSituation": true,
+      "contentSha256": "2b83ca99b74c0762d0037849c5038b68cc4a5c2e173c8b6e37b1974a8b7ae8bb",
+      "claims": [
+        {
+          "kind": "authored-recommendation",
+          "claim": "Explore a completeness check before assignment, involve both handoff owners, and compare local effort with overall resolution.",
+          "section": "3, Insurance; 5.5; 5.6",
+          "date": "2026-10-07",
+          "caveat": "The scenario states actual file returns for missing estimates. The proposed task and measures are hypotheses to test, not permission to settle claims or a packaged service.",
+          "locations": [
+            "q",
+            "a",
+            "why"
+          ]
+        }
       ]
     }
   ]

@@ -1,0 +1,16 @@
+{
+  "schema": 2,
+  "packId": "fsi",
+  "packRevision": 1,
+  "state": {
+    "teams": [
+      { "name": "Branch team", "score": 1600 },
+      { "name": "Claims team", "score": -400 }
+    ],
+    "used": ["0-0", "2-3", "5-4"],
+    "dd": ["2-3", "4-2"],
+    "timerOn": false,
+    "muted": true,
+    "timerSecs": 60
+  }
+}

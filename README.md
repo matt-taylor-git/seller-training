@@ -106,13 +106,13 @@ The storage probe times real browser reads and writes with a maximal valid board
 
 ## Verify FSI
 
-FSI adds fictional bank, insurance, wealth, and payments conversations. It teaches data ownership, human review, platform qualification, workload-specific hosting, and measured value. Its board contains 6 categories, 30 clues, and 1 Final. Both activities share one pack.
+FSI revision 2 contains fresh fictional banking, insurance, wealth, and payments conversations. It teaches discovery, useful task selection, information ownership, risk boundaries, next steps, and measured results. Its board contains 6 categories, 30 standalone clues, and 1 Final. Both activities share one pack.
 
-The pack contains 23 nodes, 69 choices, 12 outcomes, and 5 takeaways per scenario. Bank and insurance each take 7 choices. Insurance recovery uses an alternate second node without changing the engine. Wealth and payments each take 4 choices.
+The pack contains 22 nodes, 66 choices, 12 outcomes, and 4 takeaways per scenario. Banking and insurance each take 6 choices, including recovery through an alternate second node. Wealth and payments each take 4 choices. Every route matches its advertised length.
 
-Read [the FSI authoring record](content-authoring/README.md) for source dates, claim coverage, review status, and distribution limits. All 35 items have evidence records with 56 claim entries. The source compilation is not copied into the repository. Provenance stays outside the web root.
+Read [the FSI authoring record](content-authoring/README.md) for the lesson map, source limits, checks, and review status. All 35 items have evidence records with 46 entries that distinguish source claims, fictional facts, and authored recommendations. The source compilation is not copied into the repository. Provenance stays outside the web root.
 
-Run the content and 10 browser lanes:
+Run the content checks and 12 FSI browser tests:
 
 ```sh
 node scripts/check-content.mjs
@@ -121,11 +121,11 @@ CP3_EVIDENCE_DIR=/tmp/cp3-evidence PORT=8183 npx playwright test tests/browser/f
 node scripts/measure-training.mjs --baseline ../baseline --candidate . --samples 20 --packs default,fsi
 ```
 
-The browser lanes select FSI through declared localStorage setup, then use actual clicks and keys. They cover ideal play, risky bank play, insurance recovery, all 31 quiz answers, both Daily Doubles, Final scoring, Default return, and group-mode density. Readability checks run at 1440 by 900 and 1920 by 1080 pixels. They count rendered lines, record text and element heights, and pin existing font sizes. Regular answers allow 3 lines, Final answers allow 4, and supporting notes allow 3. Authored word ceilings also prevent oversized copy before browser testing. `CP3_EVIDENCE_DIR` retains screenshots, answer records, and browser error logs. Playwright saves videos and traces under `test-results`.
+The browser lanes select FSI through declared localStorage setup, then use actual clicks and keys. They cover ideal play, poor bank play, both full-scenario recoveries, all 31 quiz answers, both Daily Doubles, Final scoring, Default return, group-mode density, and new signals. Revision-1 progress remains untouched while valid team names can be recovered. Only explicit replacement creates the new revision-2 save. Readability checks run at 1440 by 900 and 1920 by 1080 pixels. They count rendered lines, record text and element heights, and pin existing font sizes. Regular answers allow 3 lines, Final answers allow 4, and supporting notes allow 3. Authored word ceilings also prevent oversized copy before browser testing. `CP3_EVIDENCE_DIR` retains screenshots, answer records, and browser error logs. Playwright saves videos and traces under `test-results`.
 
 The performance probe measures actual candidate Default and FSI entries against equivalent baseline Default screens. It records 20 cold samples per route and version, interleaves baseline and candidate, and blocks remote fonts. The same 1000 ms, 150 ms delta, and 400 KiB limits apply. Run a separate comparison against the CP2 worktree to retain its Default baseline.
 
-Coming Soon plays remain unavailable. Offering descriptions reflect the supplied compilation on 2026-10-07, not a verified live catalog. Confirm current scope and prerequisites before customer use. The integration task reports a source-reviewed draft with PASS and 2 minor notes, which this change addresses. Parent review of the final committed pack remains open. Public hosting and distribution are not approved by this change.
+Coming Soon plays remain unavailable and do not appear in the new curriculum. Offering descriptions reflect the supplied compilation on 2026-10-07, not a verified live catalog. Confirm current scope before customer use. Revision 2 does not inherit an earlier PASS status. Independent parent review of the final committed pack remains required. Public hosting and distribution are not approved by this change.
 
 ## Choose content for both activities
 
@@ -151,7 +151,7 @@ CP4_EVIDENCE_DIR=/tmp/cp4-evidence PORT=8184 npx playwright test tests/browser/s
 node scripts/measure-training.mjs --settings --baseline ../baseline --candidate . --samples 20 --packs default,fsi
 ```
 
-The lanes use real Settings controls to switch both ways. They check one preference write per Save, board separation, canceled relaunch, changed selection during confirmation, keyboard focus, storage failures, desktop sizes, and 200 percent CSS zoom. The CSS zoom check does not verify browser zoom. They retain screenshots and browser errors locally. Run `npx playwright test` for all 40 lanes, including existing content readability checks.
+The lanes use real Settings controls to switch both ways. They check one preference write per Save, board separation, canceled relaunch, changed selection during confirmation, keyboard focus, storage failures, desktop sizes, and 200 percent CSS zoom. The CSS zoom check does not verify browser zoom. They retain screenshots and browser errors locally. Run `npx playwright test` for all 42 tests, including content readability and revision-2 persistence checks.
 
 The probe interleaves cold contexts against trunk Home-to-game. It measures Save click to the status DOM update, not the browser's paint. It then measures Return to Home click through activity entry. The activity click bypasses Playwright's hover-animation wait, not the browser's click handler. The status DOM update must stay within 100 ms at p95. The complete entry must stay within 1000 ms and trunk plus 150 ms. Each document route must use at most 10 first-party requests. The report also records the full journey's request count without deduplicating modules. Page-load, decoded-byte, and storage budgets remain unchanged. Compare against CP3 separately to retain the prior activity baseline.
 

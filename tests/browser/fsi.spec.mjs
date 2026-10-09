@@ -7,7 +7,8 @@ import fsi from '../../prototype/seller-ai-training/packs/fsi.mjs';
 const original = JSON.parse(readFileSync(new URL('../fixtures/default-original.json', import.meta.url), 'utf8'));
 const evidence = process.env.CP3_EVIDENCE_DIR;
 const selectionKey = 'aiTraining.selection.v1';
-const boardKey = 'aiDealJeopardy.v2.fsi.1';
+const boardKey = `aiDealJeopardy.v2.fsi.${fsi.revision}`;
+const oldCheckpoint = readFileSync(new URL('../fixtures/fsi-revision-1-checkpoint.json', import.meta.url), 'utf8');
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 const test = base.extend({
   context: async ({ context }, use, info) => {
@@ -53,18 +54,23 @@ async function startMeeting(page, scenario) {
   await expect(page.locator('.idcard h2')).toHaveText(scenario.persona.name);
   await expect(page.locator('.mission p')).toHaveText(scenario.mission);
   await page.locator('#briefGo').click();
+  await expect(page.locator(`.msg.cust[data-node="${scenario.start}"]`)).toBeVisible();
+  await expect(page.locator('.choice')).toHaveCount(3);
+  await capture(page, `${scenario.id}-opening-${page.viewportSize().width}.png`);
 }
-async function respond(page, nodeId, node, choice, turn, nominal) {
+async function respond(page, nodeId, node, choice, turn, nominal, capturePrefix = 'group') {
   await expect(page.locator('.choice')).toHaveCount(node.ch.length);
   await expect(page.locator(`.msg.cust[data-node="${nodeId}"]`)).toBeVisible();
   await expect(page.locator('#turnLbl')).toHaveText(`Turn ${turn} of ${nominal}`);
   const texts = await page.locator('.choice .txt').allTextContents();
   expect([...texts].sort()).toEqual(node.ch.map(choice => choice.t).sort());
   const position = texts.indexOf(choice.t);
+  if (nominal === 6 && turn === 4) await capture(page, `${capturePrefix}-${nodeId}-later-full-turn-${page.viewportSize().width}.png`);
   if (turn % 2) await page.keyboard.press(`Digit${position + 1}`);
   else await page.locator('.choice').nth(position).click();
   await expect(page.locator('.fb p')).toHaveText(choice.fb);
   if (choice.q !== 'best') await expect(page.locator('.better')).toContainText(node.ch.find(choice => choice.q === 'best').t);
+  if (['reset', 'pushback'].includes(nodeId) && choice.q === 'best') await capture(page, `${capturePrefix}-${nodeId}-recovery-${page.viewportSize().width}.png`);
   await page.keyboard.press('Enter');
   return { nodeId, quality: choice.q, response: choice.t, coaching: choice.fb };
 }
@@ -77,7 +83,7 @@ async function meeting(page, id, route = 'ideal') {
     const node = scenario.nodes[nodeId];
     const quality = route === 'risk' || route === 'recovery' && nodeId === scenario.start ? 'bad' : 'best';
     const choice = node.ch.find(choice => choice.q === quality);
-    trace.push(await respond(page, nodeId, node, choice, trace.length + 1, scenario.turns));
+    trace.push(await respond(page, nodeId, node, choice, trace.length + 1, scenario.turns, `${id}-${route}`));
     nodeId = choice.next;
   }
   await expect(page.locator('#sDeb')).toHaveClass(/show/);
@@ -168,7 +174,7 @@ async function clues(page, categories, lane) {
         record(`lane-${lane}-answers.json`, { seen });
         expectTextBudget(answer, 3, viewport.width === 1440 ? 33.12 : 40);
         expectTextBudget(explanation, 3, viewport.width === 1440 ? 18 : 21);
-        if (category === 2 && row === 4) await capture(page, `fsi-worst-regular-${viewport.width}.png`);
+        if (category === 4 && row === 1) await capture(page, `fsi-handoff-answer-${viewport.width}.png`);
         if (row === 4 && category === categories[1]) await capture(page, `fsi-clues-${categories[0] + 1}-${categories[1] + 1}${viewport.width === 1920 ? '-1920' : ''}.png`);
         await closeTile(page);
       }
@@ -182,47 +188,50 @@ async function clues(page, categories, lane) {
   record(`lane-${lane}-answers.json`, { seen });
 }
 
-test('Lane 1. Bank ideal ends with qualified stakeholders and a concrete next step.', async ({ page }) => {
-  await meeting(page, 'fsi-bank');
-  for (const phrase of ['security', 'finance', 'policy owner', 'Private AI Launch Workshop', 'requirements']) await expect(page.locator('#debrief')).toContainText(phrase);
+test('Lane 1. Bank ideal and recovery investigate document authority before the next step.', async ({ page }) => {
+  await meeting(page, 'branch-answers');
+  for (const phrase of ['operations owner', 'risk lead', 'AI Readiness Data Quality Assessment', 'checking time']) await expect(page.locator('#debrief')).toContainText(phrase);
   await capture(page, 'fsi-bank.png');
+  const trace = await meeting(page, 'branch-answers', 'recovery');
+  expect(trace.map(turn => turn.nodeId)).toEqual(['counter', 'reset', 'authority', 'boundaries', 'evidence', 'invitation']);
+  expect(trace[1].response).toContain('I got ahead of myself');
+  await capture(page, 'fsi-bank-recovery.png');
 });
 
-test('Lane 2. Bank risky choices reject infrastructure promises and reach a debrief.', async ({ page }) => {
-  const trace = await meeting(page, 'fsi-bank', 'risk');
-  expect(trace.some(turn => /does not prove compliance|does not prove lower total cost/.test(turn.coaching))).toBe(true);
-  await expect(page.locator('#debrief')).toContainText('Security and finance will not support');
+test('Lane 2. Bank poor choices correct source and hosting promises and reach a debrief.', async ({ page }) => {
+  const trace = await meeting(page, 'branch-answers', 'risk');
+  expect(trace.some(turn => turn.coaching.includes('Private hosting does not guarantee security or approval'))).toBe(true);
+  await expect(page.locator('#debrief')).toContainText('Start again with what staff read');
   await capture(page, 'fsi-bank-risk.png');
 });
 
-test('Lane 3. Insurance ideal and recovery explain human review and data quality in 7 turns.', async ({ page }) => {
-  await meeting(page, 'fsi-insurance');
+test('Lane 3. Insurance ideal and recovery separate the handoff from draft speed in 6 turns.', async ({ page }) => {
+  await meeting(page, 'claim-handoff');
   await capture(page, 'fsi-insurance.png');
-  const trace = await meeting(page, 'fsi-insurance', 'recovery');
-  expect(trace.map(turn => turn.nodeId)).toEqual(['i1', 'ir', 'i3', 'i4', 'i5', 'i6', 'i7']);
+  const trace = await meeting(page, 'claim-handoff', 'recovery');
+  expect(trace.map(turn => turn.nodeId)).toEqual(['backlog', 'pushback', 'missing', 'trial', 'measure', 'next']);
   expect(trace[1].coaching).toContain('withdrew');
-  expect(trace[1].response).toContain('approved sample that reflects actual documents');
-  await expect(page.locator('#debrief')).toContainText('human review');
-  await expect(page.locator('#debrief')).toContainText('Data Quality');
+  expect(trace[1].response).toContain('Who notices the missing estimate');
+  await expect(page.locator('#debrief')).toContainText('total resolution time separately');
   await capture(page, 'fsi-insurance-recovery.png');
 });
 
-test('Lane 4. Wealth keeps consent, advisor approval, and useful adoption explicit.', async ({ page }) => {
-  const trace = await meeting(page, 'fsi-wealth');
-  expect(trace[1].response).toContain('client consent');
-  expect(trace[1].response).toContain('advisor review');
-  expect(trace[2].coaching).toContain('Neither service promises');
-  await expect(page.locator('#debrief')).toContainText('investment advice without advisor approval');
+test('Lane 4. Wealth keeps client choice, advisor approval, and useful adoption explicit.', async ({ page }) => {
+  const trace = await meeting(page, 'advisor-notes');
+  expect(trace[1].response).toContain('non-recording route');
+  expect(trace[1].response).toContain('check actions before saving notes');
+  expect(trace[2].response).toContain('current scope fits');
+  await expect(page.locator('#debrief')).toContainText('Client consent and advisor approval are separate decisions');
   await capture(page, 'fsi-wealth.png');
 });
 
-test('Lane 5. Payments qualifies the platform before FirstTouch AI and rejects payment guarantees.', async ({ page }) => {
-  const trace = await meeting(page, 'fsi-payments');
-  expect(trace[0].response).toContain('Which phone system do you use');
-  expect(trace[0].response).toContain('When a call reaches your team, what information can they already see');
-  expect(trace[1].response).toContain('Five9');
-  expect(trace[2].coaching).toContain('without evidence of widespread use');
-  await expect(page.locator('#debrief')).toContainText('Authority to issue refunds stays separate');
+test('Lane 5. Payments qualifies the handoff before FirstTouch AI and separates refund authority.', async ({ page }) => {
+  const trace = await meeting(page, 'dispute-transfer');
+  expect(trace[0].response).toContain('Which phone system have you chosen');
+  expect(trace[0].response).toContain('what information reaches the employee');
+  expect(trace[1].response).toContain('confirm this handoff fits');
+  expect(trace[2].response).toContain('Refund decisions need separate rules');
+  await expect(page.locator('#debrief')).toContainText('leaving refund authority separate');
   await capture(page, 'fsi-payments.png');
 });
 
@@ -264,6 +273,7 @@ test('Lane 9. Both Daily Doubles and all Final stages keep FSI content and its o
   await page.locator('#fNext').click();
   await expect(page.locator('.fclue')).toHaveText(fsi.jeopardy.final.q);
   await readable(page, ['.fclue', '#fNext']);
+  await capture(page, 'fsi-final-question.png');
   await page.keyboard.press('Space');
   await expect(page.locator('#final .answer .a')).toHaveText(fsi.jeopardy.final.a);
   await expect(page.locator('#final .answer .why')).toHaveText(fsi.jeopardy.final.why);
@@ -344,4 +354,57 @@ test('Lane 10. Default stays unchanged and group-mode longest FSI choices fit bo
     expect(prefs.group).toBe(true);
   }
   record('fsi-density.json', { sizes });
+});
+
+test('Lane 11. Revision-1 FSI progress stays intact until explicit revision-2 replacement.', async ({ page }) => {
+  const priorKey = 'aiDealJeopardy.v2.fsi.1';
+  await page.goto('/index.html');
+  await page.evaluate(({ key, raw }) => localStorage.setItem(key, raw), { key: priorKey, raw: oldCheckpoint });
+  await page.goto('/jeopardy.html');
+  await expect(page.locator('#saveNotice')).toContainText('another content revision');
+  await expect(page.locator('.team .name')).toHaveText(['Branch team', 'Claims team']);
+  await expect(page.locator('.team .score')).toHaveText(['$0', '$0']);
+  await expect(page.locator('.tile.used')).toHaveCount(0);
+  await openTile(page, 0, 0);
+  await page.keyboard.press('Digit1');
+  await closeTile(page);
+  expect(await stored(page)).toBeNull();
+  expect(await page.evaluate(key => localStorage.getItem(key), priorKey)).toBe(oldCheckpoint);
+  await page.reload();
+  await expect(page.locator('.team .score')).toHaveText(['$0', '$0']);
+  await expect(page.locator('.tile.used')).toHaveCount(0);
+  await capture(page, 'fsi-revision-1-preserved.png');
+  page.once('dialog', dialog => dialog.dismiss());
+  await page.locator('#replaceSave').click();
+  expect(await stored(page)).toBeNull();
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('#replaceSave').click();
+  await expect(page.locator('#replaceSave')).toBeHidden();
+  expect(await stored(page)).toMatchObject({ schema: 2, packId: 'fsi', packRevision: 2, state: { teams: [{ name: 'Branch team', score: 0 }, { name: 'Claims team', score: 0 }], used: [] } });
+  expect(await page.evaluate(key => localStorage.getItem(key), priorKey)).toBe(oldCheckpoint);
+  await page.reload();
+  await expect(page.locator('.team .name')).toHaveText(['Branch team', 'Claims team']);
+  await expect(page.locator('.team .score')).toHaveText(['$0', '$0']);
+  await expect(page.locator('.tile.used')).toHaveCount(0);
+  record('fsi-revision-2-replacement.json', { old: await stored(page, priorKey), current: await stored(page) });
+});
+
+test('Lane 12. Each new opening exposes its authored signal without changing a seller response.', async ({ page }) => {
+  for (const scenario of fsi.roleplay.scenarios) {
+    await startMeeting(page, scenario);
+    const signal = page.locator(`.msg.cust[data-node="${scenario.start}"] .seg[data-sig]`);
+    const [, phrase, type, explanation] = scenario.nodes[scenario.start].c.match(/\[\[([^|]+)\|([^|]+)\|([^\]]+)\]\]/);
+    await expect(signal).toHaveText(phrase);
+    const choices = await page.locator('.choice .txt').allTextContents();
+    await signal.click();
+    await expect(signal).toHaveClass(new RegExp(`found ${type}`));
+    await expect(page.locator('.stags')).toContainText(explanation);
+    await expect(page.locator('#sigFound')).toHaveText('1');
+    await expect(page.locator('#pts')).toHaveText('25pts');
+    await signal.click();
+    await expect(page.locator('#pts')).toHaveText('25pts');
+    expect(await page.locator('.choice .txt').allTextContents()).toEqual(choices);
+    await expect(page.locator('#turnLbl')).toHaveText(`Turn 1 of ${scenario.turns}`);
+    await capture(page, `${scenario.id}-signal.png`);
+  }
 });
