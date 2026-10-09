@@ -130,7 +130,7 @@ Coming Soon plays remain unavailable and do not appear in the new curriculum. Of
 ## Choose content for both activities
 
 1. Open **Settings** from Home.
-2. Choose **Default** or **FSI**.
+2. Choose **Default**, **Financial services**, or **FSI v2**.
 3. Select **Save**.
 4. After the success message, select **Return to Home** and launch either activity.
 
@@ -156,6 +156,8 @@ The lanes use real Settings controls to switch both ways. They check one prefere
 The probe interleaves cold contexts against trunk Home-to-game. It measures Save click to the status DOM update, not the browser's paint. It then measures Return to Home click through activity entry. The activity click bypasses Playwright's hover-animation wait, not the browser's click handler. The status DOM update must stay within 100 ms at p95. The complete entry must stay within 1000 ms and trunk plus 150 ms. Each document route must use at most 10 first-party requests. The report also records the full journey's request count without deduplicating modules. Page-load, decoded-byte, and storage budgets remain unchanged. Compare against CP3 separately to retain the prior activity baseline.
 
 ### Add a future pack
+
+**FSI v2** comes from the supplied `financial-services-pack.json`. It contains six role-play scenarios and six Jeopardy categories with 30 clues plus Final. Only the supplied display label changed. Its ID is `financial-services` and its content revision is `1`; the display name does not change the saved-game revision. It is a separate pack from the existing `fsi` curriculum, so their saved boards stay separate. The source file hash is recorded in `packs/financial-services.mjs`. The supplied claims and offering descriptions have not been independently reviewed against source evidence.
 
 Add one complete `ContentPack` aggregate with both activities. Register it in `shared/training.mjs`, add provenance outside the web root, and extend content and browser tests. Home and Settings derive their choices and previews from `training.listPacks()`. Neither engine needs a new selector or a content-specific branch. Bump the pack revision when existing saved tile positions no longer identify the same content.
 

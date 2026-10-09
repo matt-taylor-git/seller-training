@@ -17,8 +17,8 @@ test('FSI contains two complete activities, revision-2 evidence, and exact-depth
   assert(Object.isFrozen(fsi) && Object.isFrozen(fsi.roleplay.scenarios[1].nodes.pushback));
 });
 
-test('The production registry exposes exactly Default and FSI as complete aggregates.', () => {
-  assert.deepEqual(training.listPacks().map(pack => pack.id), ['default', 'fsi']);
+test('The production registry exposes Default, FSI, and the supplied FSI v2 as complete aggregates.', () => {
+  assert.deepEqual(training.listPacks().map(pack => pack.id), ['default', 'fsi', 'financial-services']);
   let raw = null;
   const store = { getItem: key => key === 'aiTraining.selection.v1' ? raw : null, setItem: (_key, value) => { raw = value; }, key: () => null, length: 0 };
   const service = createTraining({ storage: () => store });

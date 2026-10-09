@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import defaultPack from '../../prototype/seller-ai-training/packs/default.mjs';
 import fsiPack from '../../prototype/seller-ai-training/packs/fsi.mjs';
+import fsiV2Pack from '../../prototype/seller-ai-training/packs/financial-services.mjs';
 
 const evidence = process.env.CP4_EVIDENCE_DIR;
 const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
@@ -89,7 +90,7 @@ test('Lane 1. Fresh Settings shows Default, both scopes, and pack-derived counts
   await expect(page.getByRole('group', { name: 'Content pack' })).toBeVisible();
   await expect(radio(page, 'default')).toBeChecked();
   await expect(page.locator('#saveSelection')).toBeDisabled();
-  for (const pack of [defaultPack, fsiPack]) {
+  for (const pack of [defaultPack, fsiPack, fsiV2Pack]) {
     await expect(page.locator(`#description-${pack.id}`)).toHaveText(pack.description);
     await expect(page.locator(`#counts-${pack.id}`)).toHaveText(`${pack.roleplay.scenarios.length} scenarios · ${pack.jeopardy.categories.length} categories · ${pack.jeopardy.categories.reduce((n, category) => n + category.clues.length, 0)} clues + Final`);
   }

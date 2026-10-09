@@ -1,5 +1,6 @@
 import defaultPack from '../packs/default.mjs';
 import fsiPack from '../packs/fsi.mjs';
+import fsiV2Pack from '../packs/financial-services.mjs';
 import { deepFreeze, validatePack } from './pack-contract.mjs';
 
 /** @typedef {import('./pack-contract.mjs').ContentPack} ContentPack */
@@ -72,7 +73,7 @@ function recoverTeams(value) {
 }
 
 /** @param {{packs?: ContentPack[], storage?: () => Store, events?: EventTarget}} [options] */
-export function createTraining({ packs = [defaultPack, fsiPack], storage = () => globalThis.localStorage, events = globalThis.window } = {}) {
+export function createTraining({ packs = [defaultPack, fsiPack, fsiV2Pack], storage = () => globalThis.localStorage, events = globalThis.window } = {}) {
   /** @type {Map<string, {pack: Readonly<ContentPack>|null, error: string}>} */
   const registry = new Map();
   for (const pack of packs) {
