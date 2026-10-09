@@ -60,7 +60,7 @@ These describe the current prototypes. They do not commit the actual product to 
 
 The prototype calls itself "AI Seller Academy" and uses CDW as the seller identity. The original fictional content now lives in one Default pack shared by both activities. The change preserves customers, branches, choices, scores, and signals. Exactly 5 Jeopardy strings replace the original seller placeholder with CDW.
 
-Default shows this notice. "Fictional training scenarios. Default's illustrative offers are not a verified CDW catalog." The prototype retains its existing browser saves and game rules. FSI now supplies a second complete pack for both activities. No Settings screen exists yet. Browser test setup selects it for verification.
+Default shows this notice. "Fictional training scenarios. Default's illustrative offers are not a verified CDW catalog." The prototype retains its existing browser saves and game rules. FSI supplies a second complete pack for both activities. Settings saves one browser-local choice for both games. Home previews reflect that choice. Open games retain their current pack until the trainer deliberately reopens them.
 
 Customer personas, company names, financial figures, and service claims in the scenarios are training examples. Do not treat them as customer evidence or confirmed facts about the actual offerings. No real testimonials, measured training results, or approved offering catalog have been supplied.
 
@@ -73,6 +73,14 @@ The content teaches governed data, human review, stakeholder discovery, platform
 `content-authoring/fsi-provenance.json` covers 35 items with 56 material claims. It cites the supplied compilation dated 2026-10-07. It does not independently verify the linked reports or current offering pages. The task reports independent review of the draft with PASS and 2 minor notes. The integrated pack addresses both notes and still needs parent review at its final head.
 
 All FSI customers, dialogue, customer metrics, and outcomes are invented. Coming Soon offerings remain unavailable. The source is internal and stays outside the repository. Provenance stays outside the web root. Distribution requires a separate approved audience and hosting decision.
+
+### Shared Settings
+
+Trainers choose Default or FSI once, then launch either activity from Home. Radio changes are drafts until Save succeeds. Native radio controls, visible keyboard focus, and a polite status message support keyboard use.
+
+Games open Settings in a separate tab. Switching the saved choice never interrupts an active meeting, clue, or Final stage. A deliberate relaunch asks before losing an unfinished meeting or Jeopardy stage. Jeopardy restores only the selected pack's compatible board. Reset and Replay stay on the current pack.
+
+Settings and saves remain local to one browser profile and origin. Role-play meetings, open clues, Final stages, and undo history do not persist. Same-pack Jeopardy tabs remain last-write-wins. This feature adds no accounts, backend, live AI calls, uploads, cross-device settings, or hosting approval.
 
 ## Product Principles
 

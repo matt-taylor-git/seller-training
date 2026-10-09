@@ -1,6 +1,6 @@
 ---
 name: CDW-inspired dark mode
-description: Restrained, high-contrast styling for the desktop customer role-playing page.
+description: Restrained, high-contrast styling for desktop customer role playing and Settings.
 colors:
   primary: "#cc0000"
   action-ink: "#ffffff"
@@ -147,7 +147,7 @@ components:
 
 **Design direction: "CDW-inspired dark mode"**
 
-This design applies to `prototype/seller-ai-training/roleplay.html`. It is a CDW-inspired treatment, not an official CDW brand standard. Do not apply it to Jeopardy or the launcher without a separate request. Their existing designs remain independent.
+This design applies to `prototype/seller-ai-training/roleplay.html` and the standalone `settings.html` screen. It is a CDW-inspired treatment, not an official CDW brand standard. Jeopardy and Home keep their independent designs. Their new navigation uses their existing controls.
 
 The interface is restrained, high-contrast, and task-focused. Cool near-black backgrounds support white text and red primary actions. The layout serves desktop trainer-led sessions and screen sharing. Mobile use is out of scope.
 
@@ -301,13 +301,23 @@ New messages enter over 250ms with `cubic-bezier(.16, 1, .3, 1)`. Other existing
 
 Honor `prefers-reduced-motion`: disable animations, transitions, and smooth scrolling, and hide floating score effects. Preserve themed selection, visible keyboard focus, thin scrollbars, and tabular numbers.
 
-No text-input component exists in this prototype. Do not invent input styling or new form workflows when maintaining this record.
+Settings adds native radio inputs, not a text-input component. Other form workflows remain outside this design change.
+
+## Settings
+
+Settings is a desktop task screen. It uses the same dark canvas, flat panels, Inter/system font stack, red Save button, and bright focus outline as role playing. It does not introduce a framework or a new visual identity.
+
+A centered column has a 760px maximum width and 24px side padding. The header pairs seller identity with Home navigation. A 30px heading introduces one labeled radio group. Each option contains the pack's name, description, and derived activity counts. The selected option combines the native radio mark, red boundary, and tinted background. Selection never relies on color alone.
+
+Save and Cancel follow the choices. A polite status message reports unsaved drafts, success, external changes, and errors. Return to Home remains a separate navigation link. The pack's disclaimer follows the controls. The page scrolls vertically at 200 percent CSS zoom, with no fixed action bar or clipped controls. This check does not verify browser zoom. It adds no motion, and it respects reduced-motion preferences.
+
+Home previews use the selected pack without changing the launcher layout. Game links open Settings in a new tab. The changed-selection action appears beside the pinned-pack notice. Jeopardy also exposes it within clues and Final, so a trainer does not need to close a stage just to open Settings.
 
 ## Do's and Don'ts
 
 ### Do
 
-- Do keep this design scoped to the customer role-playing page.
+- Do keep this design scoped to customer role playing and Settings.
 - Do preserve desktop-only use and the existing training journey.
 - Do use solid red for primary actions and brighter red for focus and small accent text.
 - Do retain explicit coaching labels and signed score changes alongside color.

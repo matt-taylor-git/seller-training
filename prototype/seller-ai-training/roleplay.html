@@ -281,6 +281,7 @@ body.group{--fs:1.06}
   .float{display:none}
 }
 @media print{body{overflow:visible}.bar,.debactions{display:none}#app{height:auto}.screen{height:auto}.deb{overflow:visible}}
+[hidden]{display:none!important}
 </style>
 </head>
 <body class="spot">
@@ -291,6 +292,7 @@ body.group{--fs:1.06}
       <div><small><span class="brandInline">CDW</span> &middot; Seller Academy</small><b>Customer Role-Play Simulator</b></div>
     </a>
     <div class="tools">
+      <a class="tg" href="settings.html" target="_blank" rel="noopener" title="Settings opens in a new tab" style="text-decoration:none;color:inherit">Settings</a>
       <button class="tg playonly on" id="tSpot" title="Click customer lines to flag hidden signals (S)"><span class="sw"></span>Signal spotter</button>
       <button class="tg gold playonly" id="tIdeal" title="Show the ideal answer (I)"><span class="sw"></span>Show ideal path</button>
       <button class="tg" id="tGroup" title="Room votes, presenter locks in the answer (G)"><span class="sw"></span>Group mode</button>
@@ -302,6 +304,7 @@ body.group{--fs:1.06}
 
   <div style="padding:4px 24px;color:var(--muted);font-size:12px;line-height:1.5">
     <p id="selectionNotice" role="status"></p>
+    <button class="tg" id="openSelected" hidden>Open selected pack</button>
     <p id="saveNotice" role="status"></p>
   </div>
 
@@ -380,6 +383,7 @@ catch (error) { document.getElementById("saveNotice").textContent = error.messag
 const { pack } = pageState;
 training.observeSelection(selection => {
   document.getElementById("selectionNotice").textContent = pageState.selectionNotice(selection);
+  document.getElementById("openSelected").hidden = !selection.valid || selection.packId === pack.id;
 });
 document.getElementById("packNotice").textContent = pack.disclaimer;
 const SCENARIOS = pack.roleplay.scenarios;
@@ -393,6 +397,15 @@ const restoredPreferences = pageState.readPreferences();
 let prefs = restoredPreferences.prefs;
 $("saveNotice").textContent = restoredPreferences.message;
 let R = null;
+$('openSelected').onclick = () => {
+  if (R && R.phase !== 'done' && !confirm('Leave this unfinished meeting? Your conversation and scores will be lost. Open selected pack?')) return;
+  setTimeout(() => {
+    const selected = training.readSelection();
+    $('selectionNotice').textContent = pageState.selectionNotice(selected);
+    $('openSelected').hidden = !selected.valid || selected.packId === pack.id;
+    if (selected.valid && selected.packId !== pack.id) location.reload();
+  }, 0);
+};
 
 document.querySelectorAll(".brandInline").forEach(e => e.textContent = BRAND_NAME);
 document.title = "Customer Role-Play Simulator · " + BRAND_NAME;
@@ -575,6 +588,7 @@ function choose(pos, viaVote){
       <div class="fbactions"><button class="cta" id="next">${c.next === "end" ? "See your debrief" : "Continue"} &rarr; <kbd>Enter</kbd></button></div>
     </div>`;
   $("next").onclick = next;
+  $("next").focus({ preventScroll: true });
   th.style.scrollBehavior = "auto"; th.scrollTop = th.scrollHeight; th.style.scrollBehavior = "";
   floatPts($("pts"), "+" + q.pts, q.col);
   renderSide();
@@ -674,9 +688,14 @@ $("bHelp").onclick = () => $("help").classList.add("show");
 $("helpClose").onclick = () => $("help").classList.remove("show");
 $("help").onclick = e => { if (e.target.id === "help") $("help").classList.remove("show"); };
 document.addEventListener("keydown", e => {
-  if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (e.target.closest('input, textarea, select, [contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return;
   const k = e.key.toLowerCase();
-  if ($("help").classList.contains("show")) { if (k === "escape" || k === "enter" || k === "?") { e.preventDefault(); $("help").classList.remove("show"); } return; }
+  if ($("help").classList.contains("show")) {
+    if (k === "escape" || k === "enter" || k === "?") { e.preventDefault(); $("help").classList.remove("show"); }
+    else if (k === " " && !e.target.closest('#help')) e.preventDefault();
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('a, button')) return;
   if (k === "?") { $("help").classList.add("show"); return; }
   if (k === "g") { toggle("group", "Group mode"); if (R && R.phase === "choose") fitThread(); return; }
   if ($("sBrief").classList.contains("show")) { if (k === "enter" && briefId) { e.preventDefault(); startScenario(briefId); } if (k === "escape") show("sPick"); return; }

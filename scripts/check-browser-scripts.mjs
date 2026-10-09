@@ -12,7 +12,7 @@ const eslint = new ESLint({
   }]
 });
 let errors = 0;
-for (const name of ['index', 'roleplay', 'jeopardy']) {
+for (const name of ['index', 'roleplay', 'jeopardy', 'settings']) {
   const source = readFileSync(new URL(`../prototype/seller-ai-training/${name}.html`, import.meta.url), 'utf8');
   for (const [index, match] of [...source.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)].entries()) {
     const module = /type="module"/.test(match[1]);
